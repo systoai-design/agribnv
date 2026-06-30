@@ -29,6 +29,7 @@ import {
   SAFETY_FEATURES_OPTIONS,
 } from '@/types/database';
 import { ImageUploader, UploadedImage } from '@/components/properties/ImageUploader';
+import { ExperienceManager } from '@/components/properties/ExperienceManager';
 import { 
   Loader2, ArrowLeft, MapPin, Bed, Bath, Users, DollarSign, Camera, 
   Clock, Shield, FileText, AlertTriangle, Settings, MapPinned, Check 
@@ -273,11 +274,12 @@ export default function EditProperty() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="photos">Photos</TabsTrigger>
               <TabsTrigger value="rules">House Rules</TabsTrigger>
               <TabsTrigger value="policies">Policies</TabsTrigger>
+              <TabsTrigger value="experiences">Experiences</TabsTrigger>
             </TabsList>
 
             {/* Basic Info Tab */}
@@ -559,6 +561,18 @@ export default function EditProperty() {
                       </div>
                     ))}
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            {/* Experiences Tab */}
+            <TabsContent value="experiences">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Farm Experiences</CardTitle>
+                  <CardDescription>Manage add-on activities guests can book during their stay.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {property && <ExperienceManager propertyId={property.id} />}
                 </CardContent>
               </Card>
             </TabsContent>

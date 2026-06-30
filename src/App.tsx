@@ -1,11 +1,13 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
-import Index from "./pages/Index";
+import LandingPage from "./pages/LandingPage";
+import Explore from "./pages/Explore";
 import Auth from "./pages/Auth";
 import PropertyDetails from "./pages/PropertyDetails";
 import Bookings from "./pages/Bookings";
@@ -23,6 +25,11 @@ import Privacy from "./pages/Privacy";
 import ChangePassword from "./pages/ChangePassword";
 import NotFound from "./pages/NotFound";
 
+function PushSetup() {
+  usePushNotifications();
+  return null;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -33,8 +40,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <NotificationsProvider>
+            <PushSetup />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/explore" element={<Explore />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/properties/:id" element={<PropertyDetails />} />
               <Route path="/bookings" element={<Bookings />} />

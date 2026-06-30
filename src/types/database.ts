@@ -159,6 +159,23 @@ export interface Wishlist {
   created_at: string;
 }
 
+export interface Review {
+  id: string;
+  property_id: string;
+  reviewer_id: string;
+  booking_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  reviewer?: { full_name: string | null; avatar_url: string | null };
+}
+
+export interface PropertyRating {
+  property_id: string;
+  average_rating: number;
+  review_count: number;
+}
+
 // Category display helpers
 export const CATEGORY_LABELS: Record<PropertyCategory, string> = {
   farmstay: 'Farmstay',

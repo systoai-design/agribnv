@@ -7,10 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Booking, BOOKING_STATUS_LABELS } from '@/types/database';
-import { Calendar, MapPin, Users, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Loader2, Star } from 'lucide-react';
+import { SubmitReviewForm } from '@/components/reviews/SubmitReviewForm';
+import { useCanReview } from '@/hooks/useReviews';
 
 export default function Bookings() {
   const { user } = useAuth();
@@ -106,7 +109,9 @@ export default function Bookings() {
 
 function BookingCard({ booking, getStatusColor }: { booking: Booking; getStatusColor: (status: Booking['status']) => string }) {
   const primaryImage = booking.property?.images?.find(img => img.is_primary) || booking.property?.images?.[0];
-  
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const { canReview } = useCanReview(booking.status === 'completed' ? booking.id : null);
+
   return (
     <Card className="overflow-hidden">
       <div className="flex flex-col md:flex-row">
@@ -145,9 +150,31 @@ function BookingCard({ booking, getStatusColor }: { booking: Booking; getStatusC
                 </span>
               </div>
             </div>
-            <div className="text-right">
-              <p className="font-display font-bold text-xl">₱{booking.total_price.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Total</p>
+            <div className="text-right space-y-2">
+              <div>
+                <p className="font-display font-bold text-xl">₱{booking.total_price.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Total</p>
+              </div>
+              {booking.status === 'completed' && canReview && (
+                <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Star className="h-3.5 w-3.5" />
+                      Leave a review
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Review your stay</DialogTitle>
+                    </DialogHeader>
+                    <SubmitReviewForm
+                      propertyId={booking.property_id}
+                      bookingId={booking.id}
+                      onSuccess={() => setReviewOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </div>
         </CardContent>

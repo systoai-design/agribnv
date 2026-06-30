@@ -13,11 +13,13 @@ interface PropertyCardProps {
   className?: string;
   index?: number;
   variant?: 'default' | 'overlay';
+  averageRating?: number;
+  reviewCount?: number;
 }
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop';
 
-export function PropertyCard({ property, className, index = 0, variant = 'overlay' }: PropertyCardProps) {
+export function PropertyCard({ property, className, index = 0, variant = 'overlay', averageRating, reviewCount }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
@@ -198,7 +200,10 @@ export function PropertyCard({ property, className, index = 0, variant = 'overla
               </span>
               <div className="flex items-center gap-0.5 shrink-0">
                 <span className="text-amber-500 text-xs">★</span>
-                <span className="text-xs text-muted-foreground">{getRating()}</span>
+                <span className="text-xs text-muted-foreground">
+                  {averageRating != null ? averageRating.toFixed(1) : getRating()}
+                  {reviewCount != null && reviewCount > 0 ? ` (${reviewCount})` : ''}
+                </span>
               </div>
             </div>
           </div>

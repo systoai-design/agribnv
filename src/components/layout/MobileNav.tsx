@@ -13,7 +13,7 @@ export function MobileNav() {
 
   // Different navigation for hosts vs guests based on viewMode
   const guestNavItems = [
-    { href: '/', label: 'Explore', icon: Compass, isCenter: false },
+    { href: '/explore', label: 'Explore', icon: Compass, isCenter: false },
     { href: '/wishlists', label: 'Wishlist', icon: Bookmark, isCenter: false },
     { href: '/', label: 'Home', icon: Home, isCenter: true },
     { href: '/inbox', label: 'Inbox', icon: Mail, isCenter: false },

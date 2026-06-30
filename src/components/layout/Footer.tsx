@@ -176,7 +176,7 @@ export function Footer() {
             {visibleDestinations.map((dest, index) => (
               <Link
                 key={`${dest.name}-${index}`}
-                to={`/?location=${encodeURIComponent(dest.name)}`}
+                to={`/explore?location=${encodeURIComponent(dest.name)}`}
                 className="group"
               >
                 <p className="text-sm font-medium text-foreground group-hover:underline">

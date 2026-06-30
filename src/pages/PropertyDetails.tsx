@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { PhotoGalleryModal } from '@/components/properties/PhotoGalleryModal';
 import { FarmExperiences } from '@/components/properties/FarmExperiences';
+import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AmenitiesModal } from '@/components/properties/AmenitiesModal';
 import PropertyMap from '@/components/map/PropertyMap';
 import { Layout } from '@/components/layout/Layout';
@@ -471,10 +472,10 @@ export default function PropertyDetails() {
           }}
         />
 
-        {/* Reviews section - placeholder for future real reviews */}
+        {/* Reviews section */}
         <div className="py-4">
-          <h3 className="font-semibold mb-2">Reviews</h3>
-          <p className="text-sm text-muted-foreground">No reviews yet. Be the first to leave a review after your stay!</p>
+          <h3 className="font-semibold mb-4">Reviews</h3>
+          <ReviewsSection propertyId={id!} />
         </div>
       </div>
 
@@ -743,7 +744,7 @@ export default function PropertyDetails() {
               </Button>
             </motion.div>
 
-            {/* Reviews - placeholder for future implementation */}
+            {/* Reviews */}
             <Separator />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -751,10 +752,8 @@ export default function PropertyDetails() {
               transition={{ delay: 0.7 }}
               className="py-8"
             >
-              <h3 className="text-xl font-semibold mb-4">Reviews</h3>
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No reviews yet. Be the first guest to review this property!</p>
-              </div>
+              <h3 className="text-xl font-semibold mb-6">Reviews</h3>
+              <ReviewsSection propertyId={id!} />
             </motion.div>
 
             {/* Map Section */}

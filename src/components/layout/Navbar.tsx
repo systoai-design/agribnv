@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { SearchBar } from '@/components/search/SearchBar';
 import { cn } from '@/lib/utils';
 import agribnvLogo from '@/assets/agribnv-logo.png';
@@ -57,7 +58,7 @@ export function Navbar({
   showSearch = true,
 }: NavbarProps) {
   const { user, profile, isHost, viewMode, switchViewMode, signOut } = useAuth();
-  const { unreadMessageCount } = useNotifications();
+  const { unreadMessageCount, bookingNotifications, bookingUnreadCount, markNotificationRead, markAllNotificationsRead } = useNotifications();
   const navigate = useNavigate();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
@@ -119,6 +120,17 @@ export function Navbar({
               >
                 {viewMode === 'host' ? 'Switch to traveling' : 'Switch to hosting'}
               </Button>
+            )}
+
+            {user && (
+              <div className="hidden md:flex">
+                <NotificationBell
+                  notifications={bookingNotifications}
+                  unreadCount={bookingUnreadCount}
+                  onMarkAsRead={markNotificationRead}
+                  onMarkAllAsRead={markAllNotificationsRead}
+                />
+              </div>
             )}
 
             {user && (

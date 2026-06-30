@@ -13,6 +13,7 @@ import { useNotifications } from '@/contexts/NotificationsContext';
 import { useToast } from '@/hooks/use-toast';
 import { Property, Booking, CATEGORY_LABELS, CATEGORY_ICONS, BOOKING_STATUS_LABELS } from '@/types/database';
 import { Plus, Home, Calendar, Users, MapPin, Eye, Edit, ToggleLeft, ToggleRight, Loader2, TrendingUp, DollarSign, Building2, Mail } from 'lucide-react';
+import { AnalyticsDashboard } from '@/components/host/AnalyticsDashboard';
 
 export default function HostDashboard() {
   const { user, isHost, becomeHost } = useAuth();
@@ -239,6 +240,7 @@ export default function HostDashboard() {
           <TabsList className="bg-muted">
             <TabsTrigger value="properties">Properties ({properties.length})</TabsTrigger>
             <TabsTrigger value="bookings">Bookings ({bookings.length})</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="properties">
@@ -280,6 +282,9 @@ export default function HostDashboard() {
                 ))}
               </div>
             )}
+          </TabsContent>
+          <TabsContent value="analytics">
+            <AnalyticsDashboard properties={properties} bookings={bookings} />
           </TabsContent>
         </Tabs>
       </div>
