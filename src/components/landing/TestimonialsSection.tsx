@@ -49,7 +49,7 @@ const TESTIMONIALS: Testimonial[] = [
     id: 't4',
     type: 'traveler',
     quote:
-      'Seamless booking, a host who actually replied, and the most genuine trip I have taken. This is exactly what Philippine tourism needs.',
+      'Seamless booking, a host who actually replied, and the most genuine trip I have taken. Already planning the next one.',
     name: 'James T.',
     role: 'Traveler · Booked 4 times',
     photoId: 'photo-1507003211169-0a1dd7228f2d',
@@ -113,7 +113,7 @@ export function TestimonialsSection() {
       aria-labelledby="testimonials-heading"
       style={{
         background:
-          'linear-gradient(180deg, #ffffff 0%, #ffffff 52%, hsl(var(--cream)) 66%, hsl(var(--forest-light)) 88%, hsl(var(--forest-dark)) 100%)',
+          'linear-gradient(180deg, #ffffff 0%, #ffffff 80%, hsl(var(--cream)) 100%)',
       }}
     >
       <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-36 pb-40 md:pb-52">
@@ -131,9 +131,9 @@ export function TestimonialsSection() {
                 id="testimonials-heading"
                 className="font-serif text-5xl md:text-6xl font-bold leading-[1.05] text-gray-900"
               >
-                From our
+                Loved by
                 <br />
-                <span style={{ color: 'hsl(var(--forest))' }}>community.</span>
+                <span style={{ color: 'hsl(var(--forest))' }}>hosts &amp; travelers.</span>
               </h2>
               <p className="text-gray-500 text-lg leading-relaxed mt-6 max-w-md">
                 The hosts who open their farms and the travelers who visit them — in their own words.

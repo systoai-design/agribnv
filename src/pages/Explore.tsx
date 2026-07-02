@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Search, ArrowRight, SlidersHorizontal, Map } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Layout } from '@/components/layout/Layout';
 import { PropertyGrid } from '@/components/properties/PropertyGrid';
@@ -24,8 +24,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { Property, ListingType, FarmstaySubcategory, GUIMARAS_MUNICIPALITIES } from '@/types/database';
 
+// URL params are untrusted input: a malformed value like ?checkin=foo would become an Invalid Date
+// that crashes date-fns formatters downstream. Return undefined for anything that isn't a real date.
+function parseParamDate(value: string | null): Date | undefined {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 export default function Explore() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
   const [selectedListingType, setSelectedListingType] = useState<ListingType>('farm_stay');
   const [selectedCategories, setSelectedCategories] = useState<FarmstaySubcategory[]>([]);
@@ -60,6 +69,30 @@ export default function Explore() {
   useEffect(() => {
     updateSubcategories(selectedCategories);
   }, [selectedCategories, updateSubcategories]);
+
+  // Apply an incoming search from the landing hero or Footer destination links. These arrive as
+  // URL params, so a cold visit — or an in-app navigation to a different /explore query while the
+  // page is already mounted — lands on filtered results. Re-runs whenever the query string changes.
+  useEffect(() => {
+    const loc = searchParams.get('location')?.trim() ?? '';
+    const guestsRaw = parseInt(searchParams.get('guests') ?? '', 10);
+    const checkIn = parseParamDate(searchParams.get('checkin'));
+    const checkOut = parseParamDate(searchParams.get('checkout'));
+
+    if (loc) {
+      setSearchLocation(loc);
+      updateSearch(loc);
+    }
+    if (!Number.isNaN(guestsRaw) && guestsRaw > 1) {
+      setSearchGuestCount(guestsRaw);
+      setGuestCount(guestsRaw);
+      updateGuests(guestsRaw);
+    }
+    if (checkIn || checkOut) {
+      setSearchDateRange({ from: checkIn, to: checkOut });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Sync price range on sheet close
   const applyFilters = () => {

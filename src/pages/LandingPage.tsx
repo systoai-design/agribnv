@@ -2,7 +2,6 @@ import { Layout } from '@/components/layout/Layout';
 import { Footer } from '@/components/layout/Footer';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';
-import { ImpactStatsSection } from '@/components/landing/ImpactStatsSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { FeaturedFarmsSection } from '@/components/landing/FeaturedFarmsSection';
 import { PhilosophySection } from '@/components/landing/PhilosophySection';
@@ -14,9 +13,9 @@ export default function LandingPage() {
     <Layout hideNav={true}>
       <LandingNav />
       <HeroSection />
-      <ImpactStatsSection />
-      <HowItWorksSection />
+      {/* Destinations first — hook the visitor with what they can book. */}
       <FeaturedFarmsSection />
+      <HowItWorksSection />
       <PhilosophySection />
       <TestimonialsSection />
       <CTASection />

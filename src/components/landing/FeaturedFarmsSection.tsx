@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +8,8 @@ import { Property } from '@/types/database';
 
 const GAP = 16;
 const SWIPE_THRESHOLD = 45;
-const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)'; // symmetric ease-in-out — buttery, no expo hard-stop
+const DURATION = 560;
 const COPIES = 3; // [before | real | after] — enough to keep both sides filled while looping.
 
 // Active slide expands; the rest stay shrunk. Widths scale with the viewport.
@@ -32,6 +33,15 @@ export function FeaturedFarmsSection() {
   const [active, setActive] = useState(0);
   const [containerW, setContainerW] = useState(0);
   const [transitionOn, setTransitionOn] = useState(false);
+  const reduce = useReducedMotion();
+  // Gate only the timing, never the width/position values, or the carousel stops working.
+  const slide = (prop: 'transform' | 'width') => {
+    if (!transitionOn) return 'none';
+    // Under reduced motion keep an instant transform transition so the loop-rebase
+    // transitionend still fires (the infinite carousel depends on that event); width can skip.
+    if (reduce) return prop === 'transform' ? 'transform 1ms linear' : 'none';
+    return `${prop} ${DURATION}ms ${EASE}`;
+  };
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
@@ -158,7 +168,7 @@ export function FeaturedFarmsSection() {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="h-[420px] md:h-[460px] rounded-[22px] bg-gray-200/60 animate-pulse shrink-0"
+                  className="h-[300px] sm:h-[380px] lg:h-[440px] rounded-[22px] bg-gray-200/60 animate-pulse shrink-0"
                   style={{ width: i === 0 ? '56%' : '20%' }}
                 />
               ))}
@@ -169,7 +179,7 @@ export function FeaturedFarmsSection() {
               style={{
                 gap: GAP,
                 transform: `translate3d(-${trackOffset}px, 0, 0)`,
-                transition: transitionOn ? `transform 600ms ${EASE}` : 'none',
+                transition: slide('transform'),
               }}
               onTransitionEnd={onTrackTransitionEnd}
             >
@@ -178,10 +188,10 @@ export function FeaturedFarmsSection() {
                 return (
                   <div
                     key={i}
-                    className={`shrink-0 h-[420px] md:h-[460px] ${isActive ? '' : 'cursor-pointer'}`}
+                    className={`shrink-0 h-[300px] sm:h-[380px] lg:h-[440px] ${isActive ? '' : 'cursor-pointer'}`}
                     style={{
                       width: containerW === 0 ? undefined : isActive ? activeW : inactiveW,
-                      transition: transitionOn ? `width 600ms ${EASE}` : 'none',
+                      transition: slide('width'),
                     }}
                     onClickCapture={(e) => {
                       // A peeking card focuses itself instead of navigating to a half-hidden farm.
@@ -239,7 +249,7 @@ export function FeaturedFarmsSection() {
                 style={{
                   width: `${progressPct}%`,
                   backgroundColor: 'hsl(var(--forest))',
-                  transition: `width 600ms ${EASE}`,
+                  transition: reduce ? 'none' : `width ${DURATION}ms ${EASE}`,
                 }}
               />
             </div>

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import agribnvLogo from '@/assets/agribnv-logo.png';
+import agribnvLogo from '@/assets/agribnv-logo-white.png';
 
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -27,7 +27,7 @@ export function LandingNav() {
       <div className="max-w-7xl mx-auto px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group justify-self-start">
-          <img src={agribnvLogo} alt="Agribnv" className="h-9 w-auto brightness-0 invert" />
+          <img src={agribnvLogo} alt="Agribnv" className="h-9 w-auto" />
         </Link>
 
         {/* Center nav pill — true page center */}
@@ -38,7 +38,7 @@ export function LandingNav() {
           <Link to="/about" className="px-4 py-1.5 rounded-full text-white/85 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors">
             Our Mission
           </Link>
-          <Link to="/host" className="px-4 py-1.5 rounded-full text-white/85 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors">
+          <Link to="/auth?mode=signup&role=host" className="px-4 py-1.5 rounded-full text-white/85 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors">
             Become a Host
           </Link>
         </nav>
@@ -57,7 +57,7 @@ export function LandingNav() {
               <>
                 <Button
                   variant="ghost"
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/auth?mode=signup')}
                   className="text-white hover:text-white hover:bg-white/10 font-medium text-sm h-9"
                 >
                   Sign in
@@ -92,9 +92,9 @@ export function LandingNav() {
         >
           <Link to="/explore" className="block text-white/80 hover:text-white py-2 text-sm font-medium" onClick={() => setMenuOpen(false)}>Explore Farms</Link>
           <Link to="/about" className="block text-white/80 hover:text-white py-2 text-sm font-medium" onClick={() => setMenuOpen(false)}>Our Mission</Link>
-          <Link to="/host" className="block text-white/80 hover:text-white py-2 text-sm font-medium" onClick={() => setMenuOpen(false)}>Become a Host</Link>
+          <Link to="/auth?mode=signup&role=host" className="block text-white/80 hover:text-white py-2 text-sm font-medium" onClick={() => setMenuOpen(false)}>Become a Host</Link>
           <div className="pt-2 flex gap-3">
-            <Button variant="outline" onClick={() => { navigate('/auth'); setMenuOpen(false); }} className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent text-sm h-9">Sign in</Button>
+            <Button variant="outline" onClick={() => { navigate('/auth?mode=signup'); setMenuOpen(false); }} className="flex-1 border-white/30 text-white hover:bg-white/10 bg-transparent text-sm h-9">Sign in</Button>
             <Button onClick={() => { navigate('/auth?mode=signup'); setMenuOpen(false); }} className="flex-1 bg-white text-primary hover:bg-white/90 text-sm h-9">Get started</Button>
           </div>
         </motion.div>

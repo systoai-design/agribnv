@@ -5,25 +5,16 @@ import { Button } from '@/components/ui/button';
 
 export function CTASection() {
   return (
-    <section className="relative py-32 md:py-40 overflow-hidden" style={{ backgroundColor: 'hsl(var(--forest-dark))' }}>
-      {/* Refined background — minimal, elegant */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Subtle gradient backdrop */}
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            background: 'radial-gradient(ellipse 100% 80% at 50% 0%, hsl(var(--forest)), hsl(var(--forest-dark)))',
-          }}
-        />
-        {/* Grain texture */}
-        <div
-          className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            backgroundSize: '200px 200px',
-          }}
-        />
-      </div>
+    <section
+      className="relative py-32 md:py-40 overflow-hidden"
+      aria-labelledby="cta-heading"
+      style={{
+        // Cream at the top hands off seamlessly from the testimonials; it deepens into a soft
+        // sage toward the bottom so there's a clear color break against the cream footer below.
+        background:
+          'linear-gradient(180deg, hsl(var(--cream)) 0%, hsl(var(--cream)) 32%, hsl(var(--sage) / 0.6) 100%)',
+      }}
+    >
 
       <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
         {/* Eyebrow */}
@@ -32,35 +23,36 @@ export function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="font-medium text-xs tracking-widest uppercase mb-5"
-          style={{ color: 'hsl(var(--sage) / 0.7)' }}
+          className="text-primary font-medium text-xs tracking-widest uppercase mb-5"
         >
           Ready to explore
         </motion.p>
 
-        {/* Headline — premium serif, scale and contrast */}
+        {/* Headline */}
         <motion.h2
+          id="cta-heading"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-serif text-5xl md:text-7xl font-bold text-white leading-[1.1] mb-7"
+          className="font-serif text-5xl md:text-7xl font-bold text-gray-900 leading-[1.1] mb-7"
         >
-          Your next adventure is growing in a field.
+          Your next adventure is{' '}
+          <span style={{ color: 'hsl(var(--forest))' }}>growing in a field.</span>
         </motion.h2>
 
-        {/* Subheadline — refined, breathed */}
+        {/* Subheadline */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto mb-12"
+          className="text-gray-600 text-lg leading-relaxed max-w-xl mx-auto mb-12"
         >
-          Whether you're seeking authentic farm experiences or opening your land to the world, Agribnv connects Filipino agriculture with curious travelers.
+          Whether you're booking an unforgettable farm stay or turning your land into year-round income, Agribnv makes it happen in a few taps.
         </motion.p>
 
-        {/* CTAs — refined button treatment */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -71,7 +63,7 @@ export function CTASection() {
           <Button
             asChild
             size="lg"
-            className="bg-white text-primary hover:bg-white/90 font-bold rounded-full px-8 h-12 text-base shadow-lg hover:shadow-xl transition-shadow group"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-full px-8 h-12 text-base shadow-lg hover:shadow-xl transition-shadow group"
           >
             <Link to="/explore">
               Explore farms
@@ -81,9 +73,10 @@ export function CTASection() {
           <Button
             asChild
             size="lg"
-            className="border-white/40 text-white hover:bg-white/5 hover:border-white/60 bg-transparent font-semibold rounded-full px-8 h-12 text-base transition-all"
+            variant="outline"
+            className="border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 bg-transparent font-semibold rounded-full px-8 h-12 text-base transition-all"
           >
-            <Link to="/host">
+            <Link to="/auth?mode=signup&role=host">
               <Home className="mr-2 h-4 w-4" />
               List your farm
             </Link>

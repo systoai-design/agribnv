@@ -1,27 +1,27 @@
 import { motion } from 'framer-motion';
-import { Wheat, Heart, Globe } from 'lucide-react';
+import { Tent, Sprout, ShieldCheck } from 'lucide-react';
 
 const PILLARS = [
   {
-    icon: Wheat,
-    title: 'Farmer-first economics',
-    body: 'Unlike booking platforms that skim up to 30%, Agribnv charges 15% — the rest stays with the farmer. When you book a ₱2,500/night stay, ₱2,125 goes directly to a Filipino farming family.',
+    icon: Tent,
+    title: 'For travelers',
+    body: 'Browse farm stays and hands-on experiences no resort can offer — harvest at sunrise, cook with your host, and sleep where your food is grown.',
   },
   {
-    icon: Heart,
-    title: 'Authentic connections',
-    body: 'Skip the resort. Sleep in a nipa hut, harvest mangoes at sunrise, and share a meal cooked from the farm\'s own produce. The farmer is your host, guide, and neighbor.',
+    icon: Sprout,
+    title: 'For hosts',
+    body: 'List your farm in minutes, set your own prices, and earn all year — not just at harvest. You keep the majority of every booking.',
   },
   {
-    icon: Globe,
-    title: 'A ripple through the economy',
-    body: 'Every peso spent at an Agribnv farm circulates through the local barangay — funding education, infrastructure, and the next generation of Filipino farmers.',
+    icon: ShieldCheck,
+    title: 'Booked with confidence',
+    body: 'Verified listings, secure GCash and Maya payments, and real guest reviews mean every trip is protected from search to checkout.',
   },
 ];
 
 export function PhilosophySection() {
   return (
-    <section className="py-24 md:py-36 overflow-hidden relative" style={{ backgroundColor: 'hsl(var(--forest-dark))' }}>
+    <section className="py-24 md:py-36 overflow-hidden relative bg-[#156530]">
       {/* Grain overlay */}
       <div
         className="absolute inset-0 opacity-10 pointer-events-none"
@@ -38,17 +38,25 @@ export function PhilosophySection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9 }}
-          className="mb-20 md:mb-28"
+          className="mb-10 md:mb-12 text-center"
         >
-          <p className="font-medium text-sm tracking-widest uppercase mb-6" style={{ color: 'hsl(var(--sage) / 0.6)' }}>Our philosophy</p>
-          <blockquote className="font-serif text-3xl md:text-5xl lg:text-6xl text-white font-bold leading-[1.1] max-w-4xl">
-            "Every booking plants a seed in the Philippine economy."
-          </blockquote>
-          <div className="mt-8 flex items-center gap-4">
-            <div className="w-12 h-px" style={{ backgroundColor: 'hsl(var(--sage) / 0.4)' }} />
-            <p className="text-white/40 text-sm">The Agribnv founding principle</p>
-          </div>
+          <p className="font-poppins font-medium text-sm tracking-widest uppercase mb-6" style={{ color: 'hsl(var(--sage) / 0.7)' }}>For hosts &amp; travelers</p>
+          <h2 className="font-roca text-3xl md:text-5xl lg:text-6xl text-white font-bold leading-[1.1] max-w-4xl mx-auto">
+            Stay on a farm.
+            <br />
+            <span className="text-[#B0D182]">Or share yours.</span>
+          </h2>
+          <p className="mt-8 font-poppins text-[#FEF9F0] text-sm max-w-md mx-auto">The Philippines' marketplace for farm stays and hands-on rural experiences.</p>
         </motion.div>
+
+        {/* Single divider line, drawn just above the three columns */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="h-px w-full origin-center bg-[#B0D182]/30 mb-10 md:mb-12"
+        />
 
         {/* Three pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
@@ -61,11 +69,12 @@ export function PhilosophySection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ duration: 0.6, delay: i * 0.13 }}
-                className="border-t border-white/10 pt-8"
               >
-                <Icon className="h-6 w-6 mb-5" style={{ color: 'hsl(var(--sage))' }} />
-                <h3 className="text-white font-semibold text-lg mb-4">{pillar.title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed">{pillar.body}</p>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#B0D182]/20 mb-5">
+                  <Icon className="h-6 w-6 text-[#B0D182]" strokeWidth={2.5} />
+                </span>
+                <h3 className="font-poppins text-white font-semibold text-lg mb-4">{pillar.title}</h3>
+                <p className="font-poppins text-[#FEF9F0] text-sm leading-relaxed">{pillar.body}</p>
               </motion.div>
             );
           })}

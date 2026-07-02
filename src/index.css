@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand heading font — Roca Two (self-hosted), three real weights mapped by range:
+   Thin 100–300, Regular 400–500 (normal + medium), Bold 600–900 (semibold + bold).
+   Browsers pick the file whose range contains the requested weight and render it as-is
+   (no synthetic weighting). Falls back to Playfair Display until loaded (font-display: swap). */
+@font-face {
+  font-family: 'Roca Two';
+  src: url('/fonts/roca-two-thin.woff') format('woff');
+  font-weight: 100 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roca Two';
+  src: url('/fonts/roca-two-regular.woff') format('woff');
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roca Two';
+  src: url('/fonts/roca-two-bold.woff') format('woff');
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Map marker hover popup */
 .property-hover-popup .maplibregl-popup-content {
   padding: 0;
@@ -117,7 +143,7 @@
     --popover-foreground: 146 65% 14%;
 
     /* Primary Green - #156530 */
-    --primary: 146 65% 14%;
+    --primary: 140 66% 24%;
     --primary-foreground: 0 0% 100%;
 
     /* Sage green secondary - #B0D182 */
@@ -139,12 +165,12 @@
     /* Borders and inputs */
     --border: 40 30% 88%;
     --input: 40 30% 88%;
-    --ring: 146 65% 14%;
+    --ring: 140 66% 24%;
 
     --radius: 1rem;
 
     /* Sidebar styling */
-    --sidebar-background: 146 65% 14%;
+    --sidebar-background: 140 66% 24%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 84 48% 66%;
     --sidebar-primary-foreground: 146 65% 14%;
@@ -154,9 +180,9 @@
     --sidebar-ring: 84 48% 66%;
 
     /* Custom tokens - Agribnv brand palette */
-    --forest: 146 65% 14%;
-    --forest-light: 146 45% 25%;
-    --forest-dark: 146 70% 10%;
+    --forest: 140 66% 24%;
+    --forest-light: 140 52% 34%;
+    --forest-dark: 140 65% 11%;
     --sage: 84 48% 66%;
     --sage-light: 84 50% 80%;
     --sage-dark: 84 40% 50%;

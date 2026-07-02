@@ -103,7 +103,10 @@ export default {
       fontFamily: {
         sans: ['Poppins', 'system-ui', 'sans-serif'],
         display: ['Poppins', 'system-ui', 'sans-serif'],
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Roca Two"', '"Playfair Display"', 'Georgia', 'serif'],
+        // Brand-named aliases (match the brand guide): Roca Two for display, Poppins for UI.
+        roca: ['"Roca Two"', '"Playfair Display"', 'Georgia', 'serif'],
+        poppins: ['Poppins', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

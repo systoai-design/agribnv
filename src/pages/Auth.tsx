@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import agribnvLogo from '@/assets/agribnv-logo.png';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -27,7 +28,7 @@ export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') === 'signup');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('guest');
+  const [selectedRole, setSelectedRole] = useState<UserRole>(searchParams.get('role') === 'host' ? 'host' : 'guest');
   const { user, signIn, signUp: authSignUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -138,8 +139,9 @@ export default function AuthPage() {
 
         {/* Content */}
         <div className="bg-card rounded-b-2xl border border-t-0 p-6 shadow-card">
-          <h1 className="text-2xl font-semibold mb-6">
-            Welcome to Agribnv
+          <h1 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-2 flex-wrap">
+            <span>Welcome to</span>
+            <img src={agribnvLogo} alt="Agribnv" className="h-7 w-auto" />
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -217,21 +219,24 @@ export default function AuthPage() {
               )}
             </div>
 
-            <div className="space-y-2 relative">
-              <Input 
-                id="password" 
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                className="h-14 rounded-xl border-2 pr-12"
-                {...register('password')} 
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-4 text-muted-foreground"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  className="h-14 rounded-xl border-2 pr-12"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}

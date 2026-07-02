@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Play, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { HeroSearch } from '@/components/landing/HeroSearch';
 
 // Served from /public — drop the farm photo here as `hero-farm.jpg`.
 const HERO_IMAGE = '/hero-farm.jpg';
@@ -17,7 +17,7 @@ export function HeroSection() {
   return (
     <section
       ref={ref}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-start md:items-center justify-center overflow-hidden"
       style={{ backgroundColor: 'hsl(var(--forest-dark))' }}
     >
       {/* Full-bleed farm photo with subtle parallax */}
@@ -52,9 +52,10 @@ export function HeroSection() {
         }}
       />
 
-      {/* Content */}
+      {/* Content — top-anchored below the nav on mobile (content is taller than the viewport
+          there); vertically centered from md up. */}
       <motion.div
-        className="relative z-10 max-w-4xl mx-auto px-6 text-center"
+        className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24 pb-16 md:py-0"
         style={{ opacity, y: contentY }}
       >
         {/* Eyebrow */}
@@ -65,7 +66,7 @@ export function HeroSection() {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm mb-8"
         >
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'hsl(var(--sage))' }} />
-          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">Farm-to-traveler platform · Philippines</span>
+          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">The farm-stay marketplace · Philippines</span>
         </motion.div>
 
         {/* Headline */}
@@ -73,14 +74,14 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.15 }}
-          className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[0.95] tracking-tight mb-6"
+          className="font-serif text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-[1] md:leading-[0.95] tracking-tight mb-5 md:mb-6"
           style={{ textShadow: '0 2px 32px hsl(146 70% 4% / 0.55)' }}
         >
           Where every stay
           <br />
-          <span style={{ color: 'hsl(var(--sage))' }}>empowers</span>
+          is a real
           <br />
-          Filipino Farmers.
+          <span style={{ color: 'hsl(var(--sage))' }}>Filipino farm.</span>
         </motion.h1>
 
         {/* Sub-headline */}
@@ -88,41 +89,36 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.35 }}
-          className="text-white/75 text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed"
+          className="text-white/75 text-base md:text-xl max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed"
           style={{ textShadow: '0 1px 20px hsl(146 70% 4% / 0.5)' }}
         >
-          Book a farm stay, join a harvest experience, or source produce directly
-          from the hands that grow it. Tourism that rebuilds rural economies.
+          Trade the city for authentic, hands-on rural experiences. Discover and book
+          verified farm stays across the Philippine countryside.
         </motion.p>
 
-        {/* CTAs */}
+        {/* Booking search — the primary action, front and center */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
-          <Button
-            asChild
-            size="lg"
-            className="bg-white text-primary hover:bg-white/90 font-bold rounded-full px-8 h-12 text-base shadow-xl shadow-black/30 group"
-          >
-            <Link to="/explore">
-              Explore farms
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="border-white/40 text-white hover:bg-white/10 hover:border-white/60 bg-white/5 backdrop-blur-sm font-semibold rounded-full px-8 h-12 text-base"
-          >
-            <Link to="/host">
-              <Play className="mr-2 h-4 w-4 fill-white" />
-              List your farm
-            </Link>
-          </Button>
+          <HeroSearch />
+        </motion.div>
+
+        {/* Secondary paths — quiet links so search stays the hero action */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mt-6 flex items-center justify-center gap-3 text-sm text-white/70"
+        >
+          <Link to="/explore" className="hover:text-white transition-colors underline-offset-4 hover:underline">
+            Browse all farms
+          </Link>
+          <span aria-hidden className="text-white/30">·</span>
+          <Link to="/auth?mode=signup&role=host" className="hover:text-white transition-colors underline-offset-4 hover:underline">
+            List your farm
+          </Link>
         </motion.div>
       </motion.div>
 
@@ -135,27 +131,6 @@ export function HeroSection() {
       >
         <MapPin className="h-4 w-4" style={{ color: 'hsl(var(--sage))' }} />
         <span className="text-xs font-medium tracking-wide uppercase">Guimaras · Philippines</span>
-      </motion.div>
-
-      {/* Editorial corner — scroll cue (bottom-right) */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.8 }}
-        className="absolute bottom-8 right-6 md:right-10 z-10 hidden sm:flex items-center gap-3 text-white/60"
-      >
-        <span className="text-xs font-medium tracking-widest uppercase">Scroll to explore</span>
-        <motion.div
-          className="w-5 h-8 border-2 border-white/30 rounded-full flex justify-center pt-1.5"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <motion.div
-            className="w-1 h-2 bg-white/70 rounded-full"
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.div>
       </motion.div>
     </section>
   );
