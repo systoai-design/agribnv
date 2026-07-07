@@ -321,6 +321,9 @@
   .safe-area-pb {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+  .safe-area-pt {
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 @layer utilities {

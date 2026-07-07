@@ -20,7 +20,7 @@ export function LandingNav() {
 
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 safe-area-pt transition-all duration-300"
       animate={{ backgroundColor: scrolled ? 'rgba(15, 50, 25, 0.97)' : 'transparent' }}
       style={{ backdropFilter: scrolled ? 'blur(12px)' : 'none' }}
     >

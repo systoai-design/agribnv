@@ -55,7 +55,7 @@ export function HeroSection() {
       {/* Content — top-anchored below the nav on mobile (content is taller than the viewport
           there); vertically centered from md up. */}
       <motion.div
-        className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24 pb-16 md:py-0"
+        className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-[calc(6rem_+_env(safe-area-inset-top))] pb-16 md:pt-0 md:pb-0"
         style={{ opacity, y: contentY }}
       >
         {/* Eyebrow */}
