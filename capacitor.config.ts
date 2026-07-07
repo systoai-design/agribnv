@@ -6,14 +6,17 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   ios: {
     contentInset: 'automatic',
-    backgroundColor: '#FEF9F0',
+    backgroundColor: '#156530',
   },
   android: {
-    backgroundColor: '#FEF9F0',
+    backgroundColor: '#156530',
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      // Hidden explicitly by useHideNativeSplash() once React has painted its first frame
+      // (AppLoadingScreen, same background + icon), instead of a fixed timer — removes any
+      // chance of a blank gap on devices where init takes longer than the old 2000ms.
+      launchAutoHide: false,
       backgroundColor: '#156530',
       showSpinner: false,
     },

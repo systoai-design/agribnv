@@ -1,12 +1,13 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHideNativeSplash } from "@/hooks/useHideNativeSplash";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
-import LandingPage from "./pages/LandingPage";
+import { Root } from "@/components/app-shell/Root";
 import Explore from "./pages/Explore";
 import Auth from "./pages/Auth";
 import PropertyDetails from "./pages/PropertyDetails";
@@ -30,6 +31,11 @@ function PushSetup() {
   return null;
 }
 
+function NativeSplashSetup() {
+  useHideNativeSplash();
+  return null;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -41,8 +47,9 @@ const App = () => (
         <BrowserRouter>
           <NotificationsProvider>
             <PushSetup />
+            <NativeSplashSetup />
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<Root />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/properties/:id" element={<PropertyDetails />} />
