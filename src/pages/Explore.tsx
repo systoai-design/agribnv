@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Search, ArrowRight, SlidersHorizontal, Map } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -7,6 +7,7 @@ import { PropertyGrid } from '@/components/properties/PropertyGrid';
 import { ListingTypeTabs } from '@/components/properties/ListingTypeTabs';
 import { FarmstayCategories } from '@/components/properties/FarmstayCategories';
 import LocationCarousel from '@/components/properties/LocationCarousel';
+import { FeaturedFarmsCarousel } from '@/components/properties/FeaturedFarmsCarousel';
 import { FloatingMapButton } from '@/components/properties/FloatingMapButton';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,7 @@ export default function Explore() {
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDateRange, setSearchDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
   const [searchGuestCount, setSearchGuestCount] = useState(1);
+  const locationCarouselsRef = useRef<HTMLDivElement>(null);
 
   const {
     properties,
@@ -261,18 +263,30 @@ export default function Explore() {
               <ArrowRight className="ml-1 h-3 w-3" />
             </Button>
           )}
+          {!hasActiveFilters && Object.keys(propertiesByLocation).length > 0 && (
+            <button
+              onClick={() => locationCarouselsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              aria-label="See more farms"
+              className="h-11 w-11 -mr-3 flex items-center justify-center rounded-full text-primary hover:bg-primary/10 transition-colors"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         {!hasActiveFilters ? (
           <div className="space-y-6">
-            {Object.entries(propertiesByLocation).map(([location, props]) => (
-              <LocationCarousel
-                key={location}
-                title={`Available in ${location}`}
-                properties={props}
-                onShowAll={() => setSearchLocation(location)}
-              />
-            ))}
+            <FeaturedFarmsCarousel properties={properties} />
+            <div ref={locationCarouselsRef} className="space-y-6 scroll-mt-4">
+              {Object.entries(propertiesByLocation).map(([location, props]) => (
+                <LocationCarousel
+                  key={location}
+                  title={`Available in ${location}`}
+                  properties={props}
+                  onShowAll={() => setSearchLocation(location)}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <PropertyGrid properties={properties} isLoading={isLoading} />

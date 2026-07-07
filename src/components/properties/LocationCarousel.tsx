@@ -59,9 +59,10 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
         {onShowAll && hasMore && (
           <button
             onClick={onShowAll}
-            className="text-xs font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+            aria-label={`Show all ${title}`}
+            className="h-11 w-11 -mr-3 flex items-center justify-center rounded-full text-primary hover:bg-primary/10 transition-colors"
           >
-            Show all
+            <ChevronRight className="w-5 h-5" />
           </button>
         )}
       </div>
