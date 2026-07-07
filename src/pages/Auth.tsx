@@ -126,7 +126,7 @@ export default function AuthPage() {
         <div className="flex-1 flex flex-col justify-center py-10">
           <div className="w-full max-w-md mx-auto">
             <div className="text-center">
-              <img src={agribnvIconGreen} alt="Agribnv" className="h-16 w-auto mx-auto mb-6" />
+              <img src={agribnvIconGreen} alt="Agribnv" className="h-24 w-auto mx-auto mb-6" />
               <h1 className="text-3xl font-bold text-foreground mb-2">
                 {isSignUp ? 'Get started' : 'Welcome back'}
               </h1>
