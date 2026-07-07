@@ -193,7 +193,7 @@ export default function Products() {
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3 mb-6 -mx-4 px-4 md:mx-0 md:px-0">
           <button
             type="button"
-            className="shrink-0 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium"
+            className="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium"
           >
             All
           </button>
@@ -201,7 +201,7 @@ export default function Products() {
             <button
               key={cat}
               type="button"
-              className="shrink-0 px-4 py-2 rounded-full bg-card border border-border/50 text-foreground text-sm font-medium hover:border-primary/50 transition-colors"
+              className="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-card border border-border/50 text-foreground text-sm font-medium hover:border-primary/50 transition-colors"
             >
               {cat}
             </button>

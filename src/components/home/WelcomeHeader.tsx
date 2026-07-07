@@ -16,7 +16,7 @@ export function WelcomeHeader() {
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 animate-fade-in">
       <div className="flex items-center gap-2.5">
-        <Link to={user ? '/profile' : '/auth'}>
+        <Link to={user ? '/profile' : '/auth'} className="flex items-center justify-center h-11 w-11 -m-0.5">
           <Avatar className="h-10 w-10 border-2 border-primary/20">
             <AvatarImage src={profile?.avatar_url || undefined} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
@@ -31,10 +31,10 @@ export function WelcomeHeader() {
       </div>
 
       <button
-        className="relative p-2 rounded-full bg-card border border-border/50 shadow-sm active:scale-90 transition-transform duration-150"
+        className="relative h-11 w-11 flex items-center justify-center rounded-full bg-card border border-border/50 shadow-sm active:scale-90 transition-transform duration-150"
       >
         <Bell className="h-4 w-4 text-foreground" />
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full" />
+        <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-primary rounded-full" />
       </button>
     </div>
   );

@@ -283,12 +283,12 @@ export default function PropertyDetails() {
   return (
     <Layout hideNavbarOnMobile={true} showMobileNav={false} showFooter={false}>
       {/* Mobile Header - Transparent with floating buttons only */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 pointer-events-none">
-        <div className="flex items-center justify-between p-4 pt-safe">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 pointer-events-none safe-area-pt">
+        <div className="flex items-center justify-between p-4">
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => navigate(-1)}
-            className="h-9 w-9 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center pointer-events-auto"
+            className="h-11 w-11 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center pointer-events-auto"
           >
             <ChevronLeft className="h-5 w-5 text-foreground" />
           </motion.button>
@@ -296,14 +296,14 @@ export default function PropertyDetails() {
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={handleShare}
-              className="h-9 w-9 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center"
+              className="h-11 w-11 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center"
             >
               <Share className="h-4 w-4 text-foreground" />
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsLiked(!isLiked)}
-              className="h-9 w-9 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center"
+              className="h-11 w-11 rounded-full bg-white/95 backdrop-blur-sm shadow-lg flex items-center justify-center"
             >
               <Heart className={cn('h-4 w-4', isLiked ? 'fill-destructive text-destructive' : 'text-foreground')} />
             </motion.button>
@@ -327,13 +327,13 @@ export default function PropertyDetails() {
             <>
               <button
                 onClick={() => setCurrentImageIndex(prev => prev === 0 ? imageUrls.length - 1 : prev - 1)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
+                className="absolute left-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setCurrentImageIndex(prev => prev === imageUrls.length - 1 ? 0 : prev + 1)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

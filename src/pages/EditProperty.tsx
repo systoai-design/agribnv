@@ -274,12 +274,12 @@ export default function EditProperty() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="photos">Photos</TabsTrigger>
-              <TabsTrigger value="rules">House Rules</TabsTrigger>
-              <TabsTrigger value="policies">Policies</TabsTrigger>
-              <TabsTrigger value="experiences">Experiences</TabsTrigger>
+            <TabsList className="flex w-full justify-start overflow-x-auto md:grid md:grid-cols-5">
+              <TabsTrigger value="basic" className="shrink-0 min-h-[44px]">Basic Info</TabsTrigger>
+              <TabsTrigger value="photos" className="shrink-0 min-h-[44px]">Photos</TabsTrigger>
+              <TabsTrigger value="rules" className="shrink-0 min-h-[44px]">House Rules</TabsTrigger>
+              <TabsTrigger value="policies" className="shrink-0 min-h-[44px]">Policies</TabsTrigger>
+              <TabsTrigger value="experiences" className="shrink-0 min-h-[44px]">Experiences</TabsTrigger>
             </TabsList>
 
             {/* Basic Info Tab */}

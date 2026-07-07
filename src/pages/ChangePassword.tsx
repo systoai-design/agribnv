@@ -112,7 +112,7 @@ export default function ChangePassword() {
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 py-4 border-b border-border/30">
         <div className="flex items-center gap-4 max-w-md mx-auto">
           <Link to="/profile">
-            <motion.button whileTap={{ scale: 0.9 }} className="p-2 -ml-2">
+            <motion.button whileTap={{ scale: 0.9 }} className="p-3 -ml-3">
               <ArrowLeft className="h-5 w-5 text-foreground" />
             </motion.button>
           </Link>

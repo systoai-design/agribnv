@@ -97,7 +97,7 @@ const MapView = () => {
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 p-3 bg-background/95 backdrop-blur-sm border-b z-10">
+      <div className="flex items-center gap-3 p-3 bg-background/95 backdrop-blur-sm border-b z-10 safe-area-pt">
         <Link to="/" className="shrink-0">
           <Button variant="ghost" size="sm" className="gap-2" onClick={() => haptics.light()}>
             <List className="w-4 h-4" />
@@ -119,7 +119,7 @@ const MapView = () => {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted"
+                className="absolute right-0 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-full hover:bg-muted"
                 aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5 text-muted-foreground" />
@@ -172,7 +172,7 @@ const MapView = () => {
                 <div className="absolute top-1/2 -translate-y-1/2 left-2 z-10">
                   <button
                     onClick={() => navigateProperties('prev')}
-                    className="w-8 h-8 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
+                    className="w-11 h-11 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -180,7 +180,7 @@ const MapView = () => {
                 <div className="absolute top-1/2 -translate-y-1/2 right-2 z-10">
                   <button
                     onClick={() => navigateProperties('next')}
-                    className="w-8 h-8 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
+                    className="w-11 h-11 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -189,7 +189,7 @@ const MapView = () => {
                 {/* Close button */}
                 <button
                   onClick={handleCloseCard}
-                  className="absolute top-3 right-3 z-10 w-8 h-8 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
+                  className="absolute top-3 right-3 z-10 w-11 h-11 bg-background/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-background transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>

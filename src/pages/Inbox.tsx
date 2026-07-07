@@ -102,7 +102,7 @@ export default function Inbox() {
             <Link to="/">
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="p-2 -ml-2"
+                className="p-3 -ml-3"
               >
                 <ArrowLeft className="h-5 w-5 text-foreground" />
               </motion.button>

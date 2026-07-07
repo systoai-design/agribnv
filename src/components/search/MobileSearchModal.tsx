@@ -97,12 +97,12 @@ export function MobileSearchModal({
             className="fixed inset-0 z-50 bg-background overflow-auto"
           >
             {/* Header */}
-            <div className="sticky top-0 bg-card z-10 px-4 pt-4 pb-3 border-b border-border/30">
+            <div className="sticky top-0 bg-card z-10 px-4 pt-4 pb-3 border-b border-border/30 safe-area-pt">
               {/* Close Button */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="absolute left-4 top-4 p-2 rounded-full border border-border/50 bg-card shadow-sm"
+                className="absolute left-4 top-4 h-11 w-11 flex items-center justify-center rounded-full border border-border/50 bg-card shadow-sm"
               >
                 <X className="h-4 w-4 text-foreground" />
               </motion.button>
@@ -344,7 +344,7 @@ export function MobileSearchModal({
                             <motion.button
                               whileTap={{ scale: 0.9 }}
                               className={cn(
-                                'h-9 w-9 rounded-full border flex items-center justify-center transition-colors',
+                                'h-11 w-11 rounded-full border flex items-center justify-center transition-colors',
                                 guestCount <= 1
                                   ? 'border-border/30 text-muted-foreground/50 cursor-not-allowed'
                                   : 'border-border text-foreground hover:border-foreground'
@@ -357,7 +357,7 @@ export function MobileSearchModal({
                             <span className="w-8 text-center font-semibold text-foreground">{guestCount}</span>
                             <motion.button
                               whileTap={{ scale: 0.9 }}
-                              className="h-9 w-9 rounded-full border border-border text-foreground hover:border-foreground flex items-center justify-center transition-colors"
+                              className="h-11 w-11 rounded-full border border-border text-foreground hover:border-foreground flex items-center justify-center transition-colors"
                               onClick={() => onGuestCountChange(guestCount + 1)}
                             >
                               <span className="text-xl leading-none">+</span>

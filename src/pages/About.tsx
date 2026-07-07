@@ -31,10 +31,10 @@ export default function About() {
   return (
     <Layout showMobileNav={false}>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 py-4 border-b border-border/30">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm safe-area-pt px-4 py-4 border-b border-border/30">
         <div className="flex items-center gap-4 max-w-2xl mx-auto">
           <Link to="/profile">
-            <motion.button whileTap={{ scale: 0.9 }} className="p-2 -ml-2">
+            <motion.button whileTap={{ scale: 0.9 }} className="h-11 w-11 flex items-center justify-center -ml-2">
               <ArrowLeft className="h-5 w-5 text-foreground" />
             </motion.button>
           </Link>

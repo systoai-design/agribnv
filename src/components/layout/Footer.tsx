@@ -255,12 +255,12 @@ export function Footer() {
               <span className="text-sm font-medium text-foreground">₱ PHP</span>
               
               {/* Social Icons */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <a
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground hover:opacity-70 transition-opacity"
+                  className="flex items-center justify-center h-11 w-11 text-foreground hover:opacity-70 transition-opacity"
                   aria-label="Facebook"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -271,7 +271,7 @@ export function Footer() {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground hover:opacity-70 transition-opacity"
+                  className="flex items-center justify-center h-11 w-11 text-foreground hover:opacity-70 transition-opacity"
                   aria-label="X (Twitter)"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -282,7 +282,7 @@ export function Footer() {
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground hover:opacity-70 transition-opacity"
+                  className="flex items-center justify-center h-11 w-11 text-foreground hover:opacity-70 transition-opacity"
                   aria-label="Instagram"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

@@ -127,7 +127,7 @@ export default function AuthPage() {
           <Link to="/" aria-label="Agribnv home" className="inline-flex items-center">
             <img src={agribnvLogo} alt="Agribnv" className="h-8 w-auto" />
           </Link>
-          <Link to="/" aria-label="Close" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/" aria-label="Close" className="flex items-center justify-center h-11 w-11 -m-3 text-muted-foreground hover:text-foreground transition-colors">
             <X className="h-5 w-5" />
           </Link>
         </div>
@@ -218,7 +218,7 @@ export default function AuthPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-muted-foreground"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>

@@ -255,7 +255,7 @@ export default function Explore() {
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="text-primary hover:text-primary/80 text-xs h-8"
+              className="text-primary hover:text-primary/80 text-xs h-11 min-h-[44px]"
             >
               Clear filters
               <ArrowRight className="ml-1 h-3 w-3" />
@@ -321,7 +321,7 @@ export default function Explore() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-full h-10 w-10 border-border/50"
+                    className="rounded-full h-11 w-11 border-border/50"
                     onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
                     disabled={guestCount <= 1}
                   >
@@ -331,7 +331,7 @@ export default function Explore() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-full h-10 w-10 border-border/50"
+                    className="rounded-full h-11 w-11 border-border/50"
                     onClick={() => setGuestCount(guestCount + 1)}
                   >
                     +
@@ -369,7 +369,7 @@ export default function Explore() {
             </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border/50 bg-card">
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border/50 bg-card safe-area-pb">
             <div className="flex items-center justify-between gap-4">
               <Button variant="ghost" onClick={clearFilters} className="underline font-semibold text-foreground">
                 Clear all
