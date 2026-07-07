@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { Navbar } from './Navbar';
 import { MobileNav } from './MobileNav';
 import { Footer } from './Footer';
@@ -62,7 +63,7 @@ export function Layout({
       <main className={`flex-1 ${showMobileNav ? 'pb-20 md:pb-0' : ''}`}>
         {children}
       </main>
-      {showFooter && <Footer />}
+      {showFooter && !Capacitor.isNativePlatform() && <Footer />}
       {showMobileNav && <MobileNav />}
     </div>
   );

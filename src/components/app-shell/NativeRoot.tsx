@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthPage from '@/pages/Auth';
-import { AppLoadingScreen, getSplashVariant } from './AppLoadingScreen';
+import { AppLoadingScreen } from './AppLoadingScreen';
 
 // Root minimum display time so the loading screen always registers as a deliberate branding
 // moment rather than a flash — Supabase's local session check often resolves in well under this.
@@ -21,7 +21,7 @@ export function NativeRoot() {
   }, []);
 
   if (isLoading || !minDisplayElapsed) {
-    return <AppLoadingScreen variant={getSplashVariant()} />;
+    return <AppLoadingScreen />;
   }
 
   if (!user) {

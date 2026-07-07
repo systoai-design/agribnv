@@ -6,10 +6,10 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   ios: {
     contentInset: 'automatic',
-    backgroundColor: '#156530',
+    backgroundColor: '#FEF9F0',
   },
   android: {
-    backgroundColor: '#156530',
+    backgroundColor: '#FEF9F0',
   },
   plugins: {
     SplashScreen: {
@@ -17,7 +17,7 @@ const config: CapacitorConfig = {
       // (AppLoadingScreen, same background + icon), instead of a fixed timer — removes any
       // chance of a blank gap on devices where init takes longer than the old 2000ms.
       launchAutoHide: false,
-      backgroundColor: '#156530',
+      backgroundColor: '#FEF9F0',
       showSpinner: false,
     },
     PushNotifications: {
