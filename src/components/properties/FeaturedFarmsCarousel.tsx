@@ -4,6 +4,7 @@ import { MapPin } from 'lucide-react';
 import { Property } from '@/types/database';
 import { cn } from '@/lib/utils';
 import haptics from '@/utils/haptics';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface FeaturedFarmsCarouselProps {
   properties: Property[];
@@ -11,6 +12,7 @@ interface FeaturedFarmsCarouselProps {
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&auto=format&fit=crop';
 const MAX_FEATURED = 6;
+const AUTOPLAY_INTERVAL_MS = 7000;
 
 function getHeroImage(property: Property): string {
   const images = property.images?.slice().sort((a, b) => a.display_order - b.display_order) ?? [];
@@ -19,11 +21,13 @@ function getHeroImage(property: Property): string {
 
 // Full-bleed swipeable hero banner for the top "Featured Farms" section — one large image per
 // slide with dot pagination, distinct from the smaller card rows used for the location carousels
-// further down the page.
+// further down the page. Auto-advances every 7s (paused for prefers-reduced-motion); manual swipe
+// always works and resets the auto-advance clock so it never fights the user mid-gesture.
 export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps) {
   const featured = properties.slice(0, MAX_FEATURED);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -39,6 +43,32 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll, featured.length]);
+
+  // Auto-advance. Re-armed on every scroll event (manual swipe or programmatic), so a manual
+  // swipe always gets a full fresh interval afterward instead of being interrupted mid-gesture.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || prefersReducedMotion || featured.length <= 1) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    const advance = () => {
+      const slideWidth = el.children[0]?.clientWidth ?? 0;
+      if (slideWidth === 0) return;
+      const nextIndex = (Math.round(el.scrollLeft / slideWidth) + 1) % featured.length;
+      el.scrollTo({ left: nextIndex * slideWidth, behavior: 'smooth' });
+    };
+    const rearm = () => {
+      clearTimeout(timer);
+      timer = setTimeout(advance, AUTOPLAY_INTERVAL_MS);
+    };
+
+    rearm();
+    el.addEventListener('scroll', rearm, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', rearm);
+    };
+  }, [prefersReducedMotion, featured.length]);
 
   if (featured.length === 0) return null;
 
