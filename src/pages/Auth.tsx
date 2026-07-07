@@ -4,15 +4,16 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, X, Mail, Eye, EyeOff, User, Home } from 'lucide-react';
+import { Loader2, X, Eye, EyeOff, User, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import agribnvLogo from '@/assets/agribnv-logo.png';
+import { AuthGraphic } from '@/components/auth/AuthGraphic';
+import { TreeOverlay } from '@/components/auth/TreeOverlay';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -47,7 +48,7 @@ export default function AuthPage() {
           .eq('user_id', user.id)
           .eq('role', 'host')
           .single();
-        
+
         if (data) {
           navigate('/host');
         } else {
@@ -65,12 +66,11 @@ export default function AuthPage() {
         // Sign up the user
         const { error } = await authSignUp(data.email, data.password, data.fullName);
         if (error) {
-          // Handle specific error messages
           if (error.message.includes('already registered')) {
-            toast({ 
-              title: 'Account exists', 
+            toast({
+              title: 'Account exists',
               description: 'This email is already registered. Try signing in instead.',
-              variant: 'destructive' 
+              variant: 'destructive',
             });
           } else {
             toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
@@ -78,35 +78,33 @@ export default function AuthPage() {
         } else {
           // If host role selected, add it (guest role is added by default via trigger)
           if (selectedRole === 'host') {
-            // Wait briefly for auth to complete and then add host role
             setTimeout(async () => {
               const { data: sessionData } = await supabase.auth.getSession();
               if (sessionData.session?.user) {
                 await supabase.from('user_roles').insert({
                   user_id: sessionData.session.user.id,
-                  role: 'host'
+                  role: 'host',
                 });
               }
             }, 500);
           }
-          
-          toast({ 
-            title: selectedRole === 'host' ? 'Welcome, Host!' : 'Welcome to Agribnv!', 
-            description: selectedRole === 'host' 
-              ? 'Your host account has been created. Start listing your farm!' 
-              : 'Your account has been created.' 
+
+          toast({
+            title: selectedRole === 'host' ? 'Welcome, Host!' : 'Welcome to Agribnv!',
+            description: selectedRole === 'host'
+              ? 'Your host account has been created. Start listing your farm!'
+              : 'Your account has been created.',
           });
-          // Redirect based on role
           navigate(selectedRole === 'host' ? '/host' : '/');
         }
       } else {
         const { error } = await signIn(data.email, data.password);
         if (error) {
           if (error.message.includes('Invalid login')) {
-            toast({ 
-              title: 'Invalid credentials', 
+            toast({
+              title: 'Invalid credentials',
               description: 'Email or password is incorrect. Please try again.',
-              variant: 'destructive' 
+              variant: 'destructive',
             });
           } else {
             toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
@@ -121,162 +119,168 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md"
-      >
-        {/* Header */}
-        <div className="bg-card rounded-t-2xl border-b p-4 flex items-center justify-center relative">
-          <Link to="/" className="absolute left-4">
+    <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
+      {/* LEFT — form pane */}
+      <div className="flex-1 flex flex-col px-6 py-8 sm:px-10 lg:px-16 xl:px-24">
+        {/* Top bar: logo (home) + close */}
+        <div className="flex items-center justify-between">
+          <Link to="/" aria-label="Agribnv home" className="inline-flex items-center">
+            <img src={agribnvLogo} alt="Agribnv" className="h-8 w-auto" />
+          </Link>
+          <Link to="/" aria-label="Close" className="text-muted-foreground hover:text-foreground transition-colors">
             <X className="h-5 w-5" />
           </Link>
-          <h2 className="font-semibold">
-            {isSignUp ? 'Sign up' : 'Log in'}
-          </h2>
         </div>
 
-        {/* Content */}
-        <div className="bg-card rounded-b-2xl border border-t-0 p-6 shadow-card">
-          <h1 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-2 flex-wrap">
-            <span>Welcome to</span>
-            <img src={agribnvLogo} alt="Agribnv" className="h-7 w-auto" />
-          </h1>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Role Selection for Sign Up */}
-            <AnimatePresence mode="wait">
-              {isSignUp && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-3"
-                >
-                  <p className="text-sm font-medium text-muted-foreground">I want to:</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRole('guest')}
-                      className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-                        selectedRole === 'guest'
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center",
-                        selectedRole === 'guest' ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <User className="h-6 w-6" />
-                      </div>
-                      <span className="font-medium text-sm">Book Stays</span>
-                      <span className="text-xs text-muted-foreground text-center">Find & book farm experiences</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRole('host')}
-                      className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-                        selectedRole === 'host'
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center",
-                        selectedRole === 'host' ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <Home className="h-6 w-6" />
-                      </div>
-                      <span className="font-medium text-sm">Host Guests</span>
-                      <span className="text-xs text-muted-foreground text-center">List your farm property</span>
-                    </button>
-                  </div>
-
-                  <Input 
-                    id="fullName" 
-                    placeholder="Full name"
-                    className="h-14 rounded-xl border-2"
-                    {...register('fullName')} 
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="space-y-2">
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="Email"
-                className="h-14 rounded-xl border-2"
-                {...register('email')} 
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  className="h-14 rounded-xl border-2 pr-12"
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground">
-              By signing up, you agree to our{' '}
-              <Link to="/terms" className="underline font-semibold">Terms of Use</Link>
-              {' '}and{' '}
-              <Link to="/privacy" className="underline font-semibold">Privacy Policy</Link>.
+        {/* Form — vertically centered in the pane */}
+        <div className="flex-1 flex flex-col justify-center py-10">
+          <div className="w-full max-w-md mx-auto">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              {isSignUp ? 'Get started' : 'Welcome back'}
+            </h1>
+            <p className="text-muted-foreground mb-8">
+              {isSignUp ? 'Create your account to start booking farm stays.' : 'Sign in to your Agribnv account.'}
             </p>
 
-            <Button 
-              type="submit" 
-              className="w-full h-12 rounded-xl text-base font-semibold bg-gradient-to-r from-[#E61E4D] to-[#D70466] hover:opacity-90"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                isSignUp 
-                  ? (selectedRole === 'host' ? 'Create Host Account' : 'Create Account')
-                  : 'Log in'
-              )}
-            </Button>
-          </form>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {/* Role Selection for Sign Up */}
+              <AnimatePresence mode="wait">
+                {isSignUp && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-3"
+                  >
+                    <p className="text-sm font-medium text-muted-foreground">I want to:</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRole('guest')}
+                        className={cn(
+                          'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                          selectedRole === 'guest' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                        )}
+                      >
+                        <div className={cn('w-12 h-12 rounded-full flex items-center justify-center', selectedRole === 'guest' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
+                          <User className="h-6 w-6" />
+                        </div>
+                        <span className="font-medium text-sm">Book Stays</span>
+                        <span className="text-xs text-muted-foreground text-center">Find & book farm experiences</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRole('host')}
+                        className={cn(
+                          'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                          selectedRole === 'host' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                        )}
+                      >
+                        <div className={cn('w-12 h-12 rounded-full flex items-center justify-center', selectedRole === 'host' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
+                          <Home className="h-6 w-6" />
+                        </div>
+                        <span className="font-medium text-sm">Host Guests</span>
+                        <span className="text-xs text-muted-foreground text-center">List your farm property</span>
+                      </button>
+                    </div>
 
-          {/* Social login can be added later */}
+                    <Input
+                      id="fullName"
+                      placeholder="Full name"
+                      className="h-14 rounded-xl border-2"
+                      {...register('fullName')}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => { setIsSignUp(!isSignUp); reset(); setSelectedRole('guest'); }}
-              className="text-sm font-semibold underline"
-            >
-              {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
-            </button>
+              <div className="space-y-2">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  className="h-14 rounded-xl border-2"
+                  {...register('email')}
+                />
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password"
+                    className="h-14 rounded-xl border-2 pr-12"
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                By continuing, you agree to our{' '}
+                <Link to="/terms" className="underline font-semibold">Terms of Use</Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="underline font-semibold">Privacy Policy</Link>.
+              </p>
+
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isSignUp ? (
+                  selectedRole === 'host' ? 'Create Host Account' : 'Create Account'
+                ) : (
+                  'Log in'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => { setIsSignUp(!isSignUp); reset(); setSelectedRole('guest'); }}
+                className="text-sm font-semibold underline"
+              >
+                {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
+              </button>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
+
+      {/* RIGHT — animated "Terraced Light" brand graphic (desktop only) */}
+      <div className="hidden lg:flex lg:flex-1 relative flex-col justify-end overflow-hidden p-12 xl:p-16 bg-[#156530]">
+        <AuthGraphic />
+        <TreeOverlay />
+
+        {/* Caption — bottom */}
+        <div className="relative z-10">
+          <h2 className="font-serif text-4xl xl:text-5xl font-bold text-white leading-[1.1]">
+            Stay on a farm.
+            <br />
+            <span className="text-[#B0D182]">Or share yours.</span>
+          </h2>
+          <div className="mt-6 flex items-center gap-3">
+            <span className="h-px w-8" style={{ backgroundColor: 'hsl(var(--sage) / 0.6)' }} />
+            <span className="text-[11px] tracking-[0.2em] uppercase text-white/55 font-medium">
+              Guimaras · 10.60°N 122.60°E
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

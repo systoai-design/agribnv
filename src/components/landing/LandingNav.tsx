@@ -26,12 +26,12 @@ export function LandingNav() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group justify-self-start">
+        <Link to="/" className="col-start-1 flex items-center gap-2 group justify-self-start">
           <img src={agribnvLogo} alt="Agribnv" className="h-9 w-auto" />
         </Link>
 
         {/* Center nav pill — true page center */}
-        <nav className="hidden md:flex items-center gap-1 justify-self-center rounded-full border border-white/15 bg-white/5 backdrop-blur-md px-1.5 py-1">
+        <nav className="col-start-2 hidden md:flex items-center gap-1 justify-self-center rounded-full border border-white/15 bg-white/5 backdrop-blur-md px-1.5 py-1">
           <Link to="/explore" className="px-4 py-1.5 rounded-full text-white/85 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors">
             Explore Farms
           </Link>
@@ -44,7 +44,7 @@ export function LandingNav() {
         </nav>
 
         {/* Right cluster: desktop CTA + mobile hamburger */}
-        <div className="flex items-center gap-3 justify-self-end">
+        <div className="col-start-3 flex items-center gap-3 justify-self-end">
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <Button

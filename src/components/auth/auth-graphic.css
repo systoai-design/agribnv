@@ -1,0 +1,98 @@
+/* "Terraced Light" — the animated farm landscape for the auth pane. */
+
+/* Terrace lines drift left by exactly one wave period; the waves are periodic over 800u, so the
+   loop point is seamless. */
+.ag-drift {
+  animation: ag-drift 28s linear infinite;
+  will-change: transform;
+}
+@keyframes ag-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-800px); }
+}
+
+/* Bird flocks — slow, seamless glides; the far flock moves slower and the other way (parallax). */
+.ag-birds {
+  animation: ag-birds 26s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes ag-birds {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(26px, -12px); }
+}
+.ag-birds2 {
+  animation: ag-birds2 34s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes ag-birds2 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-20px, 10px); }
+}
+
+/* Tree breeze — the Remotion overlay box rotates a whisker around the trunk base
+   (400, 476 of 800×1200 → 50% / 39.7%). Only the tree's pixels are visible in the box, so this
+   reads as the tree swaying. Uneven keyframes = soft gusts, not a metronome. */
+.ag-tree-sway {
+  transform-origin: 50% 39.7%;
+  animation: ag-tree-sway 11s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes ag-tree-sway {
+  0%   { transform: rotate(-0.6deg); }
+  32%  { transform: rotate(0.4deg); }
+  55%  { transform: rotate(0.7deg); }
+  78%  { transform: rotate(0.1deg); }
+  100% { transform: rotate(-0.6deg); }
+}
+
+/* Falling leaf — once per ~17s cycle a leaf detaches from the canopy edge and flutters down,
+   swinging as it falls, fading out before the horizon. Hidden the rest of the cycle. The first
+   cycle's delay lets the growth animation finish first.
+   Fall distance is a fraction of --ag-box-h (set inline by TreeOverlay to the cover-box's actual
+   pixel height) rather than a fixed px value — the leaf starts at 23.5% of box height and the
+   horizon sits at ~39.2%, so capping the descent at 13% of box height keeps a safety margin above
+   the ground at any pane size. Horizontal sway stays in px (small, size-insensitive). */
+.ag-fall-leaf {
+  opacity: 0;
+  animation: ag-fall-leaf 17s linear 11s infinite;
+  will-change: transform, opacity;
+}
+@keyframes ag-fall-leaf {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  3%   { opacity: 0.85; }
+  12%  { transform: translate(-14px, calc(var(--ag-box-h, 1200px) * 0.031)) rotate(-40deg); }
+  22%  { transform: translate(10px, calc(var(--ag-box-h, 1200px) * 0.068)) rotate(25deg); }
+  32%  { opacity: 0.8; transform: translate(-8px, calc(var(--ag-box-h, 1200px) * 0.104)) rotate(-30deg); }
+  38%  { opacity: 0; transform: translate(0, calc(var(--ag-box-h, 1200px) * 0.13)) rotate(-10deg); }
+  100% { opacity: 0; transform: translate(0, calc(var(--ag-box-h, 1200px) * 0.13)) rotate(-10deg); }
+}
+
+/* Wind-blown grass — each blade rotates about its own base (transform-origin set inline per
+   blade in AuthGraphic.tsx). Asymmetric keyframes read as a gust rather than a metronome; each
+   blade's animation-delay/-duration (also set inline) staggers the sway into a ripple across the
+   field instead of every blade moving in lockstep. */
+.ag-grass {
+  animation-name: ag-grass-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@keyframes ag-grass-sway {
+  0%   { transform: rotate(-3deg); }
+  45%  { transform: rotate(4.5deg); }
+  70%  { transform: rotate(2deg); }
+  100% { transform: rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ag-drift,
+  .ag-birds,
+  .ag-birds2,
+  .ag-tree-sway,
+  .ag-grass {
+    animation: none;
+  }
+  .ag-fall-leaf {
+    display: none;
+  }
+}
