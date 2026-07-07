@@ -4,14 +4,14 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, X, Eye, EyeOff, User, Home } from 'lucide-react';
+import { Loader2, Eye, EyeOff, User, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import agribnvLogo from '@/assets/agribnv-logo.png';
+import agribnvIconGreen from '@/assets/agribnv-icon-green.png';
 import { AuthGraphic } from '@/components/auth/AuthGraphic';
 import { TreeOverlay } from '@/components/auth/TreeOverlay';
 
@@ -122,25 +122,18 @@ export default function AuthPage() {
     <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
       {/* LEFT — form pane */}
       <div className="flex-1 flex flex-col px-6 py-8 sm:px-10 lg:px-16 xl:px-24">
-        {/* Top bar: logo (home) + close */}
-        <div className="flex items-center justify-between">
-          <Link to="/" aria-label="Agribnv home" className="inline-flex items-center">
-            <img src={agribnvLogo} alt="Agribnv" className="h-8 w-auto" />
-          </Link>
-          <Link to="/" aria-label="Close" className="flex items-center justify-center h-11 w-11 -m-3 text-muted-foreground hover:text-foreground transition-colors">
-            <X className="h-5 w-5" />
-          </Link>
-        </div>
-
         {/* Form — vertically centered in the pane */}
         <div className="flex-1 flex flex-col justify-center py-10">
           <div className="w-full max-w-md mx-auto">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              {isSignUp ? 'Get started' : 'Welcome back'}
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              {isSignUp ? 'Create your account to start booking farm stays.' : 'Sign in to your Agribnv account.'}
-            </p>
+            <div className="text-center">
+              <img src={agribnvIconGreen} alt="Agribnv" className="h-16 w-auto mx-auto mb-6" />
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                {isSignUp ? 'Get started' : 'Welcome back'}
+              </h1>
+              <p className="text-muted-foreground mb-8">
+                {isSignUp ? 'Create your account to start booking farm stays.' : 'Sign in to your Agribnv account.'}
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Role Selection for Sign Up */}
