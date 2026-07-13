@@ -26,6 +26,10 @@ import Privacy from "./pages/Privacy";
 import ChangePassword from "./pages/ChangePassword";
 import NotFound from "./pages/NotFound";
 
+import { Keyboard } from '@capacitor/keyboard';
+import { Capacitor } from '@capacitor/core';
+import { useEffect } from 'react';
+
 function PushSetup() {
   usePushNotifications();
   return null;
@@ -33,6 +37,15 @@ function PushSetup() {
 
 function NativeSplashSetup() {
   useHideNativeSplash();
+  return null;
+}
+
+function KeyboardSetup() {
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(console.error);
+    }
+  }, []);
   return null;
 }
 
@@ -48,6 +61,7 @@ const App = () => (
           <NotificationsProvider>
             <PushSetup />
             <NativeSplashSetup />
+            <KeyboardSetup />
             <Routes>
               <Route path="/" element={<Root />} />
               <Route path="/explore" element={<Explore />} />

@@ -12,7 +12,7 @@ const MIN_DISPLAY_MS = 700;
 // app has no reason to show a landing pitch — it goes straight to the sign-in/sign-up flow, or
 // past it entirely if a session is already active.
 export function NativeRoot() {
-  const { user, isHost, isLoading } = useAuth();
+  const { user, viewMode, isLoading } = useAuth();
   const [minDisplayElapsed, setMinDisplayElapsed] = useState(false);
 
   useEffect(() => {
@@ -28,5 +28,5 @@ export function NativeRoot() {
     return <AuthPage />;
   }
 
-  return <Navigate to={isHost ? '/host' : '/explore'} replace />;
+  return <Navigate to={viewMode === 'host' ? '/host' : '/explore'} replace />;
 }

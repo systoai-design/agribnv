@@ -24,8 +24,8 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
   const navigate = useNavigate();
 
   return (
-    <div className="relative">
-      <div className="flex items-center justify-start sm:justify-center gap-1 p-1 bg-muted/50 rounded-xl overflow-x-auto scrollbar-hide">
+    <div className="relative px-1">
+      <div className="flex items-center justify-start sm:justify-center gap-1 p-1.5 bg-card shadow-soft border border-border/40 rounded-xl overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => {
           const isSelected = tab.kind === 'filter' && selectedType === tab.id;
           const Icon = tab.icon;
@@ -46,7 +46,7 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
                 'transition-all duration-200 ease-out active:scale-95',
                 isSelected
                   ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               )}
             >
               <Icon className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
         })}
       </div>
       {/* Fade + scroll affordance on mobile only — justify-center on sm+ never overflows there */}
-      <div className="sm:hidden absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-muted/80 to-transparent pointer-events-none rounded-r-xl" />
+      <div className="sm:hidden absolute right-1 top-0 bottom-0 w-6 bg-gradient-to-l from-card to-transparent pointer-events-none rounded-r-xl" />
     </div>
   );
 }

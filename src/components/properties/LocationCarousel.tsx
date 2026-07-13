@@ -89,13 +89,7 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
           </button>
         )}
 
-        {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-[5] pointer-events-none md:hidden" />
-        )}
 
-        {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-[5] pointer-events-none md:hidden" />
-        )}
 
         <div
           ref={scrollRef}

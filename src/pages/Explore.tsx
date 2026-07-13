@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Search, ArrowRight, SlidersHorizontal, Map } from 'lucide-react';
+import { Search, ArrowRight, SlidersHorizontal, Map, Bell } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Layout } from '@/components/layout/Layout';
@@ -130,21 +130,12 @@ export default function Explore() {
       groups[city].push(property);
     });
 
-    // Sort to prioritize Guimaras municipalities first
     const sortedEntries = Object.entries(groups).sort((a, b) => {
-      const aIsGuimaras = GUIMARAS_MUNICIPALITIES.some(m => a[0].includes(m));
-      const bIsGuimaras = GUIMARAS_MUNICIPALITIES.some(m => b[0].includes(m));
-
-      if (aIsGuimaras && !bIsGuimaras) return -1;
-      if (!aIsGuimaras && bIsGuimaras) return 1;
-
-      if (aIsGuimaras && bIsGuimaras) {
-        const aIdx = GUIMARAS_MUNICIPALITIES.findIndex(m => a[0].includes(m));
-        const bIdx = GUIMARAS_MUNICIPALITIES.findIndex(m => b[0].includes(m));
-        return aIdx - bIdx;
-      }
-
-      return b[1].length - a[1].length;
+      // Sort by number of properties (descending)
+      const countDiff = b[1].length - a[1].length;
+      if (countDiff !== 0) return countDiff;
+      // Then alphabetically by city name
+      return a[0].localeCompare(b[0]);
     });
 
     return Object.fromEntries(sortedEntries);
@@ -174,13 +165,8 @@ export default function Explore() {
       onSearchGuestCountChange={setSearchGuestCount}
       onSearch={handleSearch}
     >
-      {/* Mobile Welcome Header */}
-      <div className="md:hidden">
-        <WelcomeHeader />
-      </div>
-
       {/* Mobile Simple Search Bar */}
-      <div className="md:hidden px-4 pb-3 flex items-center gap-2 animate-fade-in">
+      <div className="relative md:hidden px-4 pt-5 pb-3 flex items-center gap-2 animate-fade-in bg-card border-b border-border/30 sticky top-0 z-40">
         <button
           onClick={() => setIsMobileSearchOpen(true)}
           className="flex-1 flex items-center gap-3 px-3.5 py-2.5 rounded-full bg-card border border-border/50 shadow-soft active:scale-[0.98] transition-transform"
@@ -188,7 +174,7 @@ export default function Explore() {
           <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
             <Search className="h-4 w-4 text-primary" />
           </div>
-          <span className="text-sm text-muted-foreground truncate">Search your destination...</span>
+          <span className="text-sm text-muted-foreground truncate">Search...</span>
         </button>
         <button
           type="button"
@@ -205,6 +191,14 @@ export default function Explore() {
           className="w-11 h-11 rounded-full bg-card border border-border/50 shadow-soft flex items-center justify-center active:scale-95 transition-transform shrink-0"
         >
           <Map className="h-4 w-4 text-foreground" />
+        </button>
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="w-11 h-11 rounded-full bg-card border border-border/50 shadow-soft flex items-center justify-center active:scale-95 transition-transform shrink-0 relative"
+        >
+          <Bell className="h-4 w-4 text-foreground" />
+          <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-primary rounded-full" />
         </button>
       </div>
 
@@ -228,14 +222,6 @@ export default function Explore() {
         <ListingTypeTabs
           selectedType={selectedListingType}
           onTypeChange={setSelectedListingType}
-        />
-      </div>
-
-      {/* Farmstay Categories */}
-      <div className="md:px-0">
-        <FarmstayCategories
-          selectedCategories={selectedCategories}
-          onCategoryChange={setSelectedCategories}
         />
       </div>
 

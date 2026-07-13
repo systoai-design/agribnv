@@ -76,7 +76,7 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
     <div>
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth -mx-4 px-4 md:mx-0 md:px-0 md:rounded-2xl md:overflow-hidden"
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth gap-4 md:rounded-2xl md:overflow-hidden"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {featured.map((property) => (
@@ -84,7 +84,7 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
             key={property.id}
             to={`/properties/${property.id}`}
             onClick={() => haptics.light()}
-            className="relative snap-start shrink-0 w-full aspect-[4/3] md:aspect-[21/9] rounded-2xl md:rounded-none overflow-hidden"
+            className="relative snap-center shrink-0 w-full aspect-[4/3] md:aspect-[21/9] rounded-2xl overflow-hidden"
           >
             <img
               src={getHeroImage(property)}

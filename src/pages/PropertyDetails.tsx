@@ -13,6 +13,8 @@ import { PhotoGalleryModal } from '@/components/properties/PhotoGalleryModal';
 import { FarmExperiences } from '@/components/properties/FarmExperiences';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AmenitiesModal } from '@/components/properties/AmenitiesModal';
+import { FarmerProfileModal } from '@/components/properties/FarmerProfileModal';
+import { PropertyCalendarModal, FarmEvent } from '@/components/properties/PropertyCalendarModal';
 import PropertyMap from '@/components/map/PropertyMap';
 import { Layout } from '@/components/layout/Layout';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +27,7 @@ import { Property, Experience, CATEGORY_LABELS, CANCELLATION_POLICY_LABELS, CANC
 import {
   MapPin, Users, BedDouble, Bath, Wifi, Car, Utensils, TreePine, Tv, Wind,
   Clock, ChevronLeft, ChevronRight, Loader2, Star, Share, Heart, Grid3X3,
-  Warehouse, DoorOpen, ShieldCheck, X, Award, CalendarDays, MessageCircle, Minus, Plus
+  Warehouse, DoorOpen, ShieldCheck, X, Award, CalendarDays, MessageCircle, Minus, Plus, ChefHat, Leaf
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -66,15 +68,23 @@ export default function PropertyDetails() {
   const { blockedRanges } = useAvailability(property?.id);
   const [isLoading, setIsLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showFarmerProfile, setShowFarmerProfile] = useState(false);
+  const [isStartingConversation, setIsStartingConversation] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
   const [guestCount, setGuestCount] = useState(1);
   const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
   const [isBooking, setIsBooking] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [showAllPhotos, setShowAllPhotos] = useState(false);
-  const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [isStartingConversation, setIsStartingConversation] = useState(false);
 
   // Share handler
   const handleShare = () => {
@@ -156,9 +166,51 @@ export default function PropertyDetails() {
     { before: new Date() },
     ...blockedRanges.map((r) => ({ from: r.from, to: r.to })),
   ];
+
+  const specialEvents: FarmEvent[] = [
+    {
+      date: new Date(new Date().setDate(new Date().getDate() + 2)),
+      title: "Harvest Festival",
+      description: "Join us for our annual harvest festival. Experience fruit picking and enjoy a farm-to-table feast.",
+      image: "https://images.unsplash.com/photo-1595859733475-7b565158654c?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      date: new Date(new Date().setDate(new Date().getDate() + 5)),
+      title: "Goat Milking Workshop",
+      description: "Learn how to milk goats and make fresh artisanal cheese in this hands-on workshop.",
+      image: "https://images.unsplash.com/photo-1524424364114-1246c4f1c79e?auto=format&fit=crop&q=80&w=600"
+    }
+  ];
+
+  const mockExperiences = [
+    {
+      id: 'mock-1',
+      property_id: property?.id || '',
+      name: 'Morning Goat Milking',
+      description: 'Join us at sunrise to milk our friendly dairy goats. Fresh milk included!',
+      price: 250,
+      duration_hours: 1,
+      max_participants: 4,
+      is_active: true,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 'mock-2',
+      property_id: property?.id || '',
+      name: 'Organic Harvest Tour',
+      description: 'Harvest your own vegetables for dinner and learn about sustainable farming.',
+      price: 400,
+      duration_hours: 2,
+      max_participants: 6,
+      is_active: true,
+      created_at: new Date().toISOString()
+    }
+  ];
+  const displayExperiences = property?.experiences?.length ? property.experiences : mockExperiences;
+
   const accommodationTotal = nights * (property?.price_per_night || 0);
   const experiencesTotal = selectedExperiences.reduce((sum, expId) => {
-    const exp = property?.experiences?.find(e => e.id === expId);
+    const exp = displayExperiences.find(e => e.id === expId);
     return sum + (exp?.price || 0);
   }, 0);
   const serviceFee = Math.round(accommodationTotal * 0.12);
@@ -230,7 +282,7 @@ export default function PropertyDetails() {
 
       if (selectedExperiences.length > 0 && booking) {
         const expInserts = selectedExperiences.map(expId => {
-          const exp = property.experiences?.find(e => e.id === expId);
+          const exp = displayExperiences.find(e => e.id === expId);
           return {
             booking_id: booking.id,
             experience_id: expId,
@@ -313,49 +365,49 @@ export default function PropertyDetails() {
 
       {/* Mobile Full-Width Image Carousel */}
       <div className="md:hidden relative -mt-16">
-        <div className="relative h-[280px] overflow-hidden">
-          <motion.img
-            key={currentImageIndex}
-            src={imageUrls[currentImageIndex]}
-            alt={property.name}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="w-full h-full object-cover"
-          />
-          {/* Image navigation */}
-          {imageUrls.length > 1 && (
-            <>
-              <button
-                onClick={() => setCurrentImageIndex(prev => prev === 0 ? imageUrls.length - 1 : prev - 1)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setCurrentImageIndex(prev => prev === imageUrls.length - 1 ? 0 : prev + 1)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </>
-          )}
-          {/* Dots indicator */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {imageUrls.slice(0, 5).map((_, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  'h-1.5 rounded-full transition-all',
-                  idx === currentImageIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/60'
-                )}
-              />
-            ))}
-          </div>
-          {/* Image counter */}
-          <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-            {currentImageIndex + 1} / {imageUrls.length}
-          </div>
+        <div 
+          className="relative h-[280px] flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          onScroll={(e) => {
+            const element = e.currentTarget;
+            const scrollLeft = element.scrollLeft;
+            const width = element.clientWidth;
+            const newIndex = Math.round(scrollLeft / width);
+            if (newIndex !== currentImageIndex && newIndex >= 0 && newIndex < imageUrls.length) {
+              setCurrentImageIndex(newIndex);
+            }
+          }}
+        >
+          {imageUrls.map((imgUrl, idx) => (
+            <img
+              key={idx}
+              src={imgUrl}
+              alt={`${property.name} - ${idx + 1}`}
+              className="w-full h-full object-cover shrink-0 snap-center"
+            />
+          ))}
         </div>
+        
+        {/* Overlays (dots and counter) */}
+        {imageUrls.length > 1 && (
+          <>
+            {/* Dots indicator */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 pointer-events-none">
+              {imageUrls.slice(0, 5).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    'h-1.5 rounded-full transition-all',
+                    idx === currentImageIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/60'
+                  )}
+                />
+              ))}
+            </div>
+            {/* Image counter */}
+            <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md z-10 pointer-events-none">
+              {currentImageIndex + 1} / {imageUrls.length}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Mobile Content */}
@@ -364,25 +416,34 @@ export default function PropertyDetails() {
         <div>
           <h1 className="text-xl font-semibold">{property.name}</h1>
           <p className="text-sm text-muted-foreground">{CATEGORY_LABELS[property.category]} · {property.location}</p>
-        </div>
-
-        {/* Property category badge */}
-        <div className="flex items-center gap-2 py-3 border-b border-border/50">
-          <span className="text-sm text-muted-foreground">{CATEGORY_LABELS[property.category]}</span>
+          <div className="flex items-center gap-1 mt-2">
+            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+            <span className="text-sm font-medium">4.9</span>
+            <span className="text-sm text-muted-foreground underline">(120 reviews)</span>
+          </div>
         </div>
 
         {/* Host Info */}
-        <div className="flex items-center gap-4 py-4 border-b border-border/50">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={property.host?.avatar_url} />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {property.host?.full_name?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <p className="font-medium">Hosted by {property.host?.full_name}</p>
-            <p className="text-sm text-muted-foreground">Host</p>
+        <div className="flex items-center justify-between gap-4 py-4 border-b border-border/50">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 shrink-0">
+              <AvatarImage src={property.host?.avatar_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"} />
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                {property.host?.full_name?.charAt(0) || 'H'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium leading-tight">Hosted by {property.host?.full_name || 'Jesus'}</p>
+              <p className="text-sm text-muted-foreground">Host</p>
+            </div>
           </div>
+          <Button 
+            size="sm" 
+            className="rounded-full px-4 h-8 text-xs bg-[#156530] text-white hover:bg-[#156530]/90 shadow-none shrink-0"
+            onClick={() => setShowFarmerProfile(true)}
+          >
+            Know the farmer
+          </Button>
         </div>
 
         {/* Quick highlights */}
@@ -400,13 +461,7 @@ export default function PropertyDetails() {
               <p className="text-sm text-muted-foreground">Check yourself in with the lockbox</p>
             </div>
           </div>
-          <div className="flex gap-4">
-            <Award className="h-6 w-6 shrink-0" />
-            <div>
-              <p className="font-medium">Hosted by {property.host?.full_name}</p>
-              <p className="text-sm text-muted-foreground">Your host for this property</p>
-            </div>
-          </div>
+
         </div>
 
         {/* Description */}
@@ -459,9 +514,74 @@ export default function PropertyDetails() {
           </div>
         )}
 
-        {/* Farm Experiences Section - NEW */}
+        {/* Farm-Fresh Kitchen Section */}
+        <div className="py-6 border-b border-border/50">
+          <div className="flex items-center gap-2 mb-4">
+            <ChefHat className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-lg">Farm-Fresh Kitchen</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Enjoy farm-to-table meals prepared with organic ingredients harvested right from our fields. 
+            You also have full access to our outdoor kitchen!
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 text-sm bg-muted/50 p-2 rounded-lg">
+              <Utensils className="h-4 w-4 text-primary" />
+              <span>Farm-to-table meals</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm bg-muted/50 p-2 rounded-lg">
+              <Leaf className="h-4 w-4 text-primary" />
+              <span>Organic ingredients</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Calendar Section */}
+        <div className="py-6 border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-lg mb-1">Select Dates</h3>
+              <div className="flex items-start gap-2">
+                <span className="inline-block w-2 h-2 mt-1.5 rounded-full bg-[#156530] shrink-0"></span> 
+                <p className="text-muted-foreground text-sm leading-tight">
+                  Highlighted days have<br/>special events!
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              className="rounded-full border-[#156530] text-[#156530] font-semibold px-6 hover:bg-[#156530]/5"
+              onClick={() => setShowCalendarModal(true)}
+            >
+              Check availability
+            </Button>
+          </div>
+        </div>
+
+        {/* Map Section */}
+        <div className="py-6 border-b border-border/50">
+          <h3 className="font-semibold text-lg mb-2">Where you'll be</h3>
+          <p className="text-sm text-muted-foreground mb-4">{property.location}</p>
+          {property.latitude && property.longitude ? (
+            <PropertyMap
+              properties={[property]}
+              selectedPropertyId={property.id}
+              className="h-[200px] w-full rounded-xl"
+            />
+          ) : (
+            <div className="h-[200px] w-full bg-muted rounded-xl flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-sage/20 to-primary/10" />
+              <div className="text-center z-10">
+                <MapPin className="h-8 w-8 mx-auto text-primary mb-2" />
+                <p className="text-sm text-muted-foreground">Location not available</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Farm Experiences Section */}
         <FarmExperiences
-          experiences={property.experiences || []}
+          experiences={displayExperiences as Experience[]}
           selectedExperiences={selectedExperiences}
           onToggleExperience={(expId) => {
             if (selectedExperiences.includes(expId)) {
@@ -480,7 +600,7 @@ export default function PropertyDetails() {
       </div>
 
       {/* Mobile Sticky Bottom Booking Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/50 px-4 py-3 safe-area-pb">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/50 px-4 pt-3 pb-8 shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)]">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm">
@@ -568,16 +688,6 @@ export default function PropertyDetails() {
           </Button>
         </motion.div>
 
-        {/* Photo Gallery Modal */}
-        <PhotoGalleryModal
-          isOpen={showAllPhotos}
-          onClose={() => setShowAllPhotos(false)}
-          images={imageUrls}
-          propertyName={property.name}
-          isLiked={isLiked}
-          onToggleLike={() => setIsLiked(!isLiked)}
-        />
-
         <div className="grid lg:grid-cols-3 gap-12 lg:gap-16">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
@@ -595,10 +705,15 @@ export default function PropertyDetails() {
                 <p className="text-muted-foreground mt-1">
                   {property.max_guests} guests · {property.bedrooms} bedroom{property.bedrooms > 1 ? 's' : ''} · {property.bedrooms} bed{property.bedrooms > 1 ? 's' : ''} · {property.bathrooms} bath{property.bathrooms > 1 ? 's' : ''}
                 </p>
+                <div className="flex items-center gap-1 mt-2">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  <span className="text-sm font-medium">4.9</span>
+                  <span className="text-sm text-muted-foreground underline hover:text-foreground cursor-pointer transition-colors">(120 reviews)</span>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 border-2 border-background shadow-md">
-                  <AvatarImage src={property.host?.avatar_url || undefined} />
+                  <AvatarImage src={property.host?.avatar_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"} />
                   <AvatarFallback className="bg-foreground text-background font-semibold">
                     {property.host?.full_name?.charAt(0) || 'H'}
                   </AvatarFallback>
@@ -615,15 +730,7 @@ export default function PropertyDetails() {
               transition={{ delay: 0.3 }}
               className="space-y-6"
             >
-              <div className="flex gap-6 items-start">
-                <div className="p-2">
-                  <Award className="h-6 w-6 text-foreground" />
-                </div>
-                <div>
-                  <p className="font-semibold">Hosted by {property.host?.full_name}</p>
-                  <p className="text-muted-foreground text-sm">Your host for this property.</p>
-                </div>
-              </div>
+
               <div className="flex gap-6 items-start">
                 <div className="p-2">
                   <DoorOpen className="h-6 w-6 text-foreground" />
@@ -707,42 +814,28 @@ export default function PropertyDetails() {
               </>
             )}
 
-            {/* Calendar Section */}
-            <Separator />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <h3 className="text-xl font-semibold mb-2">
-                {nights > 0 
-                  ? `${nights} night${nights > 1 ? 's' : ''} in ${property.location.split(',')[0]}`
-                  : `Select check-in date`
-                }
-              </h3>
-              {dateRange.from && dateRange.to && (
-                <p className="text-muted-foreground text-sm mb-6">
-                  {format(dateRange.from, 'MMM d, yyyy')} - {format(dateRange.to, 'MMM d, yyyy')}
-                </p>
-              )}
-              <div className="flex justify-center lg:justify-start">
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={(range) => setDateRange({ from: range?.from, to: range?.to })}
-                  disabled={disabledDates}
-                  className="rounded-xl p-3 pointer-events-auto"
-                  numberOfMonths={2}
-                />
+            {/* Desktop Calendar Section */}
+            <div className="mt-8 pt-8 border-t border-border/50">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Select Dates</h3>
+                  <div className="flex items-start gap-2">
+                    <span className="inline-block w-2.5 h-2.5 mt-1.5 rounded-full bg-[#156530] shrink-0"></span> 
+                    <p className="text-muted-foreground leading-tight">
+                      Highlighted days have<br/>special events!
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="rounded-full border-[#156530] text-[#156530] font-semibold px-8 hover:bg-[#156530]/5"
+                  onClick={() => setShowCalendarModal(true)}
+                >
+                  Check availability
+                </Button>
               </div>
-              <Button 
-                variant="link" 
-                className="px-0 mt-4 underline text-foreground"
-                onClick={() => setDateRange({ from: undefined, to: undefined })}
-              >
-                Clear dates
-              </Button>
-            </motion.div>
+            </div>
 
             {/* Reviews */}
             <Separator />
@@ -812,18 +905,27 @@ export default function PropertyDetails() {
                       {property.host?.bio || 'Your host is looking forward to welcoming you!'}
                     </p>
                   </div>
-                  <Button 
-                    className="rounded-lg bg-foreground text-background hover:bg-foreground/90 mt-4"
-                    onClick={handleContactHost}
-                    disabled={isStartingConversation}
-                  >
-                    {isStartingConversation ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                    )}
-                    Message Host
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-3 mt-4">
+                    <Button 
+                      className="rounded-lg bg-foreground text-background hover:bg-foreground/90"
+                      onClick={handleContactHost}
+                      disabled={isStartingConversation}
+                    >
+                      {isStartingConversation ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Message Host
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="rounded-lg border-foreground/20 hover:bg-muted"
+                      onClick={() => setShowFarmerProfile(true)}
+                    >
+                      Know the farmer
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -944,7 +1046,7 @@ export default function PropertyDetails() {
                             selected={dateRange}
                             onSelect={(range) => setDateRange({ from: range?.from, to: range?.to })}
                             disabled={disabledDates}
-                            numberOfMonths={2}
+                            numberOfMonths={1}
                             className="p-3 pointer-events-auto"
                           />
                         </PopoverContent>
@@ -967,7 +1069,7 @@ export default function PropertyDetails() {
                               { before: dateRange.from || new Date() },
                               ...blockedRanges.map((r) => ({ from: r.from, to: r.to })),
                             ]}
-                            numberOfMonths={2}
+                            numberOfMonths={1}
                             className="p-3 pointer-events-auto"
                           />
                         </PopoverContent>
@@ -1059,7 +1161,6 @@ export default function PropertyDetails() {
         </div>
       </div>
 
-      {/* Photo Gallery Modal - Works for both mobile and desktop */}
       <PhotoGalleryModal
         isOpen={showAllPhotos}
         onClose={() => setShowAllPhotos(false)}
@@ -1069,12 +1170,30 @@ export default function PropertyDetails() {
         onToggleLike={() => setIsLiked(!isLiked)}
       />
 
-      {/* Amenities Modal */}
       <AmenitiesModal
         isOpen={showAmenitiesModal}
         onClose={() => setShowAmenitiesModal(false)}
         amenities={property.amenities || []}
         propertyName={property.name}
+      />
+
+      <FarmerProfileModal
+        isOpen={showFarmerProfile}
+        onClose={() => setShowFarmerProfile(false)}
+        host={property.host || null}
+        property={property}
+        onContactHost={handleContactHost}
+        isStartingConversation={isStartingConversation}
+      />
+
+      <PropertyCalendarModal
+        isOpen={showCalendarModal}
+        onClose={() => setShowCalendarModal(false)}
+        dateRange={dateRange as any}
+        setDateRange={(range) => setDateRange({ from: range?.from, to: range?.to })}
+        disabledDates={disabledDates as Date[]}
+        specialEvents={specialEvents}
+        locationName={property.location}
       />
     </Layout>
   );

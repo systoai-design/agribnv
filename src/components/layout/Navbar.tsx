@@ -79,7 +79,7 @@ export function Navbar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-card/95 backdrop-blur-sm border-b border-border/50 safe-area-pt">
+      <header className="hidden md:block sticky top-0 z-50 w-full bg-card/95 backdrop-blur-sm border-b border-border/50 safe-area-pt">
         <div className="container h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
           <div className="flex-shrink-0">

@@ -15,9 +15,17 @@ export function AppLoadingScreen() {
         src={agribnvIconGreen}
         alt="Agribnv"
         initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="h-28 w-auto"
+        animate={{ 
+          opacity: [0, 1, 1, 1], 
+          scale: [0.92, 1, 1.05, 1] 
+        }}
+        transition={{ 
+          duration: 2, 
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse'
+        }}
+        className="h-28 w-auto drop-shadow-md"
       />
     </div>
   );

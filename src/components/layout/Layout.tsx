@@ -38,8 +38,8 @@ export function Layout({
   // Full screen mode - no nav, no footer
   if (hideNav) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <main className="flex-1">
+      <div className="h-screen flex flex-col overflow-hidden">
+        <main id="main-scroll-container" className="flex-1 overflow-y-auto overflow-x-hidden">
           {children}
         </main>
       </div>
@@ -47,8 +47,8 @@ export function Layout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className={hideNavbarOnMobile ? 'hidden md:block' : ''}>
+    <div className="h-screen flex flex-col overflow-hidden">
+      <div className={hideNavbarOnMobile ? 'hidden md:block shrink-0' : 'shrink-0'}>
         <Navbar 
           showSearch={showSearch}
           searchLocation={searchLocation}
@@ -60,11 +60,11 @@ export function Layout({
           onSearch={onSearch}
         />
       </div>
-      <main className={`flex-1 ${showMobileNav ? 'pb-20 md:pb-0' : ''}`}>
+      <main id="main-scroll-container" className={`flex-1 overflow-y-auto overflow-x-hidden ${showMobileNav ? 'pb-20 md:pb-0' : ''}`}>
         {children}
       </main>
-      {showFooter && !Capacitor.isNativePlatform() && <Footer />}
-      {showMobileNav && <MobileNav />}
+      {showFooter && !Capacitor.isNativePlatform() && <div className="shrink-0"><Footer /></div>}
+      {showMobileNav && <div className="shrink-0"><MobileNav /></div>}
     </div>
   );
 }

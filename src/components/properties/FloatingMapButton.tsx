@@ -13,12 +13,16 @@ export function FloatingMapButton({ threshold = 300 }: FloatingMapButtonProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsVisible(window.scrollY > threshold);
+    const container = document.getElementById('main-scroll-container') || window;
+    
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement | Window;
+      const scrollY = 'scrollTop' in target ? target.scrollTop : target.scrollY;
+      setIsVisible(scrollY > threshold);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [threshold]);
 
   const handleClick = () => {
@@ -30,7 +34,7 @@ export function FloatingMapButton({ threshold = 300 }: FloatingMapButtonProps) {
     <button
       onClick={handleClick}
       className={cn(
-        'fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50',
+        'fixed bottom-32 md:bottom-8 left-1/2 -translate-x-1/2 z-50',
         'flex items-center gap-2 px-5 py-3',
         'bg-foreground text-background',
         'rounded-full shadow-lg',
