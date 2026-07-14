@@ -97,7 +97,7 @@ export default function Inbox() {
     return (
       <Layout>
         {/* Header */}
-        <div className="sticky top-0 z-40 bg-background px-4 py-4 border-b border-border/30">
+        <div className="sticky top-0 safe-area-pt z-40 bg-background px-4 py-4 border-b border-border/30">
           <div className="flex items-center gap-4">
             <Link to="/">
               <motion.button

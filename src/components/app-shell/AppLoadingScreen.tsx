@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import agribnvIconGreen from '@/assets/agribnv-icon-green.png';
+import agribnvIconGreen from '@/assets/agribnv-icon-green.png?v=2';
 
 // Shown on native platforms while the initial auth session check resolves, between the native
 // OS splash screen (same cream background + icon, for a seamless handoff) and the sign-in form.

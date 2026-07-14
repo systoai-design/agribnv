@@ -108,7 +108,7 @@ export function CategoryFilter({ selectedCategories, onCategoryChange, onFilters
   };
 
   return (
-    <div className="sticky top-0 md:top-20 z-40 bg-background py-2 md:py-4">
+    <div className="sticky top-0 safe-area-pt md:top-20 z-40 bg-background py-2 md:py-4">
       <div className="md:container">
         {/* Mobile Layout - Categories + Buttons in one row */}
         <div className="md:hidden">

@@ -96,7 +96,7 @@ export default function Terms() {
         </div>
       </div>
 
-      <div className="container py-8 max-w-2xl mx-auto px-4">
+      <div className="container py-8 safe-area-pt max-w-2xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

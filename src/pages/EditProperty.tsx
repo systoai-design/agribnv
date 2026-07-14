@@ -30,9 +30,10 @@ import {
 } from '@/types/database';
 import { ImageUploader, UploadedImage } from '@/components/properties/ImageUploader';
 import { ExperienceManager } from '@/components/properties/ExperienceManager';
+import { HostCalendarManager } from '@/components/host/HostCalendarManager';
 import { 
   Loader2, ArrowLeft, MapPin, Bed, Bath, Users, DollarSign, Camera, 
-  Clock, Shield, FileText, AlertTriangle, Settings, MapPinned, Check 
+  Clock, Shield, FileText, AlertTriangle, Settings, MapPinned, Check, CalendarIcon
 } from 'lucide-react';
 
 const AMENITIES = [
@@ -251,7 +252,7 @@ export default function EditProperty() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container py-8 max-w-4xl">
+        <div className="container py-8 safe-area-pt max-w-4xl">
           <Skeleton className="h-10 w-48 mb-8" />
           <Skeleton className="h-[600px] w-full" />
         </div>
@@ -261,7 +262,7 @@ export default function EditProperty() {
 
   return (
     <Layout>
-      <div className="container py-8 max-w-4xl">
+      <div className="container py-8 safe-area-pt max-w-4xl">
         <Button variant="ghost" onClick={() => navigate('/host')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
@@ -274,12 +275,13 @@ export default function EditProperty() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="flex w-full justify-start overflow-x-auto md:grid md:grid-cols-5">
+            <TabsList className="flex w-full justify-start overflow-x-auto md:grid md:grid-cols-6">
               <TabsTrigger value="basic" className="shrink-0 min-h-[44px]">Basic Info</TabsTrigger>
               <TabsTrigger value="photos" className="shrink-0 min-h-[44px]">Photos</TabsTrigger>
               <TabsTrigger value="rules" className="shrink-0 min-h-[44px]">House Rules</TabsTrigger>
               <TabsTrigger value="policies" className="shrink-0 min-h-[44px]">Policies</TabsTrigger>
               <TabsTrigger value="experiences" className="shrink-0 min-h-[44px]">Experiences</TabsTrigger>
+              <TabsTrigger value="calendar" className="shrink-0 min-h-[44px]">Calendar</TabsTrigger>
             </TabsList>
 
             {/* Basic Info Tab */}
@@ -573,6 +575,22 @@ export default function EditProperty() {
                 </CardHeader>
                 <CardContent>
                   {property && <ExperienceManager propertyId={property.id} />}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Calendar Tab */}
+            <TabsContent value="calendar">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CalendarIcon className="h-5 w-5" />
+                    Calendar & Availability
+                  </CardTitle>
+                  <CardDescription>View your bookings and block dates to prevent reservations.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {property && <HostCalendarManager propertyId={property.id} />}
                 </CardContent>
               </Card>
             </TabsContent>

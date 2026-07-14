@@ -4,59 +4,73 @@ import { X, Share, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
+import { PropertyImage } from '@/types/database';
 
 interface PhotoGalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  images: string[];
+  images: (string | PropertyImage)[];
   propertyName: string;
   isLiked?: boolean;
   onToggleLike?: () => void;
 }
 
-// Image section configuration for visual variety
-const getImageSections = (images: string[]) => {
+const CATEGORY_LABELS: Record<string, string> = {
+  exterior: 'Exterior & View',
+  living_area: 'Living Area',
+  bedroom: 'Bedroom',
+  bathroom: 'Bathroom / CR',
+  kitchen: 'Kitchen & Dining',
+  outdoor: 'Outdoor Spaces',
+  amenities: 'Amenities',
+  farm_animals: 'Farm Animals',
+};
+
+const getImageSections = (images: (string | PropertyImage)[]) => {
   if (images.length === 0) return [];
   
   const sections: { title: string; images: { url: string; fullWidth: boolean }[] }[] = [];
   
-  // First image is always hero/full-width
-  sections.push({
-    title: 'Photo tour',
-    images: [{ url: images[0], fullWidth: true }]
-  });
-  
-  if (images.length > 1) {
-    // Outdoor section (images 1-2)
-    const outdoorImages = images.slice(1, 3).map((url, idx) => ({
-      url,
-      fullWidth: false
-    }));
-    if (outdoorImages.length > 0) {
-      sections.push({ title: 'Outdoor spaces', images: outdoorImages });
-    }
-  }
-  
-  if (images.length > 3) {
-    // Living area with one full-width
+  // Backwards compatibility for string[]
+  if (typeof images[0] === 'string') {
+    const urls = images as string[];
     sections.push({
-      title: 'Living area',
-      images: [{ url: images[3], fullWidth: true }]
+      title: 'Photo tour',
+      images: [{ url: urls[0], fullWidth: true }]
     });
-  }
-  
-  if (images.length > 4) {
-    // Remaining images in 2-column grid
-    const remainingImages = images.slice(4).map(url => ({
-      url,
-      fullWidth: false
-    }));
-    if (remainingImages.length > 0) {
-      sections.push({ title: 'More spaces', images: remainingImages });
+    if (urls.length > 1) {
+      sections.push({ title: 'Outdoor spaces', images: urls.slice(1, 3).map(url => ({ url, fullWidth: false })) });
     }
+    if (urls.length > 3) {
+      sections.push({ title: 'Living area', images: [{ url: urls[3], fullWidth: true }] });
+    }
+    if (urls.length > 4) {
+      sections.push({ title: 'More spaces', images: urls.slice(4).map(url => ({ url, fullWidth: false })) });
+    }
+    return sections;
   }
   
-  return sections;
+  // Logic for PropertyImage[]
+  const propImages = images as PropertyImage[];
+  const groups: Record<string, { url: string; fullWidth: boolean }[]> = {};
+  
+  propImages.forEach((img) => {
+    const category = img.category || 'exterior';
+    const label = CATEGORY_LABELS[category] || 'More photos';
+    
+    if (!groups[label]) groups[label] = [];
+    
+    // First image in each category is full width
+    groups[label].push({
+      url: img.image_url,
+      fullWidth: groups[label].length === 0
+    });
+  });
+
+  return Object.entries(groups).map(([title, imgs]) => ({
+    title,
+    images: imgs
+  }));
 };
 
 export function PhotoGalleryModal({
@@ -71,7 +85,7 @@ export function PhotoGalleryModal({
   const sections = getImageSections(images);
   
   // Get flat index for lightbox navigation
-  const allImages = images;
+  const allImages = images.map(img => typeof img === 'string' ? img : img.image_url);
   
   const handlePrev = useCallback(() => {
     if (lightboxIndex !== null && lightboxIndex > 0) {
@@ -120,7 +134,7 @@ export function PhotoGalleryModal({
         tabIndex={0}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b">
+        <div className="sticky top-0 safe-area-pt z-10 bg-background border-b">
           <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
             <Button
               variant="ghost"

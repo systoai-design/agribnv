@@ -48,7 +48,7 @@ export default function Profile() {
     if (viewMode === 'host') {
       switchViewMode('guest');
       navigate('/');
-      toast({ title: 'Switched to Guest mode', description: 'Now browsing as a traveler.' });
+      toast({ title: 'Switched to Traveller mode', description: 'Now browsing as a traveller.' });
     } else {
       switchViewMode('host');
       navigate('/host');
@@ -168,7 +168,7 @@ export default function Profile() {
   return (
     <Layout>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background px-4 py-4 border-b border-border/30 md:hidden">
+      <div className="sticky top-0 safe-area-pt z-40 bg-background px-4 py-4 border-b border-border/30 md:hidden">
         <div className="flex items-center gap-4">
           <Link to="/">
             <motion.button
@@ -182,7 +182,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="container py-8 max-w-md mx-auto px-4">
+      <div className="container py-8 safe-area-pt max-w-md mx-auto px-4">
         {/* Profile Avatar Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -248,7 +248,7 @@ export default function Profile() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-secondary-foreground">
-                  {viewMode === 'host' ? 'You\'re in Host mode' : 'You\'re in Guest mode'}
+                  {viewMode === 'host' ? "You're in Host mode" : "You're in Traveller mode"}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {viewMode === 'host' ? 'Managing your listings' : 'Browsing farm stays'}
@@ -256,7 +256,7 @@ export default function Profile() {
               </div>
               <Button onClick={handleSwitchMode} variant="outline" size="sm" className="gap-2">
                 <Repeat className="h-4 w-4" />
-                {viewMode === 'host' ? 'Switch to Guest' : 'Switch to Host'}
+                {viewMode === 'host' ? 'Switch to Traveller' : 'Switch to Host'}
               </Button>
             </div>
           </motion.div>

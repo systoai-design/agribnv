@@ -309,7 +309,7 @@ export default function PropertyDetails() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container py-8 flex justify-center">
+        <div className="container py-8 safe-area-pt flex justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </Layout>
@@ -364,7 +364,7 @@ export default function PropertyDetails() {
       </div>
 
       {/* Mobile Full-Width Image Carousel */}
-      <div className="md:hidden relative -mt-16">
+      <div className="md:hidden relative safe-area-pt">
         <div 
           className="relative h-[280px] flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           onScroll={(e) => {
@@ -402,9 +402,17 @@ export default function PropertyDetails() {
                 />
               ))}
             </div>
-            {/* Image counter */}
-            <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md z-10 pointer-events-none">
-              {currentImageIndex + 1} / {imageUrls.length}
+            {/* Image counter & View all button */}
+            <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10">
+              <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md pointer-events-none">
+                {currentImageIndex + 1} / {imageUrls.length}
+              </div>
+              <button 
+                onClick={() => setShowAllPhotos(true)}
+                className="bg-white/90 text-black text-xs font-medium px-3 py-1.5 rounded-md shadow-sm active:scale-95 transition-transform"
+              >
+                View all
+              </button>
             </div>
           </>
         )}
@@ -1164,7 +1172,7 @@ export default function PropertyDetails() {
       <PhotoGalleryModal
         isOpen={showAllPhotos}
         onClose={() => setShowAllPhotos(false)}
-        images={imageUrls}
+        images={property.images && property.images.length > 0 ? property.images : imageUrls}
         propertyName={property.name}
         isLiked={isLiked}
         onToggleLike={() => setIsLiked(!isLiked)}

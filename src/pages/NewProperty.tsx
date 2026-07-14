@@ -182,7 +182,7 @@ export default function NewProperty() {
 
   return (
     <Layout>
-      <div className="container py-8 max-w-4xl">
+      <div className="container py-8 safe-area-pt max-w-4xl">
         <Button variant="ghost" onClick={() => navigate('/host')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard

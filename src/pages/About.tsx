@@ -42,7 +42,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="container py-8 max-w-2xl mx-auto px-4">
+      <div className="container py-8 safe-area-pt max-w-2xl mx-auto px-4">
         {/* Logo and Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

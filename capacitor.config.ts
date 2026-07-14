@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: 'Agribnv',
   webDir: 'dist',
   ios: {
-    contentInset: 'automatic',
     backgroundColor: '#FEF9F0',
   },
   android: {
@@ -22,6 +21,9 @@ const config: CapacitorConfig = {
     },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
+    },
+    StatusBar: {
+      overlaysWebView: true,
     },
   },
 };

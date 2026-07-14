@@ -323,12 +323,20 @@
 
 }
 
-@layer utilities {
-  /* Safe area for mobile */
-  .safe-area-pb {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
+/* Toast safe area (never purged) */
+.toast-safe-top {
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 0.5rem) !important;
+}
 
+/* Safe area for mobile (never purged) */
+.safe-area-pt {
+  padding-top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 1.5rem) !important;
+}
+.safe-area-pb {
+  padding-bottom: max(1rem, var(--sab, env(safe-area-inset-bottom, 0px))) !important;
+}
+
+@layer utilities {
   /* Glass effect */
   .glass {
     @apply bg-white/90 backdrop-blur-md;

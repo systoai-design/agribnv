@@ -132,7 +132,7 @@ export default function HostDashboard() {
 
   return (
     <Layout>
-      <div className="container py-8">
+      <div className="container py-8 safe-area-pt">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>

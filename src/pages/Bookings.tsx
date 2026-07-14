@@ -65,7 +65,7 @@ export default function Bookings() {
 
   return (
     <Layout>
-      <div className="container py-8">
+      <div className="container py-8 safe-area-pt">
         <h1 className="font-display text-3xl font-bold mb-6">My Bookings</h1>
 
         <Tabs defaultValue="upcoming" className="space-y-6">

@@ -109,7 +109,7 @@ export default function ChangePassword() {
   return (
     <Layout showMobileNav={false}>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 py-4 border-b border-border/30">
+      <div className="sticky top-0 safe-area-pt z-40 bg-background/95 backdrop-blur-sm px-4 py-4 border-b border-border/30">
         <div className="flex items-center gap-4 max-w-md mx-auto">
           <Link to="/profile">
             <motion.button whileTap={{ scale: 0.9 }} className="p-3 -ml-3">
@@ -120,7 +120,7 @@ export default function ChangePassword() {
         </div>
       </div>
 
-      <div className="container py-8 max-w-md mx-auto px-4">
+      <div className="container py-8 safe-area-pt max-w-md mx-auto px-4">
         {isSuccess ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

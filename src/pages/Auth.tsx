@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import agribnvIconGreen from '@/assets/agribnv-icon-green.png';
+import agribnvIconGreen from '@/assets/agribnv-icon-green.png?v=2';
 import { AuthGraphic } from '@/components/auth/AuthGraphic';
 import { TreeOverlay } from '@/components/auth/TreeOverlay';
 

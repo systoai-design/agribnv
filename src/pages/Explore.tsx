@@ -166,7 +166,7 @@ export default function Explore() {
       onSearch={handleSearch}
     >
       {/* Mobile Simple Search Bar */}
-      <div className="relative md:hidden px-4 pt-5 pb-3 flex items-center gap-2 animate-fade-in bg-card border-b border-border/30 sticky top-0 z-40">
+      <div className="relative md:hidden px-4 safe-area-pt pb-3 flex items-center gap-2 animate-fade-in bg-card border-b border-border/30 sticky top-0 z-40">
         <button
           onClick={() => setIsMobileSearchOpen(true)}
           className="flex-1 flex items-center gap-3 px-3.5 py-2.5 rounded-full bg-card border border-border/50 shadow-soft active:scale-[0.98] transition-transform"

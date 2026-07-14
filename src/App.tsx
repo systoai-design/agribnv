@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 
 import { Keyboard } from '@capacitor/keyboard';
 import { Capacitor } from '@capacitor/core';
+import { SafeArea } from 'capacitor-plugin-safe-area';
 import { useEffect } from 'react';
 
 function PushSetup() {
@@ -49,6 +50,27 @@ function KeyboardSetup() {
   return null;
 }
 
+function SafeAreaSetup() {
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      SafeArea.getSafeAreaInsets().then(({ insets }) => {
+        document.documentElement.style.setProperty('--sat', `${insets.top}px`);
+        document.documentElement.style.setProperty('--sab', `${insets.bottom}px`);
+        document.documentElement.style.setProperty('--sar', `${insets.right}px`);
+        document.documentElement.style.setProperty('--sal', `${insets.left}px`);
+      }).catch(console.error);
+
+      SafeArea.addListener('safeAreaChanged', data => {
+        document.documentElement.style.setProperty('--sat', `${data.insets.top}px`);
+        document.documentElement.style.setProperty('--sab', `${data.insets.bottom}px`);
+        document.documentElement.style.setProperty('--sar', `${data.insets.right}px`);
+        document.documentElement.style.setProperty('--sal', `${data.insets.left}px`);
+      });
+    }
+  }, []);
+  return null;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -62,6 +84,7 @@ const App = () => (
             <PushSetup />
             <NativeSplashSetup />
             <KeyboardSetup />
+            <SafeAreaSetup />
             <Routes>
               <Route path="/" element={<Root />} />
               <Route path="/explore" element={<Explore />} />

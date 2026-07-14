@@ -80,6 +80,54 @@ export function useCanReview(bookingId: string | null) {
   return { canReview, existingReviewId };
 }
 
+export function useCanReviewProperty(propertyId: string) {
+  const [canReview, setCanReview] = useState(false);
+  const [eligibleBookingId, setEligibleBookingId] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!propertyId || !user) return;
+    async function check() {
+      // Find all completed bookings for this user on this property
+      const { data: bookings } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('property_id', propertyId)
+        .eq('guest_id', user.id)
+        .eq('status', 'completed');
+
+      if (!bookings || bookings.length === 0) {
+        setCanReview(false);
+        setEligibleBookingId(null);
+        return;
+      }
+
+      // Check which of these bookings already have a review
+      const bookingIds = bookings.map(b => b.id);
+      const { data: reviews } = await supabase
+        .from('reviews')
+        .select('booking_id')
+        .in('booking_id', bookingIds);
+      
+      const reviewedBookingIds = new Set(reviews?.map(r => r.booking_id) || []);
+      
+      // Find the first completed booking that hasn't been reviewed
+      const unreviewedBooking = bookings.find(b => !reviewedBookingIds.has(b.id));
+
+      if (unreviewedBooking) {
+        setCanReview(true);
+        setEligibleBookingId(unreviewedBooking.id);
+      } else {
+        setCanReview(false);
+        setEligibleBookingId(null);
+      }
+    }
+    check();
+  }, [propertyId, user]);
+
+  return { canReview, eligibleBookingId };
+}
+
 export function useCreateReview() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
