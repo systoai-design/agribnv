@@ -5,6 +5,8 @@ import { ReviewCard } from './ReviewCard';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { SubmitReviewForm } from './SubmitReviewForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ReviewsSectionProps {
   propertyId: string;
@@ -14,6 +16,25 @@ export function ReviewsSection({ propertyId }: ReviewsSectionProps) {
   const { reviews, rating, isLoading, refetch } = usePropertyReviews(propertyId);
   const { canReview, eligibleBookingId } = useCanReviewProperty(propertyId);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleReviewClick = (e: React.MouseEvent) => {
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to leave a review.",
+      });
+      return;
+    }
+    if (!canReview) {
+      e.preventDefault(); // Prevent dialog from opening
+      toast({
+        title: "Cannot leave a review",
+        description: "You can only review properties you have booked and stayed at.",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -43,18 +64,17 @@ export function ReviewsSection({ propertyId }: ReviewsSectionProps) {
         ) : (
           <div /> // Placeholder for flex layout
         )}
-        
-        {canReview && eligibleBookingId && (
-          <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Star className="h-3.5 w-3.5" />
-                Leave a review
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+        <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={handleReviewClick}>
+              <Star className="h-4 w-4" />
+              Write a Review
+            </Button>
+          </DialogTrigger>
+          {canReview && eligibleBookingId && (
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Review your stay</DialogTitle>
+                <DialogTitle>Write a Review</DialogTitle>
               </DialogHeader>
               <SubmitReviewForm
                 propertyId={propertyId}
@@ -65,8 +85,8 @@ export function ReviewsSection({ propertyId }: ReviewsSectionProps) {
                 }}
               />
             </DialogContent>
-          </Dialog>
-        )}
+          )}
+        </Dialog>
       </div>
 
       {/* Review list */}
