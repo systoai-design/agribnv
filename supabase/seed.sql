@@ -456,7 +456,11 @@ BEGIN
         ('Nueva Valencia, Guimaras', 'Nueva Valencia, Guimaras', 10.51, 122.57),
         ('Balamban, Cebu', 'Balamban, Cebu', 10.49, 123.77),
         ('El Nido, Palawan', 'El Nido, Palawan', 11.35, 119.53),
-        ('Davao City, Davao del Sur', 'Davao City, Davao del Sur', 7.18, 125.40)
+        ('Davao City, Davao del Sur', 'Davao City, Davao del Sur', 7.18, 125.40),
+        ('Tagaytay, Cavite', 'Tagaytay, Cavite', 14.115, 120.962),
+        ('Panglao, Bohol', 'Panglao, Bohol', 9.619, 123.801),
+        ('Baguio, Benguet', 'Baguio, Benguet', 16.402, 120.596),
+        ('San Lorenzo, Guimaras', 'San Lorenzo, Guimaras', 10.610, 122.620)
       ) AS t(loc, addr, lat, lng)
     LOOP
       FOR i IN 1..5 LOOP

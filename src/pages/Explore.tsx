@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Search, ArrowRight, SlidersHorizontal, Map, Bell } from 'lucide-react';
+import { Search, ArrowRight, SlidersHorizontal, Map, Bell, ChevronLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Layout } from '@/components/layout/Layout';
@@ -37,7 +37,9 @@ export default function Explore() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
-  const [selectedListingType, setSelectedListingType] = useState<ListingType>('farm_stay');
+  const [selectedListingType, setSelectedListingType] = useState<ListingType>(
+    (searchParams.get('type') as ListingType) || 'farm_stay'
+  );
   const [selectedCategories, setSelectedCategories] = useState<FarmstaySubcategory[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [guestCount, setGuestCount] = useState(1);
@@ -225,12 +227,23 @@ export default function Explore() {
         />
       </div>
 
+      {/* Farmstay Categories */}
+      <div className="md:px-0">
+        <FarmstayCategories
+          selectedCategories={selectedCategories}
+          onCategoryChange={setSelectedCategories}
+        />
+      </div>
+
       {/* Main Content */}
       <section id="search-section" className="container py-3 md:py-6">
         <div className="flex items-center justify-between mb-3 md:mb-6 animate-fade-in">
           <div>
             <h2 className="font-serif text-lg md:text-2xl font-bold text-foreground">
-              {hasActiveFilters ? 'Search Results' : 'Featured Farms'}
+              {hasActiveFilters ? 'Search Results' : 
+                selectedListingType === 'farm_stay' ? 'Featured Farms' : 
+                selectedListingType === 'farm_experience' ? 'Featured Experiences' : 
+                'Featured Tours'}
             </h2>
             {hasActiveFilters && (
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -269,7 +282,10 @@ export default function Explore() {
                   key={location}
                   title={`Available in ${location}`}
                   properties={props}
-                  onShowAll={() => setSearchLocation(location)}
+                  onShowAll={() => {
+                    // Update URL and let the useEffect handle triggering the search
+                    navigate(`/explore?location=${encodeURIComponent(location)}`);
+                  }}
                 />
               ))}
             </div>
@@ -281,12 +297,20 @@ export default function Explore() {
 
       {/* Filters Sheet */}
       <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto border-l-0 rounded-l-3xl">
-          <SheetHeader className="border-b border-border/50 pb-4">
-            <SheetTitle className="text-center text-lg font-semibold text-foreground">Filters</SheetTitle>
+        <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 border-l-0 rounded-l-3xl">
+          <SheetHeader className="flex flex-row items-center justify-between border-b border-border/50 px-4 pb-4 safe-area-pt shrink-0 space-y-0">
+            <button
+              onClick={closeFilters}
+              className="h-10 w-10 flex items-center justify-center rounded-full hover:bg-muted/50 active:scale-95 transition-all"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="h-6 w-6 text-foreground" />
+            </button>
+            <SheetTitle className="text-lg font-semibold text-foreground">Filters</SheetTitle>
+            <div className="w-10" /> {/* Spacer for precise centering */}
           </SheetHeader>
 
-          <div className="py-8 space-y-8">
+          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8">
             {/* Price Range */}
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-foreground">Price range</h3>
@@ -300,12 +324,12 @@ export default function Explore() {
                 className="mt-6"
               />
               <div className="flex items-center justify-between gap-4 mt-4">
-                <div className="flex-1 p-4 border border-border/50 rounded-2xl bg-muted/30">
+                <div className="flex-1 p-4 border border-border/50 rounded-2xl bg-card shadow-sm">
                   <p className="text-xs text-muted-foreground font-medium">Minimum</p>
                   <p className="font-bold text-foreground text-lg">₱{priceRange[0].toLocaleString()}</p>
                 </div>
                 <span className="text-muted-foreground">–</span>
-                <div className="flex-1 p-4 border border-border/50 rounded-2xl bg-muted/30">
+                <div className="flex-1 p-4 border border-border/50 rounded-2xl bg-card shadow-sm">
                   <p className="text-xs text-muted-foreground font-medium">Maximum</p>
                   <p className="font-bold text-foreground text-lg">₱{priceRange[1].toLocaleString()}</p>
                 </div>
@@ -315,7 +339,7 @@ export default function Explore() {
             {/* Guests */}
             <div className="space-y-6 border-t border-border/50 pt-8">
               <h3 className="text-xl font-semibold text-foreground">Guests</h3>
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
+              <div className="flex items-center justify-between p-4 bg-card border border-border/50 shadow-sm rounded-2xl">
                 <span className="font-medium text-foreground">Number of guests</span>
                 <div className="flex items-center gap-4">
                   <Button
@@ -343,7 +367,7 @@ export default function Explore() {
             {/* Dates */}
             <div className="space-y-6 border-t border-border/50 pt-8">
               <h3 className="text-xl font-semibold text-foreground">Dates</h3>
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl mb-4">
+              <div className="flex items-center justify-between p-4 bg-card border border-border/50 shadow-sm rounded-2xl mb-4">
                 <span className="font-medium text-foreground">Check in - Check out</span>
                 <span className="text-muted-foreground">{formatDateRangeDisplay()}</span>
               </div>
@@ -369,7 +393,7 @@ export default function Explore() {
             </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border/50 bg-card safe-area-pb">
+          <div className="p-6 border-t border-border/50 bg-card safe-area-pb shrink-0">
             <div className="flex items-center justify-between gap-4">
               <Button variant="ghost" onClick={clearFilters} className="underline font-semibold text-foreground">
                 Clear all

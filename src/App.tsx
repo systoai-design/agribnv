@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { Root } from "@/components/app-shell/Root";
+import { RoleRoute } from "@/components/auth/RoleRoute";
 import Explore from "./pages/Explore";
 import Auth from "./pages/Auth";
 import PropertyDetails from "./pages/PropertyDetails";
@@ -87,18 +88,18 @@ const App = () => (
             <SafeAreaSetup />
             <Routes>
               <Route path="/" element={<Root />} />
-              <Route path="/explore" element={<Explore />} />
+              <Route path="/explore" element={<RoleRoute requireHost={false}><Explore /></RoleRoute>} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/properties/:id" element={<PropertyDetails />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/host" element={<HostDashboard />} />
-              <Route path="/host/properties/new" element={<NewProperty />} />
-              <Route path="/host/properties/:id/edit" element={<EditProperty />} />
+              <Route path="/properties/:id" element={<RoleRoute requireHost={false}><PropertyDetails /></RoleRoute>} />
+              <Route path="/bookings" element={<RoleRoute requireHost={false}><Bookings /></RoleRoute>} />
+              <Route path="/host" element={<RoleRoute requireHost={true}><HostDashboard /></RoleRoute>} />
+              <Route path="/host/properties/new" element={<RoleRoute requireHost={true}><NewProperty /></RoleRoute>} />
+              <Route path="/host/properties/:id/edit" element={<RoleRoute requireHost={true}><EditProperty /></RoleRoute>} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/wishlists" element={<Wishlists />} />
-              <Route path="/map" element={<MapView />} />
+              <Route path="/wishlists" element={<RoleRoute requireHost={false}><Wishlists /></RoleRoute>} />
+              <Route path="/map" element={<RoleRoute requireHost={false}><MapView /></RoleRoute>} />
               <Route path="/inbox" element={<Inbox />} />
-              <Route path="/products" element={<Products />} />
+              <Route path="/products" element={<RoleRoute requireHost={false}><Products /></RoleRoute>} />
               <Route path="/about" element={<About />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />

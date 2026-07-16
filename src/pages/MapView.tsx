@@ -98,10 +98,10 @@ const MapView = () => {
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 p-3 bg-background/95 backdrop-blur-sm border-b z-10 safe-area-pt">
-        <Link to="/" className="shrink-0">
+        <Link to="/explore" className="shrink-0">
           <Button variant="ghost" size="sm" className="gap-2" onClick={() => haptics.light()}>
-            <List className="w-4 h-4" />
-            <span className="hidden sm:inline">Show list</span>
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back to Explore</span>
           </Button>
         </Link>
 

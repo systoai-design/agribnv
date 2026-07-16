@@ -1,23 +1,23 @@
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Property } from '@/types/database';
-import { PropertyCard } from './PropertyCard';
+import { SampleProduct } from '@/types/product';
+import { ProductCard } from './ProductCard';
 
-interface LocationCarouselProps {
+interface ProductLocationCarouselProps {
   title: string;
-  properties: Property[];
+  products: SampleProduct[];
   onShowAll?: () => void;
 }
 
 const MAX_VISIBLE = 5;
 
-const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProps) => {
+const ProductLocationCarousel = ({ title, products, onShowAll }: ProductLocationCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const displayedProperties = properties.slice(0, MAX_VISIBLE);
-  const remainingCount = properties.length - MAX_VISIBLE;
+  const displayedProducts = products.slice(0, MAX_VISIBLE);
+  const remainingCount = products.length - MAX_VISIBLE;
   const hasMore = remainingCount > 0;
 
   const checkScroll = () => {
@@ -38,7 +38,7 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
         window.removeEventListener('resize', checkScroll);
       };
     }
-  }, [properties]);
+  }, [products]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
@@ -49,7 +49,7 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
     });
   };
 
-  if (properties.length === 0) return null;
+  if (products.length === 0) return null;
 
   return (
     <section className="relative animate-fade-in">
@@ -89,19 +89,17 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
           </button>
         )}
 
-
-
         <div
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-2"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {displayedProperties.map((property, index) => (
+          {displayedProducts.map((product, index) => (
             <div
-              key={property.id}
+              key={product.id}
               className="snap-start shrink-0 w-[calc(48%-6px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-9px)] lg:w-[calc(20%-10px)] xl:w-[calc(16.666%-10px)]"
             >
-              <PropertyCard property={property} index={index} />
+              <ProductCard product={product} index={index} />
             </div>
           ))}
 
@@ -109,7 +107,7 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
             <div className="snap-start shrink-0 w-[calc(48%-6px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-9px)] lg:w-[calc(20%-10px)] xl:w-[calc(16.666%-10px)]">
               <button
                 onClick={onShowAll}
-                className="w-full aspect-[4/3] rounded-xl border-2 border-dashed border-muted-foreground/25 
+                className="w-full aspect-square rounded-2xl border-2 border-dashed border-muted-foreground/25 
                            flex flex-col items-center justify-center gap-2 
                            hover:border-primary hover:bg-primary/5 transition-all group"
               >
@@ -119,7 +117,7 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
                 </div>
                 <div className="text-center">
                   <p className="font-medium text-sm text-foreground">Show all</p>
-                  <p className="text-xs text-muted-foreground">{remainingCount}+ stays</p>
+                  <p className="text-xs text-muted-foreground">{remainingCount}+ items</p>
                 </div>
               </button>
             </div>
@@ -130,4 +128,4 @@ const LocationCarousel = ({ title, properties, onShowAll }: LocationCarouselProp
   );
 };
 
-export default LocationCarousel;
+export default ProductLocationCarousel;

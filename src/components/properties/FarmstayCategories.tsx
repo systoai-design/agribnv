@@ -32,10 +32,10 @@ export function FarmstayCategories({
   const handleCategoryClick = (categoryId: FarmstaySubcategory) => {
     if (isDragging) return;
     haptics.light();
-    if (selectedCategories.includes(categoryId)) {
-      onCategoryChange(selectedCategories.filter(c => c !== categoryId));
+    if (selectedCategories.includes(categoryId) && selectedCategories.length === 1) {
+      onCategoryChange([]);
     } else {
-      onCategoryChange([...selectedCategories, categoryId]);
+      onCategoryChange([categoryId]);
     }
   };
 

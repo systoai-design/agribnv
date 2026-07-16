@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ChevronRight, Home, Compass, Tractor } from 'lucide-react';
+import { Search, X, Home, Compass, Tractor, CalendarDays, Users, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -23,23 +23,20 @@ interface MobileSearchModalProps {
 }
 
 const SUGGESTED_DESTINATIONS = [
-  { name: 'Tagaytay', description: 'Because your wishlist has stays', emoji: '🏔️' },
-  { name: 'Baguio', description: 'Great for a weekend getaway', emoji: '🌲' },
-  { name: 'Batangas', description: 'For sights like Taal Volcano', emoji: '🌋' },
-  { name: 'La Union', description: 'Surf and farm adventures', emoji: '🏄' },
-  { name: 'Guimaras', description: 'Mango paradise', emoji: '🥭' },
+  { name: 'Tagaytay', emoji: '🏔️' },
+  { name: 'Baguio', emoji: '🌲' },
+  { name: 'Batangas', emoji: '🌋' },
+  { name: 'La Union', emoji: '🏄' },
+  { name: 'Guimaras', emoji: '🥭' },
 ];
 
 const TABS: { id: ListingType; label: string; icon: typeof Home }[] = [
-  { id: 'farm_stay', label: 'Homes', icon: Home },
+  { id: 'farm_stay', label: 'Stays', icon: Home },
   { id: 'farm_experience', label: 'Experiences', icon: Compass },
   { id: 'farm_tour', label: 'Tours', icon: Tractor },
 ];
 
-type ActiveStep = 'where' | 'when' | 'who' | null;
-
-const springTransition = { type: 'spring', damping: 30, stiffness: 400 };
-const expandTransition = { type: 'spring', damping: 25, stiffness: 350 };
+const springTransition = { type: 'spring', damping: 25, stiffness: 350 };
 
 export function MobileSearchModal({
   isOpen,
@@ -54,16 +51,7 @@ export function MobileSearchModal({
   listingType = 'farm_stay',
   onListingTypeChange,
 }: MobileSearchModalProps) {
-  const [activeStep, setActiveStep] = useState<ActiveStep>('where');
-
-  const formatDateRange = () => {
-    if (!dateRange.from && !dateRange.to) return 'Add dates';
-    if (dateRange.from && !dateRange.to) return format(dateRange.from, 'MMM d');
-    if (dateRange.from && dateRange.to) {
-      return `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d')}`;
-    }
-    return 'Add dates';
-  };
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleSearch = () => {
     onSearch?.();
@@ -82,321 +70,215 @@ export function MobileSearchModal({
         <>
           {/* Backdrop */}
           <motion.div
+            key="mobile-search-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background z-50"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100]"
+            onClick={onClose}
           />
 
           {/* Modal */}
           <motion.div
+            key="mobile-search-modal"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={springTransition}
-            className="fixed inset-0 z-50 bg-background overflow-auto"
+            className="fixed inset-x-0 bottom-0 top-12 z-[100] bg-card rounded-t-3xl shadow-2xl flex flex-col overflow-hidden border-t border-border/50"
           >
             {/* Header */}
-            <div className="sticky top-0 bg-card z-10 px-4 pt-4 pb-3 border-b border-border/30 safe-area-pt">
-              {/* Close Button */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={onClose}
-                className="absolute left-4 top-4 h-11 w-11 flex items-center justify-center rounded-full border border-border/50 bg-card shadow-sm"
-              >
-                <X className="h-4 w-4 text-foreground" />
-              </motion.button>
+            <div className="bg-primary/5 px-4 pt-4 pb-4 shrink-0 flex flex-col gap-4 relative border-b border-primary/10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                  <Tractor className="h-5 w-5" />
+                  Find your farm escape
+                </h2>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onClose}
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-background/50 hover:bg-background/80 transition-all"
+                >
+                  <X className="h-5 w-5 text-foreground" />
+                </motion.button>
+              </div>
 
-              {/* Tabs with Icons */}
-              <div className="flex justify-center gap-8 pt-10 pb-2">
+              {/* Listing Type Toggle */}
+              <div className="flex bg-background/60 p-1 rounded-xl shadow-inner relative">
                 {TABS.map((tab) => {
-                  const Icon = tab.icon;
                   const isActive = listingType === tab.id;
                   return (
-                    <motion.button
+                    <button
                       key={tab.id}
                       onClick={() => onListingTypeChange?.(tab.id)}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex flex-col items-center gap-1"
+                      className={cn(
+                        'flex-1 py-2 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all relative z-10',
+                        isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                      )}
                     >
-                      <div className={cn(
-                        'p-2 rounded-full transition-colors',
-                        isActive ? 'bg-primary/10' : ''
-                      )}>
-                        <Icon className={cn(
-                          'h-5 w-5 transition-colors',
-                          isActive ? 'text-primary' : 'text-muted-foreground'
-                        )} />
-                      </div>
-                      <span className={cn(
-                        'text-xs font-medium transition-colors',
-                        isActive ? 'text-primary' : 'text-muted-foreground'
-                      )}>
-                        {tab.label}
-                      </span>
                       {isActive && (
                         <motion.div
-                          layoutId="activeSearchTab"
-                          className="absolute bottom-0 h-0.5 w-16 bg-primary rounded-full"
+                          layoutId="activeTabBg"
+                          className="absolute inset-0 bg-primary rounded-lg shadow-sm"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                         />
                       )}
-                    </motion.button>
+                      <tab.icon className="h-4 w-4 relative z-20" />
+                      <span className="relative z-20">{tab.label}</span>
+                    </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Search Sections */}
-            <div className="p-4 space-y-3 pb-32">
-              {/* Where Section */}
-              <motion.div
-                layout
-                className={cn(
-                  'bg-card border rounded-3xl overflow-hidden transition-all',
-                  activeStep === 'where'
-                    ? 'border-border shadow-lg'
-                    : 'border-border/30'
-                )}
-              >
-                <motion.button
-                  className="w-full p-5 flex items-center justify-between"
-                  onClick={() => setActiveStep(activeStep === 'where' ? null : 'where')}
-                  whileTap={{ scale: 0.995 }}
-                >
-                  <span className={cn(
-                    'font-medium transition-colors',
-                    activeStep === 'where' ? 'text-xs text-muted-foreground' : 'text-sm text-muted-foreground'
-                  )}>
-                    Where
-                  </span>
-                  {activeStep !== 'where' && (
-                    <span className="font-semibold text-foreground">
-                      {location || "I'm flexible"}
+            {/* Form Content */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-8">
+              
+              {/* Destination Section */}
+              <div className="space-y-4">
+                <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" /> Destination
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search destinations (e.g. Tagaytay)"
+                    value={location}
+                    onChange={(e) => onLocationChange(e.target.value)}
+                    className="pl-11 h-14 rounded-2xl border-2 border-border focus:border-primary bg-background text-base shadow-sm"
+                  />
+                </div>
+                
+                {/* Horizontal Chips */}
+                <div className="flex overflow-x-auto gap-3 pb-2 -mx-5 px-5 scrollbar-hide">
+                  {SUGGESTED_DESTINATIONS.map((dest) => (
+                    <motion.button
+                      key={dest.name}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => onLocationChange(dest.name)}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2.5 rounded-full border border-border/50 bg-background whitespace-nowrap shadow-sm transition-colors",
+                        location.toLowerCase() === dest.name.toLowerCase() ? "border-primary bg-primary/5 text-primary" : "hover:border-primary/50 text-muted-foreground"
+                      )}
+                    >
+                      <span>{dest.emoji}</span>
+                      <span className="font-medium text-sm">{dest.name}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dates Section */}
+              <div className="space-y-4">
+                <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-primary" /> Trip Dates
+                </label>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                    className={cn(
+                      "flex-1 h-14 border-2 rounded-2xl flex flex-col justify-center px-4 transition-all text-left",
+                      isCalendarOpen ? "border-primary bg-primary/5" : "border-border bg-background shadow-sm"
+                    )}
+                  >
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Check in</span>
+                    <span className="font-medium text-foreground truncate">
+                      {dateRange.from ? format(dateRange.from, 'MMM d, yyyy') : 'Add date'}
                     </span>
-                  )}
-                </motion.button>
-
-                <AnimatePresence>
-                  {activeStep === 'where' && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={expandTransition}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 pb-5 space-y-5">
-                        <h2 className="text-2xl font-bold text-foreground">Where to?</h2>
-
-                        {/* Search Input */}
-                        <div className="relative">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
-                            placeholder="Search destinations"
-                            value={location}
-                            onChange={(e) => onLocationChange(e.target.value)}
-                            className="pl-12 h-14 rounded-2xl border-2 border-border focus:border-primary bg-background text-base"
-                            autoFocus
-                          />
-                        </div>
-
-                        {/* Suggested Destinations */}
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                            Suggested destinations
-                          </p>
-                          {SUGGESTED_DESTINATIONS.map((dest) => (
-                            <motion.button
-                              key={dest.name}
-                              className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/50 transition-colors text-left"
-                              onClick={() => {
-                                onLocationChange(dest.name);
-                                setActiveStep('when');
-                              }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <div className="h-12 w-12 rounded-xl bg-muted/80 flex items-center justify-center flex-shrink-0 text-2xl">
-                                {dest.emoji}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-foreground">{dest.name}</p>
-                                <p className="text-sm text-muted-foreground truncate">{dest.description}</p>
-                              </div>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* When Section */}
-              <motion.div
-                layout
-                className={cn(
-                  'bg-card border rounded-3xl overflow-hidden transition-all',
-                  activeStep === 'when'
-                    ? 'border-border shadow-lg'
-                    : 'border-border/30'
-                )}
-              >
-                <motion.button
-                  className="w-full p-5 flex items-center justify-between"
-                  onClick={() => setActiveStep(activeStep === 'when' ? null : 'when')}
-                  whileTap={{ scale: 0.995 }}
-                >
-                  <span className={cn(
-                    'font-medium transition-colors',
-                    activeStep === 'when' ? 'text-xs text-muted-foreground' : 'text-sm text-muted-foreground'
-                  )}>
-                    When
-                  </span>
-                  {activeStep !== 'when' && (
-                    <span className="font-semibold text-foreground">{formatDateRange()}</span>
-                  )}
-                </motion.button>
-
-                <AnimatePresence>
-                  {activeStep === 'when' && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={expandTransition}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 pb-5 space-y-4">
-                        <h2 className="text-2xl font-bold text-foreground">When's your trip?</h2>
-
-                        <CalendarComponent
-                          mode="range"
-                          selected={dateRange}
-                          onSelect={(range) => onDateRangeChange({ from: range?.from, to: range?.to })}
-                          disabled={{ before: new Date() }}
-                          numberOfMonths={1}
-                          className="rounded-xl mx-auto"
-                        />
-
-                        {dateRange.from && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full"
-                            onClick={() => onDateRangeChange({ from: undefined, to: undefined })}
-                          >
-                            Clear dates
-                          </Button>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Who Section */}
-              <motion.div
-                layout
-                className={cn(
-                  'bg-card border rounded-3xl overflow-hidden transition-all',
-                  activeStep === 'who'
-                    ? 'border-border shadow-lg'
-                    : 'border-border/30'
-                )}
-              >
-                <motion.button
-                  className="w-full p-5 flex items-center justify-between"
-                  onClick={() => setActiveStep(activeStep === 'who' ? null : 'who')}
-                  whileTap={{ scale: 0.995 }}
-                >
-                  <span className={cn(
-                    'font-medium transition-colors',
-                    activeStep === 'who' ? 'text-xs text-muted-foreground' : 'text-sm text-muted-foreground'
-                  )}>
-                    Who
-                  </span>
-                  {activeStep !== 'who' && (
-                    <span className="font-semibold text-foreground">
-                      {guestCount > 1 ? `${guestCount} guests` : 'Add guests'}
+                  </button>
+                  <button
+                    onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                    className={cn(
+                      "flex-1 h-14 border-2 rounded-2xl flex flex-col justify-center px-4 transition-all text-left",
+                      isCalendarOpen ? "border-primary bg-primary/5" : "border-border bg-background shadow-sm"
+                    )}
+                  >
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Check out</span>
+                    <span className="font-medium text-foreground truncate">
+                      {dateRange.to ? format(dateRange.to, 'MMM d, yyyy') : 'Add date'}
                     </span>
-                  )}
-                </motion.button>
+                  </button>
+                </div>
 
                 <AnimatePresence>
-                  {activeStep === 'who' && (
+                  {isCalendarOpen && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={expandTransition}
-                      className="overflow-hidden"
+                      className="overflow-hidden bg-card rounded-2xl border border-border shadow-sm p-2"
                     >
-                      <div className="px-5 pb-5 space-y-4">
-                        <h2 className="text-2xl font-bold text-foreground">Who's coming?</h2>
-
-                        <div className="flex items-center justify-between py-4">
-                          <div>
-                            <p className="font-semibold text-foreground">Guests</p>
-                            <p className="text-sm text-muted-foreground">Ages 13 or above</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <motion.button
-                              whileTap={{ scale: 0.9 }}
-                              className={cn(
-                                'h-11 w-11 rounded-full border flex items-center justify-center transition-colors',
-                                guestCount <= 1
-                                  ? 'border-border/30 text-muted-foreground/50 cursor-not-allowed'
-                                  : 'border-border text-foreground hover:border-foreground'
-                              )}
-                              onClick={() => onGuestCountChange(Math.max(1, guestCount - 1))}
-                              disabled={guestCount <= 1}
-                            >
-                              <span className="text-xl leading-none">−</span>
-                            </motion.button>
-                            <span className="w-8 text-center font-semibold text-foreground">{guestCount}</span>
-                            <motion.button
-                              whileTap={{ scale: 0.9 }}
-                              className="h-11 w-11 rounded-full border border-border text-foreground hover:border-foreground flex items-center justify-center transition-colors"
-                              onClick={() => onGuestCountChange(guestCount + 1)}
-                            >
-                              <span className="text-xl leading-none">+</span>
-                            </motion.button>
-                          </div>
-                        </div>
-                      </div>
+                      <CalendarComponent
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={(range) => onDateRangeChange({ from: range?.from, to: range?.to })}
+                        disabled={{ before: new Date() }}
+                        numberOfMonths={1}
+                        className="mx-auto"
+                      />
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
+
+              {/* Guests Section */}
+              <div className="space-y-4 pb-6">
+                <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" /> Guests
+                </label>
+                
+                <div className="flex items-center justify-between p-4 border border-border rounded-2xl bg-background shadow-sm">
+                  <div>
+                    <p className="font-semibold text-foreground">Number of guests</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => onGuestCountChange(Math.max(1, guestCount - 1))}
+                      disabled={guestCount <= 1}
+                      className={cn(
+                        "h-10 w-10 rounded-full flex items-center justify-center border transition-all text-lg",
+                        guestCount <= 1 
+                          ? "border-border/50 text-muted-foreground/30 cursor-not-allowed" 
+                          : "border-primary/30 text-primary hover:bg-primary/5"
+                      )}
+                    >
+                      -
+                    </motion.button>
+                    <span className="w-6 text-center font-bold text-lg">{guestCount}</span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => onGuestCountChange(guestCount + 1)}
+                      className="h-10 w-10 rounded-full flex items-center justify-center border border-primary/30 text-primary hover:bg-primary/5 transition-all text-lg"
+                    >
+                      +
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Footer */}
-            <motion.div
-              className="fixed bottom-0 left-0 right-0 p-4 bg-card border-t border-border/30 safe-area-pb"
-              initial={{ y: 100 }}
-              animate={{ y: 0 }}
-              transition={{ delay: 0.2, ...springTransition }}
-            >
+            {/* Sticky Footer */}
+            <div className="p-4 bg-background border-t border-border/50 safe-area-pb shrink-0 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
               <div className="flex items-center justify-between gap-4">
                 <Button
                   variant="ghost"
                   onClick={handleClear}
-                  className="underline font-semibold text-foreground hover:text-primary hover:bg-transparent px-0"
+                  className="font-medium text-muted-foreground hover:text-foreground"
                 >
-                  Clear all
+                  Clear
                 </Button>
-                <motion.div whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={handleSearch}
-                    className="rounded-xl px-6 h-12 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 font-semibold shadow-lg"
-                  >
-                    <Search className="h-4 w-4" />
-                    Search
-                  </Button>
-                </motion.div>
+                <Button
+                  onClick={handleSearch}
+                  size="lg"
+                  className="flex-1 rounded-xl h-14 gap-2 bg-primary hover:bg-primary/90 font-bold text-lg shadow-lg"
+                >
+                  <Search className="h-5 w-5" />
+                  Search Farm Stays
+                </Button>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </>
       )}

@@ -27,7 +27,6 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
     <div className="relative px-1">
       <div className="flex items-center justify-start sm:justify-center gap-1 p-1.5 bg-card shadow-soft border border-border/40 rounded-xl overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => {
-          const isSelected = tab.kind === 'filter' && selectedType === tab.id;
           const Icon = tab.icon;
 
           return (
@@ -38,13 +37,16 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
                 if (tab.kind === 'filter') {
                   onTypeChange(tab.id);
                 } else {
+                  // If it's a link, we just navigate to it. 
+                  // But wait, if they are clicking a filter while on a link page?
+                  // The parent handles that via onTypeChange.
                   navigate(tab.to);
                 }
               }}
               className={cn(
                 'relative flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-lg text-sm font-medium shrink-0 min-h-[44px]',
                 'transition-all duration-200 ease-out active:scale-95',
-                isSelected
+                selectedType === tab.id
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               )}
