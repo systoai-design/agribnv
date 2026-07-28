@@ -66,7 +66,7 @@ export function HeroSection() {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm mb-8"
         >
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'hsl(var(--sage))' }} />
-          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">The farm-stay marketplace · Philippines</span>
+          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">THE AGRITOURISM PLATFORM</span>
         </motion.div>
 
         {/* Headline */}
@@ -77,11 +77,9 @@ export function HeroSection() {
           className="font-serif text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-[1] md:leading-[0.95] tracking-tight mb-5 md:mb-6"
           style={{ textShadow: '0 2px 32px hsl(146 70% 4% / 0.55)' }}
         >
-          Where every stay
+          Experience Agriculture
           <br />
-          is a real
-          <br />
-          <span style={{ color: 'hsl(var(--sage))' }}>Filipino farm.</span>
+          <span style={{ color: 'hsl(var(--sage))' }}>like never before.</span>
         </motion.h1>
 
         {/* Sub-headline */}
@@ -92,8 +90,7 @@ export function HeroSection() {
           className="text-white/75 text-base md:text-xl max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed"
           style={{ textShadow: '0 1px 20px hsl(146 70% 4% / 0.5)' }}
         >
-          Trade the city for authentic, hands-on rural experiences. Discover and book
-          verified farm stays across the Philippine countryside.
+          Escape the city for authentic farm stays, connect with the heart of local agriculture, and uplift Filipino farming communities with every visit.
         </motion.p>
 
         {/* Booking search — the primary action, front and center */}

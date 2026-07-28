@@ -13,14 +13,22 @@ export function LandingNav() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const scrollContainer = document.getElementById('main-scroll-container');
+    
+    if (scrollContainer) {
+      const onScroll = () => setScrolled(scrollContainer.scrollTop > 40);
+      scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+      return () => scrollContainer.removeEventListener('scroll', onScroll);
+    } else {
+      const onScroll = () => setScrolled(window.scrollY > 40);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }
   }, []);
 
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-50 safe-area-pt transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top)] transition-all duration-300"
       animate={{ backgroundColor: scrolled ? 'rgba(15, 50, 25, 0.97)' : 'transparent' }}
       style={{ backdropFilter: scrolled ? 'blur(12px)' : 'none' }}
     >

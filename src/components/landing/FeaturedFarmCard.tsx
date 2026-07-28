@@ -41,7 +41,6 @@ export function FeaturedFarmCard({ property, expanded = false, editorsPick = fal
   const primary = property.images?.find((img) => img.is_primary) || property.images?.[0];
   const imageUrl = primary?.image_url || FALLBACK_IMAGE;
   const rating = pseudoRating(property.id);
-  const price = `₱${property.price_per_night.toLocaleString()}`;
   const reduce = useReducedMotion();
 
   return (
@@ -98,15 +97,6 @@ export function FeaturedFarmCard({ property, expanded = false, editorsPick = fal
             <h3 className="font-serif text-2xl md:text-3xl font-bold tracking-tight leading-tight text-white line-clamp-2">
               {property.name}
             </h3>
-            <div className="mt-3 flex items-center justify-between gap-2">
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-bold text-white">{price}</span>
-                <span className="text-sm text-white/65">/night</span>
-              </div>
-              <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold opacity-0 translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-within:opacity-100 group-focus-within:translate-x-0 motion-reduce:transition-none" style={{ color: 'hsl(var(--forest))' }}>
-                View farm <ArrowUpRight className="h-4 w-4" />
-              </span>
-            </div>
           </div>
 
           {/* COMPACT caption — peek cards reveal it on hover/focus (never on the active card) */}
@@ -119,10 +109,6 @@ export function FeaturedFarmCard({ property, expanded = false, editorsPick = fal
             style={{ transition: reduce ? undefined : COMPACT_TRANSITION }}
           >
             <h3 className="text-sm font-bold uppercase tracking-wide text-white line-clamp-2">{property.name}</h3>
-            <div className="mt-1.5 flex items-baseline gap-1">
-              <span className="text-sm font-bold text-white">{price}</span>
-              <span className="text-[11px] text-white/65">/night</span>
-            </div>
           </div>
 
           {/* LOCATION — always visible, anchored at the bottom (fixed position → never moves) */}

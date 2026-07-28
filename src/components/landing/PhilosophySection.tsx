@@ -5,12 +5,12 @@ const PILLARS = [
   {
     icon: Tent,
     title: 'For travelers',
-    body: 'Browse farm stays and hands-on experiences no resort can offer — harvest at sunrise, cook with your host, and sleep where your food is grown.',
+    body: 'Browse farm stays and hands-on experiences no resort can offer — experience the agriculture from a whole new perspective.',
   },
   {
     icon: Sprout,
     title: 'For hosts',
-    body: 'List your farm in minutes, set your own prices, and earn all year — not just at harvest. You keep the majority of every booking.',
+    body: 'List your farm in minutes, set your own prices, and earn all year — not just at harvest season. Create new opportunities from the land you call home.',
   },
   {
     icon: ShieldCheck,

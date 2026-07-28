@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Home, Compass, Tractor, CalendarDays, Users, MapPin } from 'lucide-react';
+import { Search, X, Home, Compass, Tractor, CalendarDays, Users, MapPin, Leaf } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,8 @@ interface MobileSearchModalProps {
   onDateRangeChange: (range: { from: Date | undefined; to: Date | undefined }) => void;
   guestCount: number;
   onGuestCountChange: (count: number) => void;
+  experience?: string;
+  onExperienceChange?: (experience: string) => void;
   onSearch?: () => void;
   listingType?: ListingType;
   onListingTypeChange?: (type: ListingType) => void;
@@ -28,6 +30,13 @@ const SUGGESTED_DESTINATIONS = [
   { name: 'Batangas', emoji: '🌋' },
   { name: 'La Union', emoji: '🏄' },
   { name: 'Guimaras', emoji: '🥭' },
+];
+
+const SUGGESTED_EXPERIENCES = [
+  { name: 'Farm Tour', emoji: '🚜' },
+  { name: 'Fruit Picking', emoji: '🍎' },
+  { name: 'Culinary', emoji: '👨‍🍳' },
+  { name: 'Animal Care', emoji: '🐑' },
 ];
 
 const TABS: { id: ListingType; label: string; icon: typeof Home }[] = [
@@ -47,6 +56,8 @@ export function MobileSearchModal({
   onDateRangeChange,
   guestCount,
   onGuestCountChange,
+  experience = '',
+  onExperienceChange,
   onSearch,
   listingType = 'farm_stay',
   onListingTypeChange,
@@ -62,6 +73,7 @@ export function MobileSearchModal({
     onLocationChange('');
     onDateRangeChange({ from: undefined, to: undefined });
     onGuestCountChange(1);
+    onExperienceChange?.('');
   };
 
   return (
@@ -223,7 +235,7 @@ export function MobileSearchModal({
               </div>
 
               {/* Guests Section */}
-              <div className="space-y-4 pb-6">
+              <div className="space-y-4">
                 <label className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" /> Guests
                 </label>
@@ -257,6 +269,41 @@ export function MobileSearchModal({
                   </div>
                 </div>
               </div>
+
+              {/* Experience Section */}
+              <div className="space-y-4 pb-6">
+                <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Leaf className="h-4 w-4 text-primary" /> Experience
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search experiences (e.g. Farm Tour)"
+                    value={experience}
+                    onChange={(e) => onExperienceChange?.(e.target.value)}
+                    className="pl-11 h-14 rounded-2xl border-2 border-border focus:border-primary bg-background text-base shadow-sm"
+                  />
+                </div>
+                
+                {/* Horizontal Chips */}
+                <div className="flex overflow-x-auto gap-3 pb-2 -mx-5 px-5 scrollbar-hide">
+                  {SUGGESTED_EXPERIENCES.map((exp) => (
+                    <motion.button
+                      key={exp.name}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => onExperienceChange?.(exp.name)}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2.5 rounded-full border border-border/50 bg-background whitespace-nowrap shadow-sm transition-colors",
+                        experience.toLowerCase() === exp.name.toLowerCase() ? "border-primary bg-primary/5 text-primary" : "hover:border-primary/50 text-muted-foreground"
+                      )}
+                    >
+                      <span>{exp.emoji}</span>
+                      <span className="font-medium text-sm">{exp.name}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
             {/* Sticky Footer */}

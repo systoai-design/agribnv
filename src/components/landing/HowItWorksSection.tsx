@@ -45,7 +45,7 @@ const JOURNEYS: Record<Mode, Journey> = {
   host: {
     eyebrow: 'For hosts',
     heading: 'Hosting is just as simple.',
-    sub: 'List once, get discovered, and earn all year — you keep 85% of every booking.',
+    sub: 'List once, get discovered, and earn all year — you keep 100% of your listed price.',
     steps: [
       {
         icon: Sprout,
@@ -63,7 +63,7 @@ const JOURNEYS: Record<Mode, Journey> = {
         icon: Wallet,
         title: 'Get paid',
         description:
-          'Secure GCash and Maya payouts land after every stay. You keep 85% — no listing fees, no lock-in, ever.',
+          'Secure GCash and Maya payouts land after every stay. You keep 100% — no listing fees, no lock-in, ever.',
       },
     ],
   },
@@ -309,7 +309,7 @@ export function HowItWorksSection() {
               </div>
               <div className="leading-tight">
                 <p className="text-gray-900 font-semibold text-sm">Real farms</p>
-                <p className="text-gray-500 text-xs">Real families</p>
+                <p className="text-gray-500 text-xs">Real Experiences</p>
               </div>
             </motion.div>
           </motion.div>
