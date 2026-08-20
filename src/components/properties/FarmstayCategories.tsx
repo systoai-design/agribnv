@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
-import { Tractor, Fish, Home, Warehouse, Building, Tent, Users } from 'lucide-react';
+import { Tractor, Fish, Home, Utensils } from 'lucide-react';
 import { FarmstaySubcategory, FARMSTAY_LABELS } from '@/types/database';
 import { cn } from '@/lib/utils';
 import haptics from '@/utils/haptics';
@@ -14,10 +14,7 @@ const SUBCATEGORIES: { id: FarmstaySubcategory; icon: React.ElementType }[] = [
   { id: 'agrifarm', icon: Tractor },
   { id: 'aquafarm', icon: Fish },
   { id: 'homestay', icon: Home },
-  { id: 'kubo_hut', icon: Warehouse },
-  { id: 'farm_cottage', icon: Building },
-  { id: 'camp_stay', icon: Tent },
-  { id: 'dorm_shared', icon: Users },
+  { id: 'kitchen', icon: Utensils },
 ];
 
 export function FarmstayCategories({
@@ -106,7 +103,7 @@ export function FarmstayCategories({
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex items-center justify-center gap-4 container">
+      <div className="hidden md:flex items-center justify-center gap-3 container">
         {SUBCATEGORIES.map((category) => {
           const isSelected = selectedCategories.includes(category.id);
           const Icon = category.icon;
@@ -117,13 +114,13 @@ export function FarmstayCategories({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={cn(
-                'flex flex-col items-center gap-2 px-4 py-3 rounded-xl transition-all',
+                'flex flex-col items-center gap-1.5 px-4 py-2.5 rounded-xl transition-all cursor-pointer min-w-[76px]',
                 isSelected 
                   ? 'bg-primary text-primary-foreground shadow-soft'
                   : 'bg-card border border-border/50 text-muted-foreground hover:border-primary/50 hover:text-foreground'
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4" />
               <span className="text-xs font-medium">{FARMSTAY_LABELS[category.id]}</span>
             </motion.button>
           );

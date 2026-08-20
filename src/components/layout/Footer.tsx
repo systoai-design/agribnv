@@ -4,6 +4,7 @@ import { Globe, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import agribnvLogo from '@/assets/agribnv-logo.png';
+import { InspirationGallery } from './InspirationGallery';
 
 // Agribnv Logo Icon - Using brand logo image
 function AgribnvIcon({ className = '' }: { className?: string }) {
@@ -16,7 +17,7 @@ function AgribnvIcon({ className = '' }: { className?: string }) {
   );
 }
 
-const INSPIRATION_TABS = [
+export const INSPIRATION_TABS = [
   { id: 'popular', label: 'Popular' },
   { id: 'farm-stays', label: 'Farm stays' },
   { id: 'eco-retreats', label: 'Eco retreats' },
@@ -25,7 +26,7 @@ const INSPIRATION_TABS = [
   { id: 'family', label: 'Family-friendly' },
 ];
 
-const INSPIRATION_DESTINATIONS: Record<string, { name: string; type: string }[]> = {
+export const INSPIRATION_DESTINATIONS: Record<string, { name: string; type: string }[]> = {
   popular: [
     { name: 'Tagaytay', type: 'Farm stays' },
     { name: 'Batangas', type: 'Beachside farms' },
@@ -123,10 +124,6 @@ const FOOTER_LINKS = {
 
 export function Footer() {
   const [activeTab, setActiveTab] = useState('popular');
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const destinations = INSPIRATION_DESTINATIONS[activeTab] || [];
-  const visibleDestinations = isExpanded ? destinations : destinations.slice(0, 8);
 
   return (
     <footer className="bg-muted/30 border-t border-border/50">
@@ -143,7 +140,6 @@ export function Footer() {
               key={tab.id}
               onClick={() => {
                 setActiveTab(tab.id);
-                setIsExpanded(false);
               }}
               className={cn(
                 'pb-3 text-sm font-medium whitespace-nowrap transition-colors relative',
@@ -163,45 +159,8 @@ export function Footer() {
           ))}
         </div>
         
-        {/* Destinations Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-          >
-            {visibleDestinations.map((dest, index) => (
-              <Link
-                key={`${dest.name}-${index}`}
-                to={`/explore?location=${encodeURIComponent(dest.name)}`}
-                className="group"
-              >
-                <p className="text-sm font-medium text-foreground group-hover:underline">
-                  {dest.name}
-                </p>
-                <p className="text-sm text-muted-foreground">{dest.type}</p>
-              </Link>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-        
-        {/* Show More */}
-        {destinations.length > 8 && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 mt-6 text-sm font-medium text-foreground hover:underline"
-          >
-            {isExpanded ? 'Show less' : 'Show more'}
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        )}
+        {/* Visual Destinations Gallery */}
+        <InspirationGallery activeTab={activeTab} />
       </div>
 
       {/* Main Footer Links */}

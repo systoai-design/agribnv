@@ -24,8 +24,8 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
   const navigate = useNavigate();
 
   return (
-    <div className="relative px-1">
-      <div className="flex items-center justify-start sm:justify-center gap-1 p-1.5 bg-card shadow-soft border border-border/40 rounded-xl overflow-x-auto scrollbar-hide">
+    <div className="relative px-1 flex justify-center">
+      <div className="inline-flex items-center justify-start sm:justify-center gap-1 p-1 bg-card shadow-soft border border-border/40 rounded-xl overflow-x-auto scrollbar-hide max-w-full">
         {TABS.map((tab) => {
           const Icon = tab.icon;
 
@@ -44,8 +44,8 @@ export function ListingTypeTabs({ selectedType, onTypeChange }: ListingTypeTabsP
                 }
               }}
               className={cn(
-                'relative flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-lg text-sm font-medium shrink-0 min-h-[44px]',
-                'transition-all duration-200 ease-out active:scale-95',
+                'relative flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium shrink-0 min-h-[40px]',
+                'transition-all duration-200 ease-out active:scale-95 cursor-pointer',
                 selectedType === tab.id
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'

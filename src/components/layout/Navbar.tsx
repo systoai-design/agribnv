@@ -80,9 +80,9 @@ export function Navbar({
   return (
     <>
       <header className="hidden md:block sticky top-0 z-50 w-full bg-card/95 backdrop-blur-sm border-b border-border/50 safe-area-pt">
-        <div className="container h-16 md:h-20 flex items-center justify-between">
+        <div className="container h-16 md:h-20 grid grid-cols-[1fr_auto_1fr] items-center">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="justify-self-start">
             <Link to="/" className="flex items-center group">
               <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -94,8 +94,8 @@ export function Navbar({
           </div>
 
           {/* Center Search - Always in same position, animates width */}
-          {showSearch && (
-            <div className="hidden md:flex flex-1 justify-center px-4">
+          <div className="hidden md:flex justify-self-center z-10">
+            {showSearch && (
               <SearchBar
                 location={searchLocation}
                 onLocationChange={onSearchLocationChange || (() => {})}
@@ -107,11 +107,11 @@ export function Navbar({
                 isExpanded={isSearchExpanded}
                 onExpandedChange={setIsSearchExpanded}
               />
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0 justify-end">
+          <div className="flex items-center gap-2 justify-self-end">
             {isHost && (
               <Button
                 variant="ghost"

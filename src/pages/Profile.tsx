@@ -31,6 +31,8 @@ import {
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
   avatar_url: z.string().url().optional().or(z.literal('')),
+  username: z.string().min(3, 'Username must be at least 3 characters').optional().or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -69,6 +71,8 @@ export default function Profile() {
     defaultValues: {
       full_name: profile?.full_name || '',
       avatar_url: profile?.avatar_url || '',
+      username: profile?.username || '',
+      phone: profile?.phone || '',
     },
   });
 
@@ -77,6 +81,8 @@ export default function Profile() {
       reset({
         full_name: profile.full_name || '',
         avatar_url: profile.avatar_url || '',
+        username: profile.username || '',
+        phone: profile.phone || '',
       });
     }
   }, [profile, reset]);
@@ -91,6 +97,8 @@ export default function Profile() {
         .update({
           full_name: data.full_name,
           avatar_url: data.avatar_url || null,
+          username: data.username || null,
+          phone: data.phone || null,
         })
         .eq('id', user.id);
 
@@ -152,7 +160,7 @@ export default function Profile() {
     .map((n) => n[0])
     .join('')
     .toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U';
-  const username = profile?.full_name?.toLowerCase().replace(/\s+/g, '') || 'user';
+  const username = profile?.username || profile?.full_name?.toLowerCase().replace(/\s+/g, '') || 'user';
 
   const settingsItems = [
     { icon: Lock, label: 'Change Password', href: '/change-password' },
@@ -219,6 +227,16 @@ export default function Profile() {
                 <Label htmlFor="full_name">Full Name</Label>
                 <Input id="full_name" {...register('full_name')} />
                 {errors.full_name && <p className="text-sm text-destructive">{errors.full_name.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" {...register('username')} />
+                {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input id="phone" {...register('phone')} />
+                {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="avatar_url">Avatar URL</Label>

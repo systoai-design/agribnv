@@ -39,6 +39,7 @@ export type FarmstaySubcategory =
   | 'agrifarm'
   | 'aquafarm'
   | 'homestay'
+  | 'kitchen'
   | 'kubo_hut'
   | 'farm_cottage'
   | 'camp_stay'
@@ -245,6 +246,7 @@ export const FARMSTAY_LABELS: Record<FarmstaySubcategory, string> = {
   agrifarm: 'Agrifarm',
   aquafarm: 'Aquafarm',
   homestay: 'Homestay',
+  kitchen: 'Kitchen',
   kubo_hut: 'Kubo/Hut',
   farm_cottage: 'Cottage',
   camp_stay: 'Camp Stay',

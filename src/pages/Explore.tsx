@@ -220,7 +220,7 @@ export default function Explore() {
       />
 
       {/* Listing Type Tabs */}
-      <div className="px-4 md:px-0 md:container py-2">
+      <div className="px-4 md:px-0 md:container py-1.5">
         <ListingTypeTabs
           selectedType={selectedListingType}
           onTypeChange={setSelectedListingType}
@@ -236,8 +236,8 @@ export default function Explore() {
       </div>
 
       {/* Main Content */}
-      <section id="search-section" className="container py-3 md:py-6">
-        <div className="flex items-center justify-between mb-3 md:mb-6 animate-fade-in">
+      <section id="search-section" className="container py-2 md:py-4">
+        <div className="flex items-center justify-between mb-2.5 md:mb-4 animate-fade-in">
           <div>
             <h2 className="font-serif text-lg md:text-2xl font-bold text-foreground">
               {hasActiveFilters ? 'Search Results' : 
@@ -262,34 +262,34 @@ export default function Explore() {
               <ArrowRight className="ml-1 h-3 w-3" />
             </Button>
           )}
-          {!hasActiveFilters && Object.keys(propertiesByLocation).length > 0 && (
-            <button
-              onClick={() => locationCarouselsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              aria-label="See more farms"
-              className="h-11 w-11 -mr-3 flex items-center justify-center rounded-full text-primary hover:bg-primary/10 transition-colors"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          )}
         </div>
 
         {!hasActiveFilters ? (
-          <div className="space-y-6">
-            <FeaturedFarmsCarousel properties={properties} />
-            <div ref={locationCarouselsRef} className="space-y-6 scroll-mt-4">
-              {Object.entries(propertiesByLocation).map(([location, props]) => (
-                <LocationCarousel
-                  key={location}
-                  title={`Available in ${location}`}
-                  properties={props}
-                  onShowAll={() => {
-                    // Update URL and let the useEffect handle triggering the search
-                    navigate(`/explore?location=${encodeURIComponent(location)}`);
-                  }}
-                />
-              ))}
+          properties.length === 0 && !isLoading ? (
+            <div className="py-24 text-center space-y-4">
+              <h3 className="text-xl font-semibold text-foreground">
+                No {selectedListingType === 'farm_experience' ? 'experiences' : selectedListingType === 'farm_tour' ? 'tours' : 'farms'} found
+              </h3>
+              <p className="text-muted-foreground">We're still gathering amazing places for you.</p>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-6">
+              <FeaturedFarmsCarousel properties={properties} />
+              <div ref={locationCarouselsRef} className="space-y-6 scroll-mt-4">
+                {Object.entries(propertiesByLocation).map(([location, props]) => (
+                  <LocationCarousel
+                    key={location}
+                    title={`Available in ${location}`}
+                    properties={props}
+                    onShowAll={() => {
+                      // Update URL and let the useEffect handle triggering the search
+                      navigate(`/explore?location=${encodeURIComponent(location)}`);
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )
         ) : (
           <PropertyGrid properties={properties} isLoading={isLoading} />
         )}

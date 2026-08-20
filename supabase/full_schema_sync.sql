@@ -1,28 +1,24 @@
 -- =====================================================================
--- Agribnv — Fresh Supabase project setup
--- Paste this whole file into Supabase dashboard → SQL Editor → Run.
--- Safe to re-run: cleanup block at top drops any partial state first.
+-- Agribnv — Complete Schema Sync for Supabase (zpyjixhgpftgxgtjfsca)
+-- Run this in Supabase Dashboard → SQL Editor → Run
+-- Safe to re-run: drops existing state first.
 -- =====================================================================
 
--- Cleanup (safe on a fresh project; clears partial state on re-run) ----
-
--- Drop trigger on auth.users that our handle_new_user depends on
+-- 1. Cleanup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-
--- Drop storage policies we'll recreate
 DROP POLICY IF EXISTS "Anyone can view property images" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated users can upload property images" ON storage.objects;
 DROP POLICY IF EXISTS "Users can update their own property images" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their own property images" ON storage.objects;
 
--- Remove messages from realtime publication if already added
 DO $$
 BEGIN
   ALTER PUBLICATION supabase_realtime DROP TABLE public.messages;
 EXCEPTION WHEN undefined_object OR undefined_table THEN NULL;
 END $$;
 
--- Drop public-schema tables (CASCADE drops dependent policies/triggers/constraints)
+DROP VIEW IF EXISTS public.property_ratings CASCADE;
+DROP TABLE IF EXISTS public.reviews CASCADE;
 DROP TABLE IF EXISTS public.messages CASCADE;
 DROP TABLE IF EXISTS public.conversations CASCADE;
 DROP TABLE IF EXISTS public.wishlists CASCADE;
@@ -34,14 +30,12 @@ DROP TABLE IF EXISTS public.properties CASCADE;
 DROP TABLE IF EXISTS public.user_roles CASCADE;
 DROP TABLE IF EXISTS public.profiles CASCADE;
 
--- Drop functions
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS public.update_updated_at_column() CASCADE;
 DROP FUNCTION IF EXISTS public.is_property_owner(uuid) CASCADE;
 DROP FUNCTION IF EXISTS public.update_conversation_timestamp() CASCADE;
 DROP FUNCTION IF EXISTS public.has_role(uuid, public.app_role) CASCADE;
 
--- Drop types last (functions that reference them must be gone first)
 DROP TYPE IF EXISTS public.booking_status CASCADE;
 DROP TYPE IF EXISTS public.cancellation_policy CASCADE;
 DROP TYPE IF EXISTS public.image_category CASCADE;
@@ -50,10 +44,10 @@ DROP TYPE IF EXISTS public.property_listing_type CASCADE;
 DROP TYPE IF EXISTS public.property_category CASCADE;
 DROP TYPE IF EXISTS public.app_role CASCADE;
 
--- Extensions -----------------------------------------------------------
+-- 2. Extensions
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
--- Enums ----------------------------------------------------------------
+-- 3. Enums
 CREATE TYPE public.app_role AS ENUM ('guest', 'host');
 
 CREATE TYPE public.property_category AS ENUM (
@@ -105,7 +99,7 @@ CREATE TYPE public.cancellation_policy AS ENUM (
 
 CREATE TYPE public.booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 
--- Tables ---------------------------------------------------------------
+-- 4. Tables
 
 CREATE TABLE public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -113,7 +107,6 @@ CREATE TABLE public.profiles (
   avatar_url TEXT,
   bio TEXT,
   phone TEXT,
-  username TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -237,8 +230,27 @@ CREATE TABLE public.messages (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Functions (after tables so SQL bodies can resolve refs) --------------
+CREATE TABLE public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  property_id UUID NOT NULL REFERENCES public.properties(id) ON DELETE CASCADE,
+  reviewer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES public.bookings(id) ON DELETE CASCADE,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(booking_id)
+);
 
+-- 5. Views
+CREATE OR REPLACE VIEW public.property_ratings WITH (security_invoker = true) AS
+SELECT 
+  property_id,
+  ROUND(AVG(rating)::numeric, 1) as average_rating,
+  COUNT(id) as review_count
+FROM public.reviews
+GROUP BY property_id;
+
+-- 6. Functions
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -283,13 +295,8 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, username, phone)
-  VALUES (
-    NEW.id, 
-    NEW.raw_user_meta_data ->> 'full_name',
-    NEW.raw_user_meta_data ->> 'username',
-    NEW.raw_user_meta_data ->> 'phone'
-  );
+  INSERT INTO public.profiles (id, full_name)
+  VALUES (NEW.id, NEW.raw_user_meta_data ->> 'full_name');
 
   INSERT INTO public.user_roles (user_id, role)
   VALUES (NEW.id, 'guest');
@@ -311,8 +318,7 @@ BEGIN
 END;
 $$;
 
--- Triggers -------------------------------------------------------------
-
+-- 7. Triggers
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -337,7 +343,7 @@ CREATE TRIGGER update_conversation_on_message
   AFTER INSERT ON public.messages
   FOR EACH ROW EXECUTE FUNCTION public.update_conversation_timestamp();
 
--- Indexes --------------------------------------------------------------
+-- 8. Indexes
 CREATE INDEX idx_properties_host_id ON public.properties(host_id);
 CREATE INDEX idx_properties_is_published ON public.properties(is_published);
 CREATE INDEX idx_properties_category ON public.properties(category);
@@ -357,7 +363,7 @@ CREATE INDEX idx_conversations_host_id ON public.conversations(host_id);
 CREATE INDEX idx_messages_conversation_id ON public.messages(conversation_id);
 CREATE INDEX idx_messages_created_at ON public.messages(created_at DESC);
 
--- Row-Level Security ---------------------------------------------------
+-- 9. Row-Level Security
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
@@ -368,6 +374,7 @@ ALTER TABLE public.booking_experiences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wishlists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
 -- user_roles policies
 CREATE POLICY "Users can view their own roles"
@@ -525,7 +532,24 @@ CREATE POLICY "Users can send messages to their conversations"
 CREATE POLICY "Users can update their own messages"
   ON public.messages FOR UPDATE USING (sender_id = auth.uid());
 
--- Storage: property-images bucket --------------------------------------
+-- reviews policies
+CREATE POLICY "Reviews are viewable by everyone"
+  ON public.reviews FOR SELECT
+  USING (true);
+
+CREATE POLICY "Guests can create reviews for their completed bookings"
+  ON public.reviews FOR INSERT
+  WITH CHECK (
+    reviewer_id = auth.uid() AND
+    EXISTS (
+      SELECT 1 FROM public.bookings
+      WHERE bookings.id = reviews.booking_id
+      AND bookings.guest_id = auth.uid()
+      AND bookings.status = 'completed'
+    )
+  );
+
+-- 10. Storage Bucket & Policies
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
   'property-images',
@@ -552,5 +576,5 @@ CREATE POLICY "Users can delete their own property images"
   ON storage.objects FOR DELETE TO authenticated
   USING (bucket_id = 'property-images' AND auth.uid()::text = (storage.foldername(name))[1]);
 
--- Realtime: enable live message streams --------------------------------
+-- 11. Realtime Publication
 ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;

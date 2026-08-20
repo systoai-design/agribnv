@@ -447,7 +447,7 @@ export default function PropertyDetails() {
           </div>
           <Button 
             size="sm" 
-            className="rounded-full px-4 h-8 text-xs bg-[#156530] text-white hover:bg-[#156530]/90 shadow-none shrink-0"
+            className="rounded-full px-4 h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-none shrink-0"
             onClick={() => setShowFarmerProfile(true)}
           >
             Know the farmer
@@ -550,7 +550,7 @@ export default function PropertyDetails() {
             <div>
               <h3 className="font-semibold text-lg mb-1">Select Dates</h3>
               <div className="flex items-start gap-2">
-                <span className="inline-block w-2 h-2 mt-1.5 rounded-full bg-[#156530] shrink-0"></span> 
+                <span className="inline-block w-2 h-2 mt-1.5 rounded-full bg-primary shrink-0"></span> 
                 <p className="text-muted-foreground text-sm leading-tight">
                   Highlighted days have<br/>special events!
                 </p>
@@ -558,7 +558,7 @@ export default function PropertyDetails() {
             </div>
             <Button 
               variant="outline" 
-              className="rounded-full border-[#156530] text-[#156530] font-semibold px-6 hover:bg-[#156530]/5"
+              className="rounded-full border-primary text-primary font-semibold px-6 hover:bg-primary/10"
               onClick={() => setShowCalendarModal(true)}
             >
               Check availability
@@ -689,7 +689,7 @@ export default function PropertyDetails() {
           <Button 
             variant="outline" 
             size="sm" 
-            className="absolute bottom-4 right-4 gap-2 bg-white hover:bg-white rounded-lg shadow-md border-foreground/20"
+            className="absolute bottom-4 right-4 gap-2 bg-background hover:bg-muted rounded-lg shadow-md border-foreground/20"
             onClick={() => setShowAllPhotos(true)}
           >
             <Grid3X3 className="h-4 w-4" /> Show all photos
@@ -828,16 +828,16 @@ export default function PropertyDetails() {
                 <div>
                   <h3 className="text-xl font-semibold mb-2">Select Dates</h3>
                   <div className="flex items-start gap-2">
-                    <span className="inline-block w-2.5 h-2.5 mt-1.5 rounded-full bg-[#156530] shrink-0"></span> 
-                    <p className="text-muted-foreground leading-tight">
-                      Highlighted days have<br/>special events!
+                    <span className="inline-block w-2.5 h-2.5 mt-1.5 rounded-full bg-primary shrink-0"></span> 
+                    <p className="text-muted-foreground leading-snug">
+                      Dates marked with a dot have special farm events you can join!
                     </p>
                   </div>
                 </div>
                 <Button 
                   variant="outline" 
-                  size="lg"
-                  className="rounded-full border-[#156530] text-[#156530] font-semibold px-8 hover:bg-[#156530]/5"
+                  size="lg" 
+                  className="rounded-full border-primary text-primary font-semibold px-8 hover:bg-primary/10"
                   onClick={() => setShowCalendarModal(true)}
                 >
                   Check availability

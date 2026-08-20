@@ -8,6 +8,7 @@ interface Profile {
   avatar_url: string | null;
   bio: string | null;
   phone: string | null;
+  username: string | null;
 }
 
 type ViewMode = 'guest' | 'host';
@@ -19,7 +20,7 @@ interface AuthContextType {
   isHost: boolean;
   viewMode: ViewMode;
   isLoading: boolean;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName?: string, username?: string, phone?: string) => Promise<{ data?: any; error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   becomeHost: () => Promise<{ error: Error | null }>;
@@ -37,15 +38,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [viewMode, setViewMode] = useState<ViewMode>('guest');
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = async (userId: string): Promise<void> => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (data) {
-      setProfile(data);
+  const fetchProfile = async (userId: string, retries = 3): Promise<void> => {
+    for (let i = 0; i < retries; i++) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      
+      if (data) {
+        setProfile(data);
+        return;
+      }
+
+      // Wait 500ms before retrying if trigger hasn't finished
+      if (i < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
   };
 
@@ -127,21 +136,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+  const signUp = async (email: string, password: string, fullName?: string, username?: string, phone?: string) => {
+    const redirectUrl = `${window.location.origin}/explore`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName || '',
+          username: username || '',
+          phone: phone || '',
         },
       },
     });
 
-    return { error };
+    return { data, error };
   };
 
   const signIn = async (email: string, password: string) => {

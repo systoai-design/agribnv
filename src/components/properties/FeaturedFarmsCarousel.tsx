@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Property } from '@/types/database';
 import { cn } from '@/lib/utils';
 import haptics from '@/utils/haptics';
@@ -44,6 +44,30 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll, featured.length]);
 
+  const scrollToIndex = useCallback((index: number) => {
+    const el = scrollRef.current;
+    if (!el || el.children.length === 0) return;
+    const slideWidth = el.children[0].clientWidth;
+    if (slideWidth === 0) return;
+    el.scrollTo({ left: index * slideWidth, behavior: 'smooth' });
+    setActiveIndex(index);
+    haptics.light();
+  }, []);
+
+  const handlePrev = useCallback((e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    const prevIndex = (activeIndex - 1 + featured.length) % featured.length;
+    scrollToIndex(prevIndex);
+  }, [activeIndex, featured.length, scrollToIndex]);
+
+  const handleNext = useCallback((e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    const nextIndex = (activeIndex + 1) % featured.length;
+    scrollToIndex(nextIndex);
+  }, [activeIndex, featured.length, scrollToIndex]);
+
   // Auto-advance. Re-armed on every scroll event (manual swipe or programmatic), so a manual
   // swipe always gets a full fresh interval afterward instead of being interrupted mid-gesture.
   useEffect(() => {
@@ -73,7 +97,7 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
   if (featured.length === 0) return null;
 
   return (
-    <div>
+    <div className="relative group">
       <div
         ref={scrollRef}
         className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth gap-4 md:rounded-2xl md:overflow-hidden"
@@ -84,24 +108,24 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
             key={property.id}
             to={`/properties/${property.id}`}
             onClick={() => haptics.light()}
-            className="relative snap-center shrink-0 w-full aspect-[4/3] md:aspect-[21/9] rounded-2xl overflow-hidden"
+            className="relative snap-center shrink-0 w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] md:h-[340px] md:max-h-[38vh] rounded-2xl overflow-hidden group/card cursor-pointer"
           >
             <img
               src={getHeroImage(property)}
               alt={property.name}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-105"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
               <p className="font-serif text-lg md:text-2xl font-bold text-white leading-tight">
                 {property.name}
               </p>
-              <div className="mt-1 flex items-center gap-1 text-white/85 text-sm">
-                <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <div className="mt-1 flex items-center gap-1.5 text-white/90 text-xs md:text-sm">
+                <MapPin className="h-3.5 w-3.5 shrink-0 text-white/80" />
                 <span className="truncate">{property.location}</span>
               </div>
-              <p className="mt-1 text-secondary font-semibold text-sm">
+              <p className="mt-1 text-secondary font-semibold text-xs md:text-sm">
                 ₱{property.price_per_night.toLocaleString()}/night
               </p>
             </div>
@@ -109,14 +133,37 @@ export function FeaturedFarmsCarousel({ properties }: FeaturedFarmsCarouselProps
         ))}
       </div>
 
+      {/* Prev / Next navigation arrows */}
       {featured.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-3" aria-hidden="true">
+        <>
+          <button
+            onClick={handlePrev}
+            aria-label="Previous featured property"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-background/80 hover:bg-background backdrop-blur-md shadow-md rounded-full flex items-center justify-center border border-border/40 text-foreground transition-all opacity-0 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleNext}
+            aria-label="Next featured property"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-background/80 hover:bg-background backdrop-blur-md shadow-md rounded-full flex items-center justify-center border border-border/40 text-foreground transition-all opacity-0 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Clickable Pagination Dots */}
+      {featured.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mt-2.5" aria-label="Carousel pagination">
           {featured.map((property, i) => (
-            <span
+            <button
               key={property.id}
+              onClick={() => scrollToIndex(i)}
+              aria-label={`Go to slide ${i + 1}`}
               className={cn(
-                'h-1.5 rounded-full transition-all',
-                i === activeIndex ? 'w-5 bg-primary' : 'w-1.5 bg-primary/25',
+                'h-2 rounded-full transition-all duration-300 cursor-pointer p-0 border-0',
+                i === activeIndex ? 'w-6 bg-primary' : 'w-2 bg-primary/25 hover:bg-primary/50',
               )}
             />
           ))}

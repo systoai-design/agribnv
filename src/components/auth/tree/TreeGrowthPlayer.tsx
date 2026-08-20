@@ -23,7 +23,12 @@ export default function TreeGrowthPlayer({ width, height, mode, frame }: TreeGro
   useEffect(() => {
     const player = playerRef.current;
     if (!player) return;
-    const onEnded = () => player.seekTo(TREE_DURATION - 1);
+    const onEnded = () => {
+      // Prevent infinite loop: only seek if we aren't already at the final frame
+      if (player.getCurrentFrame() !== TREE_DURATION - 1) {
+        player.seekTo(TREE_DURATION - 1);
+      }
+    };
     player.addEventListener('ended', onEnded);
     return () => player.removeEventListener('ended', onEnded);
   }, []);

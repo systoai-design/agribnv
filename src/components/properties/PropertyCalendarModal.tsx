@@ -132,7 +132,7 @@ export function PropertyCalendarModal({
           </div>
         </div>
         <Button 
-          className="w-full rounded-full h-14 bg-[#156530] hover:bg-[#156530]/90 text-white font-bold text-lg"
+          className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg"
           onClick={onClose}
         >
           Confirm

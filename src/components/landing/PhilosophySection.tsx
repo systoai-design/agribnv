@@ -21,7 +21,7 @@ const PILLARS = [
 
 export function PhilosophySection() {
   return (
-    <section className="py-24 md:py-36 overflow-hidden relative bg-[#156530]">
+    <section className="py-24 md:py-36 overflow-hidden relative bg-primary">
       {/* Grain overlay */}
       <div
         className="absolute inset-0 opacity-10 pointer-events-none"
