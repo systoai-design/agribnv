@@ -159,9 +159,16 @@ export function Navbar({
                   >
                     <Menu className="h-4 w-4 text-foreground" />
                     <Avatar className="h-7 w-7 md:h-8 md:w-8">
-                      <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
+                      <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs md:text-sm font-semibold">
+                        {(profile?.full_name || user?.user_metadata?.full_name)
+                          ?.split(' ')
+                          .filter(Boolean)
+                          .map((n: string) => n[0])
+                          .join('')
+                          .toUpperCase() 
+                          || user?.email?.charAt(0)?.toUpperCase() 
+                          || <User className="h-4 w-4" />}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -176,8 +183,16 @@ export function Navbar({
                       exit={{ opacity: 0, y: -10 }}
                     >
                       <div className="p-4 border-b border-border/50">
-                        <p className="font-semibold text-foreground">{profile?.full_name || 'Welcome!'}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="font-semibold text-foreground">
+                          {profile?.full_name || user?.user_metadata?.full_name || 'Welcome!'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {profile?.username 
+                            ? `@${profile.username}` 
+                            : (user?.user_metadata?.username 
+                                ? `@${user.user_metadata.username}` 
+                                : (user?.email?.split('@')[0] ? `@${user.email.split('@')[0]}` : user?.email))}
+                        </p>
                       </div>
                       <DropdownMenuItem asChild className="py-3 px-4 cursor-pointer">
                         <Link to="/inbox" className="flex items-center gap-3">
@@ -202,7 +217,7 @@ export function Navbar({
                           <span>Account</span>
                         </Link>
                       </DropdownMenuItem>
-                      {isHost && (
+                      {isHost && viewMode === 'host' && (
                         <>
                           <DropdownMenuSeparator className="bg-border/50" />
                           <DropdownMenuItem asChild className="py-3 px-4 cursor-pointer">

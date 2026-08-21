@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useGeocoding } from '@/hooks/useGeocoding';
-import { PropertyCategory, CATEGORY_LABELS, CATEGORY_ICONS, ImageCategory } from '@/types/database';
+import { PropertyCategory, CATEGORY_LABELS, CATEGORY_ICONS, ImageCategory, FarmstaySubcategory, FARMSTAY_LABELS } from '@/types/database';
 import { ImageUploader, UploadedImage } from '@/components/properties/ImageUploader';
 import { Loader2, ArrowLeft, MapPin, Bed, Bath, Users, DollarSign, Camera, MapPinned, Check } from 'lucide-react';
 
@@ -48,6 +48,7 @@ const propertySchema = z.object({
   bedrooms: z.number().min(1).max(10),
   bathrooms: z.number().min(1).max(10),
   category: z.string(),
+  subcategory: z.string().optional(),
 });
 
 type PropertyForm = z.infer<typeof propertySchema>;
@@ -69,6 +70,7 @@ export default function NewProperty() {
       bedrooms: 1,
       bathrooms: 1,
       category: 'farmstay',
+      subcategory: 'agrifarm',
     },
   });
 
@@ -121,6 +123,7 @@ export default function NewProperty() {
           bedrooms: data.bedrooms,
           bathrooms: data.bathrooms,
           category: data.category as PropertyCategory,
+          subcategory: (data.subcategory || 'agrifarm') as FarmstaySubcategory,
           host_id: user.id,
           amenities: selectedAmenities,
           is_published: false,
@@ -217,20 +220,38 @@ export default function NewProperty() {
                   {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
-                  <Select defaultValue="farmstay" onValueChange={(val) => setValue('category', val)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(Object.keys(CATEGORY_LABELS) as PropertyCategory[]).map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category *</Label>
+                    <Select defaultValue="farmstay" onValueChange={(val) => setValue('category', val)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(Object.keys(CATEGORY_LABELS) as PropertyCategory[]).map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subcategory">Stay Type / Subcategory *</Label>
+                    <Select defaultValue="agrifarm" onValueChange={(val) => setValue('subcategory', val)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(Object.keys(FARMSTAY_LABELS) as FarmstaySubcategory[]).map((sub) => (
+                          <SelectItem key={sub} value={sub}>
+                            {FARMSTAY_LABELS[sub]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 

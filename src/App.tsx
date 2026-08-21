@@ -17,6 +17,7 @@ import HostDashboard from "./pages/HostDashboard";
 import NewProperty from "./pages/NewProperty";
 import EditProperty from "./pages/EditProperty";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import Wishlists from "./pages/Wishlists";
 import MapView from "./pages/MapView";
 import Inbox from "./pages/Inbox";
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/host/properties/new" element={<RoleRoute requireHost={true}><NewProperty /></RoleRoute>} />
               <Route path="/host/properties/:id/edit" element={<RoleRoute requireHost={true}><EditProperty /></RoleRoute>} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/edit" element={<EditProfile />} />
               <Route path="/wishlists" element={<RoleRoute requireHost={false}><Wishlists /></RoleRoute>} />
               <Route path="/map" element={<RoleRoute requireHost={false}><MapView /></RoleRoute>} />
               <Route path="/inbox" element={<Inbox />} />

@@ -52,6 +52,7 @@ export type AppRole = 'guest' | 'host';
 export interface Profile {
   id: string;
   full_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   bio: string | null;
   phone: string | null;

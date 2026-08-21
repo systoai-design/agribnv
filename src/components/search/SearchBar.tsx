@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -48,8 +48,8 @@ const SUGGESTED_DESTINATIONS = [
 
 const springTransition = {
   type: 'spring',
-  damping: 28,
-  stiffness: 350,
+  damping: 25,
+  stiffness: 300,
   mass: 0.8,
 };
 
@@ -76,6 +76,7 @@ export function SearchBar({
     setIsExpanded(false);
     setActiveSection(null);
   }, [setIsExpanded]);
+
   useEscapeKey(collapseSearch, isExpanded);
 
   const handleSectionClick = (section: 'location' | 'dates' | 'guests') => {
@@ -92,12 +93,12 @@ export function SearchBar({
   };
 
   const formatDateRange = () => {
-    if (!dateRange.from && !dateRange.to) return 'Any week';
+    if (!dateRange.from && !dateRange.to) return 'Dates';
     if (dateRange.from && !dateRange.to) return format(dateRange.from, 'MMM d');
     if (dateRange.from && dateRange.to) {
       return `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d')}`;
     }
-    return 'Any week';
+    return 'Dates';
   };
 
   // Compact version - simple pill
@@ -113,82 +114,84 @@ export function SearchBar({
         onClick={() => setIsExpanded(true)}
       >
         <Search className="h-4 w-4 text-primary" />
-        <span className="text-sm font-medium">Start your search</span>
+        <span className="text-sm font-medium">Search</span>
       </motion.div>
     );
   }
 
-  // Search bar with animated width transition
+  // Search bar with animated overlay pop-out (old style, jank free)
   return (
-    <motion.div
-      layout
-      initial={false}
-      animate={{
-        width: isExpanded ? 850 : 420,
-      }}
-      transition={springTransition}
-      className={cn('relative max-w-full', className)}
-    >
+    <div className={cn('relative z-50 flex justify-center w-full', className)}>
+      {/* Collapsed State */}
       <motion.div
-        layout
-        className="flex items-center rounded-full border border-border/60 shadow-lg shadow-black/[0.08] hover:shadow-xl hover:shadow-black/[0.12] transition-all duration-200 bg-background"
+        initial={false}
+        animate={{ opacity: isExpanded ? 0 : 1, scale: isExpanded ? 0.95 : 1, pointerEvents: isExpanded ? 'none' : 'auto' }}
+        transition={{ duration: 0.15 }}
+        className="flex items-center rounded-full border border-border/60 shadow-lg shadow-black/[0.08] hover:shadow-xl hover:shadow-black/[0.12] transition-shadow duration-200 bg-background w-full max-w-[420px]"
       >
-        {!isExpanded ? (
-          <>
-            {/* Collapsed: Where Section */}
-            <button
-              className="flex-1 min-w-0 px-6 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
-              onClick={() => handleSectionClick('location')}
-            >
-              <p className="text-[12px] font-semibold text-foreground tracking-tight">Where</p>
-              <p className="text-[14px] text-muted-foreground truncate">
-                {location || 'Search destinations'}
-              </p>
-            </button>
+        {/* Collapsed: Where Section */}
+        <button
+          className="flex-1 min-w-0 px-6 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
+          onClick={() => handleSectionClick('location')}
+        >
+          <p className="text-[12px] font-semibold text-foreground tracking-tight">Where</p>
+          <p className="text-[14px] text-muted-foreground truncate">
+            {location || 'Destination'}
+          </p>
+        </button>
 
-            <div className="h-6 w-px bg-border/70 shrink-0" />
+        <div className="h-6 w-px bg-border/70 shrink-0" />
 
-            {/* Collapsed: When Section */}
-            <button
-              className="flex-1 min-w-0 px-6 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
-              onClick={() => handleSectionClick('dates')}
-            >
-              <p className="text-[12px] font-semibold text-foreground tracking-tight">When</p>
-              <p className="text-[14px] text-muted-foreground truncate">
-                {formatDateRange()}
-              </p>
-            </button>
+        {/* Collapsed: When Section */}
+        <button
+          className="flex-1 min-w-0 px-6 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
+          onClick={() => handleSectionClick('dates')}
+        >
+          <p className="text-[12px] font-semibold text-foreground tracking-tight">When</p>
+          <p className="text-[14px] text-muted-foreground truncate">
+            {formatDateRange()}
+          </p>
+        </button>
 
-            <div className="h-6 w-px bg-border/70 shrink-0" />
+        <div className="h-6 w-px bg-border/70 shrink-0" />
 
-            {/* Collapsed: Who Section */}
-            <button
-              className="flex-1 min-w-0 px-5 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
-              onClick={() => handleSectionClick('guests')}
-            >
-              <p className="text-[12px] font-semibold text-foreground tracking-tight">Who</p>
-              <p className="text-[14px] text-muted-foreground truncate">
-                {guestCount > 1 ? `${guestCount} guests` : 'Add guests'}
-              </p>
-            </button>
+        {/* Collapsed: Who Section */}
+        <button
+          className="flex-1 min-w-0 px-5 py-3 text-left rounded-full hover:bg-muted/40 transition-colors"
+          onClick={() => handleSectionClick('guests')}
+        >
+          <p className="text-[12px] font-semibold text-foreground tracking-tight">Who</p>
+          <p className="text-[14px] text-muted-foreground truncate">
+            {guestCount > 1 ? `${guestCount} guests` : 'Guests'}
+          </p>
+        </button>
 
-            {/* Collapsed: Search Button */}
-            <div className="pr-2 shrink-0">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-primary/90 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSearch?.();
-                }}
-              >
-                <Search className="h-4 w-4 text-primary-foreground" />
-              </motion.button>
-            </div>
-          </>
-        ) : (
-          <>
+        {/* Collapsed: Search Button */}
+        <div className="pr-2 shrink-0">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-primary/90 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(true); // Expands search bar instead of searching directly
+            }}
+          >
+            <Search className="h-4 w-4 text-primary-foreground" />
+          </motion.button>
+        </div>
+      </motion.div>
+
+      {/* Expanded State */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: "-50%", scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+            exit={{ opacity: 0, y: -10, x: "-50%", scale: 0.95 }}
+            transition={springTransition}
+            className="absolute top-0 left-1/2 w-[850px] max-w-[95vw] bg-background rounded-full border border-border/60 shadow-xl shadow-black/[0.12] flex items-center"
+          >
             {/* Expanded: Location */}
             <Popover open={activeSection === 'location'} onOpenChange={(open) => setActiveSection(open ? 'location' : null)}>
               <PopoverTrigger asChild>
@@ -201,14 +204,14 @@ export function SearchBar({
                 >
                   <p className="text-xs font-semibold">Where</p>
                   <p className={cn('text-sm', location ? 'text-foreground' : 'text-muted-foreground')}>
-                    {location || 'Search destinations'}
+                    {location || 'Destination'}
                   </p>
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] max-w-[calc(100vw-2rem)] p-6 rounded-3xl shadow-card border-0" align="center" sideOffset={12}>
                 <div className="space-y-5">
                   <Input
-                    placeholder="Search destinations"
+                    placeholder="Destination"
                     value={location}
                     onChange={(e) => onLocationChange(e.target.value)}
                     className="rounded-xl border-muted-foreground/20 focus:border-foreground"
@@ -302,7 +305,7 @@ export function SearchBar({
                 >
                   <p className="text-xs font-semibold">Who</p>
                   <p className={cn('text-sm', guestCount > 1 ? 'text-foreground' : 'text-muted-foreground')}>
-                    {guestCount > 1 ? `${guestCount} guests` : 'Add guests'}
+                    {guestCount > 1 ? `${guestCount} guests` : 'Guests'}
                   </p>
                 </button>
               </PopoverTrigger>
@@ -348,9 +351,9 @@ export function SearchBar({
                 <span className="text-primary-foreground font-medium hidden sm:inline">Search</span>
               </motion.button>
             </div>
-          </>
+          </motion.div>
         )}
-      </motion.div>
-    </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }

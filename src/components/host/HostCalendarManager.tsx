@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Booking } from '@/types/database';
 import { Loader2, CalendarX, Lock, Unlock } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface HostCalendarManagerProps {
   propertyId: string;
@@ -116,6 +117,8 @@ export function HostCalendarManager({ propertyId }: HostCalendarManagerProps) {
     }
   };
 
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
@@ -137,7 +140,7 @@ export function HostCalendarManager({ propertyId }: HostCalendarManagerProps) {
             }}
             onDayClick={handleDayClick}
             disabled={disabledDates}
-            numberOfMonths={2}
+            numberOfMonths={isDesktop ? 2 : 1}
             className="pointer-events-auto"
             modifiers={{
               blocked: disabledDates,

@@ -1,13 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,26 +20,16 @@ import {
   Share2,
   LogOut,
   User,
-  Repeat
+  Repeat,
+  LayoutDashboard
 } from 'lucide-react';
-
-const profileSchema = z.object({
-  full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  avatar_url: z.string().url().optional().or(z.literal('')),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional().or(z.literal('')),
-  phone: z.string().optional().or(z.literal('')),
-});
-
-type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function Profile() {
   const { user, profile, refreshProfile, signOut, isHost, viewMode, switchViewMode, becomeHost } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { share } = useShare();
-  const [isLoading, setIsLoading] = useState(false);
   const [isBecomingHost, setIsBecomingHost] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleSwitchMode = () => {
     if (viewMode === 'host') {
@@ -64,54 +49,6 @@ export default function Profile() {
       text: 'Discover authentic farm stays and agricultural experiences across the Philippines! 🌿',
       url: window.location.origin,
     });
-  };
-
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<ProfileForm>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      full_name: profile?.full_name || '',
-      avatar_url: profile?.avatar_url || '',
-      username: profile?.username || '',
-      phone: profile?.phone || '',
-    },
-  });
-
-  useEffect(() => {
-    if (profile) {
-      reset({
-        full_name: profile.full_name || '',
-        avatar_url: profile.avatar_url || '',
-        username: profile.username || '',
-        phone: profile.phone || '',
-      });
-    }
-  }, [profile, reset]);
-
-  const onSubmit = async (data: ProfileForm) => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: data.full_name,
-          avatar_url: data.avatar_url || null,
-          username: data.username || null,
-          phone: data.phone || null,
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      await refreshProfile();
-      setIsEditing(false);
-      toast({ title: 'Profile updated!' });
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleBecomeHost = async () => {
@@ -154,13 +91,13 @@ export default function Profile() {
     );
   }
 
-  const avatarUrl = watch('avatar_url');
-  const initials = profile?.full_name
+  const initials = (profile?.full_name || user?.user_metadata?.full_name)
     ?.split(' ')
-    .map((n) => n[0])
+    .filter(Boolean)
+    .map((n: string) => n[0])
     .join('')
     .toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U';
-  const username = profile?.username || profile?.full_name?.toLowerCase().replace(/\s+/g, '') || 'user';
+  const username = profile?.username || user?.user_metadata?.username || (profile?.full_name || user?.user_metadata?.full_name)?.toLowerCase().replace(/\s+/g, '') || user?.email?.split('@')[0] || 'user';
 
   const settingsItems = [
     { icon: Lock, label: 'Change Password', href: '/change-password' },
@@ -176,12 +113,12 @@ export default function Profile() {
   return (
     <Layout>
       {/* Header */}
-      <div className="sticky top-0 safe-area-pt z-40 bg-background px-4 py-4 border-b border-border/30 md:hidden">
+      <div className="sticky top-0 safe-area-pt z-40 bg-background/80 backdrop-blur-md px-4 py-4 border-b border-border/30 md:hidden">
         <div className="flex items-center gap-4">
           <Link to="/">
             <motion.button
               whileTap={{ scale: 0.9 }}
-              className="p-3 -ml-3"
+              className="p-3 -ml-3 rounded-full hover:bg-muted/50 transition-colors"
             >
               <ArrowLeft className="h-5 w-5 text-foreground" />
             </motion.button>
@@ -190,211 +127,204 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="container py-8 safe-area-pt max-w-md mx-auto px-4">
-        {/* Profile Avatar Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center mb-8"
-        >
-          <div className="relative mb-4">
-            <Avatar className="h-28 w-28 border-4 border-card shadow-lg">
-              <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-3xl font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg border-2 border-card"
-            >
-              <Camera className="h-5 w-5" />
-            </button>
-          </div>
-          <h2 className="text-xl font-bold text-foreground">{profile?.full_name || 'Your Name'}</h2>
-          <p className="text-muted-foreground">@{username}</p>
-        </motion.div>
+      <div className="container py-8 md:py-12 safe-area-pt max-w-5xl mx-auto px-4">
+        
+        {/* Desktop Header */}
+        <div className="hidden md:block mb-8">
+          <h1 className="text-3xl font-bold text-foreground">Account</h1>
+        </div>
 
-        {/* Edit Form (when editing) */}
-        {isEditing && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="bg-card rounded-2xl p-4 mb-6 shadow-soft"
-          >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input id="full_name" {...register('full_name')} />
-                {errors.full_name && <p className="text-sm text-destructive">{errors.full_name.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" {...register('username')} />
-                {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" {...register('phone')} />
-                {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="avatar_url">Avatar URL</Label>
-                <Input id="avatar_url" placeholder="https://..." {...register('avatar_url')} />
-              </div>
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading} className="flex-1">
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save
-                </Button>
-              </div>
-            </form>
-          </motion.div>
-        )}
-
-        {/* Host Mode Toggle - For users who are hosts */}
-        {isHost && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-secondary/20 rounded-2xl p-4 mb-6"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-secondary-foreground">
-                  {viewMode === 'host' ? "You're in Host mode" : "You're in Traveller mode"}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {viewMode === 'host' ? 'Managing your listings' : 'Browsing farm stays'}
-                </p>
-              </div>
-              <Button onClick={handleSwitchMode} variant="outline" size="sm" className="gap-2">
-                <Repeat className="h-4 w-4" />
-                {viewMode === 'host' ? 'Switch to Traveller' : 'Switch to Host'}
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Become Host Card - Only for non-hosts */}
-        {!isHost && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-primary/10 rounded-2xl p-4 mb-6"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-primary">Become a Host</h3>
-                <p className="text-sm text-muted-foreground">List your property and earn</p>
-              </div>
-              <Button onClick={handleBecomeHost} disabled={isBecomingHost} size="sm">
-                {isBecomingHost && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Start
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* General Settings Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6"
-        >
-          <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 px-1">
-            General Settings
-          </h3>
-          <div className="bg-card rounded-2xl overflow-hidden shadow-soft">
-            {settingsItems.map((item, index) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={`flex items-center justify-between p-4 hover:bg-muted/50 transition-colors ${
-                  index < settingsItems.length - 1 ? 'border-b border-border/30' : ''
-                }`}
+        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-8 md:gap-12">
+          
+          {/* LEFT COLUMN: Identity & Editing */}
+          <div className="flex flex-col gap-6">
+            {/* Sticky Wrapper */}
+            <div className="md:sticky md:top-28 space-y-6">
+              
+              {/* Profile Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-card rounded-3xl p-8 shadow-soft border border-border/40 flex flex-col items-center text-center"
               >
-                <div className="flex items-center gap-3">
-                  <item.icon className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground">{item.label}</span>
+                <div className="relative mb-5">
+                  <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
+                    <AvatarImage src={profile?.avatar_url || undefined} />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-4xl font-bold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Information Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6"
-        >
-          <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 px-1">
-            Information
-          </h3>
-          <div className="bg-card rounded-2xl overflow-hidden shadow-soft">
-            {infoItems.map((item, index) => {
-              const baseClassName = `flex items-center justify-between p-4 hover:bg-muted/50 transition-colors w-full text-left ${
-                index < infoItems.length - 1 ? 'border-b border-border/30' : ''
-              }`;
-              
-              if (item.action === 'share') {
-                return (
-                  <button
-                    key={item.label}
-                    onClick={handleShareApp}
-                    type="button"
-                    className={baseClassName}
+                
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">{profile?.full_name || 'Your Name'}</h2>
+                <p className="text-muted-foreground mb-6">@{username}</p>
+                
+                <Link to="/profile/edit" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full rounded-full font-medium"
                   >
-                    <div className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-foreground">{item.label}</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </button>
-                );
-              }
-              
-              return (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className={baseClassName}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-foreground">{item.label}</span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    Edit Profile
+                  </Button>
                 </Link>
-              );
-            })}
+              </motion.div>
+              
+            </div>
           </div>
-        </motion.div>
 
-        {/* Sign Out Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Button 
-            variant="outline" 
-            onClick={handleSignOut} 
-            className="w-full rounded-2xl h-12 text-destructive border-destructive/30 hover:bg-destructive/10"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
-        </motion.div>
+          {/* RIGHT COLUMN: Control Center */}
+          <div className="flex flex-col gap-8">
+            
+            {/* Host Mode Toggle - For users who are hosts */}
+            {isHost && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl p-6 md:p-8"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                      <LayoutDashboard className="h-5 w-5 text-primary" />
+                      {viewMode === 'host' ? "You're in Host mode" : "You're in Traveller mode"}
+                    </h3>
+                    <p className="text-muted-foreground mt-1">
+                      {viewMode === 'host' ? 'Manage your listings, bookings, and earnings.' : 'Browse unique farm stays and book experiences.'}
+                    </p>
+                  </div>
+                  <Button onClick={handleSwitchMode} className="rounded-full shadow-sm whitespace-nowrap">
+                    <Repeat className="h-4 w-4 mr-2" />
+                    {viewMode === 'host' ? 'Switch to Traveller' : 'Switch to Host'}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Become Host Card - Only for non-hosts */}
+            {!isHost && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-6 md:p-8 shadow-md text-primary-foreground relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500">
+                  <LayoutDashboard className="w-32 h-32" />
+                </div>
+                <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-1">Become a Host</h3>
+                    <p className="text-primary-foreground/80">List your property, farm, or experience and start earning.</p>
+                  </div>
+                  <Button 
+                    onClick={handleBecomeHost} 
+                    disabled={isBecomingHost} 
+                    variant="secondary"
+                    className="rounded-full font-semibold shadow-sm px-8"
+                  >
+                    {isBecomingHost ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Get Started
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Settings & Information Grid (Desktop) / Stack (Mobile) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* General Settings Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-col gap-4"
+              >
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider px-2">
+                  Account Settings
+                </h3>
+                <div className="bg-card rounded-3xl overflow-hidden shadow-sm border border-border/40">
+                  {settingsItems.map((item, index) => (
+                    <Link
+                      key={item.label}
+                      to={item.href}
+                      className={`flex items-center justify-between p-5 hover:bg-muted/50 transition-colors group ${
+                        index < settingsItems.length - 1 ? 'border-b border-border/40' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-secondary/30 flex items-center justify-center text-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        <span className="font-medium text-foreground">{item.label}</span>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </Link>
+                  ))}
+                  
+                  {/* Sign Out Button */}
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center justify-between p-5 hover:bg-destructive/5 transition-colors group w-full text-left border-t border-border/40"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive group-hover:bg-destructive/20 transition-colors">
+                        <LogOut className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-destructive">Sign Out</span>
+                    </div>
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Information Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col gap-4"
+              >
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider px-2">
+                  Information & Support
+                </h3>
+                <div className="bg-card rounded-3xl overflow-hidden shadow-sm border border-border/40">
+                  {infoItems.map((item, index) => {
+                    const baseClassName = `flex items-center justify-between p-5 hover:bg-muted/50 transition-colors w-full text-left group ${
+                      index < infoItems.length - 1 ? 'border-b border-border/40' : ''
+                    }`;
+                    
+                    const content = (
+                      <>
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-secondary/30 flex items-center justify-center text-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <item.icon className="h-5 w-5" />
+                          </div>
+                          <span className="font-medium text-foreground">{item.label}</span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      </>
+                    );
+
+                    if (item.action === 'share') {
+                      return (
+                        <button key={item.label} onClick={handleShareApp} type="button" className={baseClassName}>
+                          {content}
+                        </button>
+                      );
+                    }
+                    
+                    return (
+                      <Link key={item.label} to={item.href} className={baseClassName}>
+                        {content}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   );

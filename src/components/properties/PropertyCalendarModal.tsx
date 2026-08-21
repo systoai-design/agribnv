@@ -144,7 +144,7 @@ export function PropertyCalendarModal({
   if (isDesktop) {
     return (
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-[2.5rem] border-0 h-[85vh] [&>button]:hidden bg-[#B0D182]">
+        <DialogContent className="sm:max-w-[720px] w-full p-0 overflow-hidden rounded-[2.5rem] border-0 h-[85vh] max-h-[850px] [&>button]:hidden bg-[#B0D182]">
           <DialogHeader className="sr-only">
             <DialogTitle>Select Dates</DialogTitle>
           </DialogHeader>

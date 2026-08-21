@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
-import { Tractor, Fish, Home, Utensils } from 'lucide-react';
+import { Tractor, Fish, Home, Utensils, Warehouse } from 'lucide-react';
 import { FarmstaySubcategory, FARMSTAY_LABELS } from '@/types/database';
 import { cn } from '@/lib/utils';
 import haptics from '@/utils/haptics';
@@ -14,6 +14,7 @@ const SUBCATEGORIES: { id: FarmstaySubcategory; icon: React.ElementType }[] = [
   { id: 'agrifarm', icon: Tractor },
   { id: 'aquafarm', icon: Fish },
   { id: 'homestay', icon: Home },
+  { id: 'farm_cottage', icon: Warehouse },
   { id: 'kitchen', icon: Utensils },
 ];
 

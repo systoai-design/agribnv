@@ -8,7 +8,7 @@ interface RoleRouteProps {
 }
 
 export function RoleRoute({ requireHost, children }: RoleRouteProps) {
-  const { user, viewMode, isLoading } = useAuth();
+  const { user, viewMode, isLoading, isHost } = useAuth();
 
   if (isLoading) {
     return <AppLoadingScreen />;
@@ -18,8 +18,8 @@ export function RoleRoute({ requireHost, children }: RoleRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (requireHost && viewMode !== 'host') {
-    // If route requires a host and the view mode is NOT host, boot them to explore
+  if (requireHost && (!isHost || viewMode !== 'host')) {
+    // If route requires a host and they are not a host or the view mode is NOT host, boot them to explore
     return <Navigate to="/explore" replace />;
   }
 

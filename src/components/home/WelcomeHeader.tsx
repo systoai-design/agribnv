@@ -6,19 +6,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 export function WelcomeHeader() {
   const { user, profile } = useAuth();
 
-  const firstName = profile?.full_name?.split(' ')[0] || 'Explorer';
-  const initials = profile?.full_name
+  const firstName = (profile?.full_name || user?.user_metadata?.full_name)?.split(' ')[0] || 'Explorer';
+  const initials = (profile?.full_name || user?.user_metadata?.full_name)
     ?.split(' ')
-    .map((n) => n[0])
+    .filter(Boolean)
+    .map((n: string) => n[0])
     .join('')
-    .toUpperCase() || 'U';
+    .toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U';
 
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 animate-fade-in">
       <div className="flex items-center gap-2.5">
         <Link to={user ? '/profile' : '/auth'} className="flex items-center justify-center h-11 w-11 -m-0.5">
           <Avatar className="h-10 w-10 border-2 border-primary/20">
-            <AvatarImage src={profile?.avatar_url || undefined} />
+            <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || undefined} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
               {initials}
             </AvatarFallback>

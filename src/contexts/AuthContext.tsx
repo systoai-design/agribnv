@@ -35,19 +35,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isHost, setIsHost] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('guest');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('agribnv_viewMode');
+    return (saved === 'host' || saved === 'guest') ? saved : 'guest';
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = async (userId: string, retries = 3): Promise<void> => {
+  const fetchProfile = async (userId: string, currentUser?: User | null, retries = 3): Promise<void> => {
+    const fallbackUser = currentUser || user;
     for (let i = 0; i < retries; i++) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
       
+      if (error) {
+        console.warn(`fetchProfile error (attempt ${i + 1}):`, error);
+      }
+
       if (data) {
-        setProfile(data);
+        setProfile({
+          ...data,
+          full_name: data.full_name || fallbackUser?.user_metadata?.full_name || null,
+          username: data.username || fallbackUser?.user_metadata?.username || fallbackUser?.email?.split('@')[0] || null,
+          phone: data.phone || fallbackUser?.user_metadata?.phone || null,
+          avatar_url: data.avatar_url || fallbackUser?.user_metadata?.avatar_url || null,
+        });
         return;
       }
 
@@ -55,6 +69,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (i < retries - 1) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
+    }
+
+    // Fallback if no profiles row exists yet
+    if (fallbackUser) {
+      setProfile({
+        id: userId,
+        full_name: fallbackUser.user_metadata?.full_name || null,
+        username: fallbackUser.user_metadata?.username || fallbackUser.email?.split('@')[0] || null,
+        phone: fallbackUser.user_metadata?.phone || null,
+        avatar_url: fallbackUser.user_metadata?.avatar_url || null,
+        bio: null,
+      });
     }
   };
 
@@ -68,19 +94,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const hostStatus = !!data;
     setIsHost(hostStatus);
-    // Auto-set view mode to host if user is a host (can be changed later)
-    if (hostStatus) {
+    
+    // Auto-set view mode to host if user is a host and hasn't explicitly saved a preference
+    const savedMode = localStorage.getItem('agribnv_viewMode');
+    if (hostStatus && !savedMode) {
       setViewMode('host');
+      localStorage.setItem('agribnv_viewMode', 'host');
     }
   };
 
   const switchViewMode = (mode: ViewMode) => {
     setViewMode(mode);
+    localStorage.setItem('agribnv_viewMode', mode);
   };
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfile(user.id);
+      await fetchProfile(user.id, user);
       await checkHostStatus(user.id);
     }
   };
@@ -92,17 +122,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!isMounted) return;
+        const currentUser = session?.user ?? null;
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(currentUser);
         
         // Fire and forget for ongoing changes - don't await, don't set loading
-        if (session?.user) {
-          fetchProfile(session.user.id);
-          checkHostStatus(session.user.id);
+        if (currentUser) {
+          fetchProfile(currentUser.id, currentUser);
+          checkHostStatus(currentUser.id);
         } else {
           setProfile(null);
           setIsHost(false);
           setViewMode('guest');
+          localStorage.removeItem('agribnv_viewMode');
         }
       }
     );
@@ -113,14 +145,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!isMounted) return;
 
+        const currentUser = session?.user ?? null;
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(currentUser);
 
         // Await role check BEFORE setting loading false
-        if (session?.user) {
+        if (currentUser) {
           await Promise.all([
-            fetchProfile(session.user.id),
-            checkHostStatus(session.user.id)
+            fetchProfile(currentUser.id, currentUser),
+            checkHostStatus(currentUser.id)
           ]);
         }
       } finally {
@@ -171,6 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setIsHost(false);
     setViewMode('guest');
+    localStorage.removeItem('agribnv_viewMode');
   };
 
   const becomeHost = async () => {
@@ -179,7 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // First check if user already has host role
-    const { data: existingRole } = await supabase
+    const { data: existingRole, error: selectError } = await supabase
       .from('user_roles')
       .select('id')
       .eq('user_id', user.id)
@@ -198,9 +232,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from('user_roles')
       .insert({ user_id: user.id, role: 'host' });
 
+    if (error) {
+      // If error is duplicate key (23505), they are already a host. Treat as success.
+      if (error.code === '23505') {
+        setIsHost(true);
+        setViewMode('host');
+        return { error: null };
+      }
+      return { error: new Error(error.message) };
+    }
+
     if (!error) {
       setIsHost(true);
       setViewMode('host');
+      localStorage.setItem('agribnv_viewMode', 'host');
     }
 
     return { error };

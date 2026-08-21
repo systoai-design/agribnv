@@ -154,7 +154,7 @@ export function MobileSearchModal({
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    placeholder="Search destinations (e.g. Tagaytay)"
+                    placeholder="Destination"
                     value={location}
                     onChange={(e) => onLocationChange(e.target.value)}
                     className="pl-11 h-14 rounded-2xl border-2 border-border focus:border-primary bg-background text-base shadow-sm"
@@ -278,7 +278,7 @@ export function MobileSearchModal({
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    placeholder="Search experiences (e.g. Farm Tour)"
+                    placeholder="Experience"
                     value={experience}
                     onChange={(e) => onExperienceChange?.(e.target.value)}
                     className="pl-11 h-14 rounded-2xl border-2 border-border focus:border-primary bg-background text-base shadow-sm"

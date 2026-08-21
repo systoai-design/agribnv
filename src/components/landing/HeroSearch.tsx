@@ -149,7 +149,7 @@ export function HeroSearch() {
       return `${format(dateRange.from, 'MMM d')} – ${format(dateRange.to, 'MMM d')}`;
     }
     if (dateRange.from) return format(dateRange.from, 'MMM d');
-    return 'Any week';
+    return 'Dates';
   };
 
   const handleSearch = () => {
@@ -183,15 +183,15 @@ export function HeroSearch() {
             <button type="button" className={fieldClass}>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Where</p>
               <p className={cn('text-sm truncate', location ? 'text-gray-900 font-medium' : 'text-gray-400')}>
-                {location || 'Search destinations'}
+                {location || 'Destination'}
               </p>
             </button>
           }
           popoverProps={{ className: 'w-[340px] p-5 rounded-3xl shadow-xl border-0', align: 'start', side: 'top', sideOffset: 14 }}
         >
           <Input
-            placeholder="Search destinations"
-            aria-label="Search destinations"
+            placeholder="Destination"
+            aria-label="Destination"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="rounded-xl mb-4"
@@ -333,7 +333,7 @@ export function HeroSearch() {
             <button type="button" className={fieldClass}>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Who</p>
               <p className={cn('text-sm truncate', guests > 1 ? 'text-gray-900 font-medium' : 'text-gray-400')}>
-                {guests > 1 ? `${guests} guests` : 'Add guests'}
+                {guests > 1 ? `${guests} guests` : 'Guests'}
               </p>
             </button>
           }
@@ -395,7 +395,7 @@ export function HeroSearch() {
           popoverProps={{ className: 'w-[340px] p-5 rounded-3xl shadow-xl border-0', align: 'start', side: 'top', sideOffset: 14 }}
         >
           <Input
-            placeholder="Search experiences"
+            placeholder="Experience"
             aria-label="Search experiences"
             value={experience}
             onChange={(e) => setExperience(e.target.value)}

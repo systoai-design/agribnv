@@ -21,8 +21,10 @@ import {
   Property,
   PropertyCategory, 
   CancellationPolicy,
+  FarmstaySubcategory,
   CATEGORY_LABELS, 
   CATEGORY_ICONS,
+  FARMSTAY_LABELS,
   CANCELLATION_POLICY_LABELS,
   CANCELLATION_POLICY_DESCRIPTIONS,
   HOUSE_RULES_OPTIONS,
@@ -53,6 +55,7 @@ const propertySchema = z.object({
   bedrooms: z.number().min(1).max(10),
   bathrooms: z.number().min(1).max(10),
   category: z.string(),
+  subcategory: z.string().optional(),
   check_in_time: z.string(),
   check_out_time: z.string(),
   cancellation_policy: z.string(),
@@ -140,6 +143,7 @@ export default function EditProperty() {
       bedrooms: prop.bedrooms,
       bathrooms: prop.bathrooms,
       category: prop.category,
+      subcategory: prop.subcategory || 'agrifarm',
       check_in_time: prop.check_in_time || '14:00',
       check_out_time: prop.check_out_time || '12:00',
       cancellation_policy: prop.cancellation_policy || 'moderate',
@@ -180,6 +184,7 @@ export default function EditProperty() {
           bedrooms: data.bedrooms,
           bathrooms: data.bathrooms,
           category: data.category as PropertyCategory,
+          subcategory: (data.subcategory || property?.subcategory || 'agrifarm') as FarmstaySubcategory,
           amenities: selectedAmenities,
           check_in_time: data.check_in_time,
           check_out_time: data.check_out_time,
@@ -306,23 +311,44 @@ export default function EditProperty() {
                     {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
-                    <Select 
-                      defaultValue={property?.category} 
-                      onValueChange={(val) => setValue('category', val)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.keys(CATEGORY_LABELS) as PropertyCategory[]).map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category *</Label>
+                      <Select 
+                        defaultValue={property?.category} 
+                        onValueChange={(val) => setValue('category', val)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.keys(CATEGORY_LABELS) as PropertyCategory[]).map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subcategory">Stay Type / Subcategory *</Label>
+                      <Select 
+                        defaultValue={property?.subcategory || 'agrifarm'} 
+                        onValueChange={(val) => setValue('subcategory', val)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.keys(FARMSTAY_LABELS) as FarmstaySubcategory[]).map((sub) => (
+                            <SelectItem key={sub} value={sub}>
+                              {FARMSTAY_LABELS[sub]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

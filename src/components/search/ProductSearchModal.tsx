@@ -98,7 +98,7 @@ export function ProductSearchModal({
                   <Search className="h-5 w-5 text-muted-foreground shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search locations or products..."
+                    placeholder="Products"
                     value={location}
                     onChange={(e) => onLocationChange(e.target.value)}
                     onFocus={() => setActiveInput('where')}
