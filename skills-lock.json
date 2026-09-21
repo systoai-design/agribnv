@@ -1,6 +1,72 @@
 {
   "version": 1,
   "skills": {
+    "code-debugging": {
+      "source": "lingzhi227/agent-research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-debugging/SKILL.md",
+      "computedHash": "a1a70ea8bc8371ca884a6ce838d981f4792be22f3feed1c59ffacf983a83ec1d"
+    },
+    "eas-workflows": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/eas-workflows/SKILL.md",
+      "computedHash": "40c39c7c73597ce263e35f2e6bbc6e534321b5365f70beb772085e9adbc3ec5c"
+    },
+    "extract-design-system": {
+      "source": "arvindrk/extract-design-system",
+      "sourceType": "github",
+      "skillPath": "skills/extract-design-system/SKILL.md",
+      "computedHash": "5f231fda377e304b202848f09ecc0fd42839355e76f60e06c3ceb7a643c15500"
+    },
+    "java-refactoring-extract-method": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/java-refactoring-extract-method/SKILL.md",
+      "computedHash": "8a467a2fe1f1d8c14a2c344dfef7060f5cf1300ad5b4d4f036b336c78f6952ab"
+    },
+    "multi-agent-brainstorming": {
+      "source": "sickn33/agentic-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/multi-agent-brainstorming/SKILL.md",
+      "computedHash": "745c009a3577c3e190c895dd49ac4fba6ec75b863fb3a95275fdda7c0884b7a9"
+    },
+    "orchestration": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "skillPath": "skills/orchestration/SKILL.md",
+      "computedHash": "2b0116fe242b0c0ecc1177600de8bafe356fc126745faad2fba9c4d19c94a1d0"
+    },
+    "persona-project-manager": {
+      "source": "googleworkspace/cli",
+      "sourceType": "github",
+      "skillPath": "skills/persona-project-manager/SKILL.md",
+      "computedHash": "791594e1b7fcabfb2cd0acc32bb3d76c2e10c7521a351f4db328c4231a031cd3"
+    },
+    "prd": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/prd/SKILL.md",
+      "computedHash": "1f3e1f005fc40fda85d250ae906c8ee4f7e8e833e23adfeca6542c19609fd7cd"
+    },
+    "refactoring-patterns": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "refactoring-patterns/SKILL.md",
+      "computedHash": "b896bb518a3c6233e93c3a3d319f0e98b9eb0c65813c432e4452d8287942cd1b"
+    },
+    "refactoring-ui": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "refactoring-ui/SKILL.md",
+      "computedHash": "27f1bda9fe53f7565928109a283a8ca20dba74ed9aab8d2ad78140f3ae658e83"
+    },
+    "security-compliance": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "skillPath": "cli-tool/components/skills/development/security-compliance/SKILL.md",
+      "computedHash": "8f3539d7698b6bff355eaeb17dac7e5f5c04c43e91efc65c40c4dab13d727942"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
@@ -12,6 +78,24 @@
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "e14e276241805c97dbcfe40dcbea1a3035269cc7293cac4b1832dda41a835e60"
+    },
+    "systematic-debugging": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/systematic-debugging/SKILL.md",
+      "computedHash": "a2750dfbaed1690da73b120254892c4f926b4576cb82eb16fc877783941fe39b"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "ad5b1fc52807e9afa4635e59218a026b164dc58b6c3f41b0f7c644dcd6ccf572"
     }
   }
 }

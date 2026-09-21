@@ -1,0 +1,80 @@
+{
+  "architectural_score": 57,
+  "total_violations": 7,
+  "breakdown": {
+    "CRITICAL": 0,
+    "HIGH": 1,
+    "MEDIUM": 2,
+    "LOW": 4
+  },
+  "passed_invariants": [
+    "Layering: components/ui maintains clean separation from pages",
+    "Code Splitting: Route pages leverage lazy-loading / React.lazy",
+    "Database Invariant: PostgreSQL GiST exclusion constraint enforces Zero Double-Booking"
+  ],
+  "violations": [
+    {
+      "code": "ARCH-CIRCULAR-001",
+      "title": "Circular Dependency Detected: src/components/layout/Footer.tsx \u2194 src/components/layout/InspirationGallery.tsx",
+      "severity": "HIGH",
+      "description": "Circular import path: src/components/layout/Footer.tsx -> src/components/layout/InspirationGallery.tsx. Circular dependencies cause runtime undefined exports and tight coupling.",
+      "file_path": "src/components/layout/Footer.tsx",
+      "line_number": null,
+      "remediation": "Extract shared types, constants, or hooks into a separate module in src/constants/ or src/types/ to break the cycle."
+    },
+    {
+      "code": "ARCH-PLATFORM-001",
+      "title": "Direct Native Capacitor Import in UI Component",
+      "severity": "MEDIUM",
+      "description": "src/components/app-shell/Root.tsx directly imports native packages: @capacitor/core. In AGENTS.md, platform code must be decoupled behind an adapter facade in core/platform.",
+      "file_path": "src/components/app-shell/Root.tsx",
+      "line_number": null,
+      "remediation": "Wrap platform features (Camera, Geolocation, Haptics) in an adapter hook (e.g. usePlatformCamera) to ensure seamless web fallback."
+    },
+    {
+      "code": "ARCH-PLATFORM-001",
+      "title": "Direct Native Capacitor Import in UI Component",
+      "severity": "MEDIUM",
+      "description": "src/components/layout/Layout.tsx directly imports native packages: @capacitor/core. In AGENTS.md, platform code must be decoupled behind an adapter facade in core/platform.",
+      "file_path": "src/components/layout/Layout.tsx",
+      "line_number": null,
+      "remediation": "Wrap platform features (Camera, Geolocation, Haptics) in an adapter hook (e.g. usePlatformCamera) to ensure seamless web fallback."
+    },
+    {
+      "code": "ARCH-MODULAR-001",
+      "title": "Monolithic File Detected (1209 LOC)",
+      "severity": "LOW",
+      "description": "src/pages/PropertyDetails.tsx exceeds 600 lines of code (1209 LOC), indicating mixed concerns and lack of vertical slice decomposition.",
+      "file_path": "src/pages/PropertyDetails.tsx",
+      "line_number": null,
+      "remediation": "Decompose large component into smaller subcomponents, custom query hooks, and utility functions."
+    },
+    {
+      "code": "ARCH-MODULAR-001",
+      "title": "Monolithic File Detected (639 LOC)",
+      "severity": "LOW",
+      "description": "src/pages/EditProperty.tsx exceeds 600 lines of code (639 LOC), indicating mixed concerns and lack of vertical slice decomposition.",
+      "file_path": "src/pages/EditProperty.tsx",
+      "line_number": null,
+      "remediation": "Decompose large component into smaller subcomponents, custom query hooks, and utility functions."
+    },
+    {
+      "code": "ARCH-MODULAR-001",
+      "title": "Monolithic File Detected (630 LOC)",
+      "severity": "LOW",
+      "description": "src/integrations/supabase/types.ts exceeds 600 lines of code (630 LOC), indicating mixed concerns and lack of vertical slice decomposition.",
+      "file_path": "src/integrations/supabase/types.ts",
+      "line_number": null,
+      "remediation": "Decompose large component into smaller subcomponents, custom query hooks, and utility functions."
+    },
+    {
+      "code": "ARCH-MODULAR-001",
+      "title": "Monolithic File Detected (638 LOC)",
+      "severity": "LOW",
+      "description": "src/components/ui/sidebar.tsx exceeds 600 lines of code (638 LOC), indicating mixed concerns and lack of vertical slice decomposition.",
+      "file_path": "src/components/ui/sidebar.tsx",
+      "line_number": null,
+      "remediation": "Decompose large component into smaller subcomponents, custom query hooks, and utility functions."
+    }
+  ]
+}

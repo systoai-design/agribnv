@@ -4,7 +4,7 @@
 **Category:** UX/UI Wireframe Layout & Behavioral Annotation  
 **Target Milestone:** v2.0 Revamp Baseline  
 **Fidelity Level:** Annotated Mid-Fidelity Wireframe Specification  
-**Governing Documents:** [`SRS.md`](file:///Users/Kyle/Desktop/Claude/Agribnv/agribnv-demo/SRS.md), [`docs/prd/PRD-001-social-feed-and-reels.md`](file:///Users/Kyle/Desktop/Claude/Agribnv/agribnv-demo/docs/prd/PRD-001-social-feed-and-reels.md)  
+**Governing Documents:** [`SRS.md`](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/SRS.md), [`docs/prd/PRD-001-social-feed-and-reels.md`](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-001-social-feed-and-reels.md)  
 
 ---
 

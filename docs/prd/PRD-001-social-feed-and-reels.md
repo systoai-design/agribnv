@@ -1,125 +1,95 @@
-# PRD-001: Social Feed, Farmer Creator Profiles & AgriReels
+# PRD-001: Farm Feed & Short-Form Video (AgriReels)
 
-**Feature Title:** Social Discovery, Farmer Profiles & Short-Form Video Feed (AgriReels)  
-**Target Milestone:** v2.0 Revamp  
-**Status:** In Review  
-**Owners:** Engineering & Product Design  
-
----
-
-## 1. Problem Statement
-In Agribnv v1, farm stays were presented as static real-estate listings. However, agricultural tourism is deeply personal and seasonal: crops ripen at specific times, farmers have rich cultural traditions, and travelers crave authentic behind-the-scenes stories rather than sterile hotel rooms. Without social discovery, farms struggle with organic discovery and repeat engagement outside of travel peak seasons.
-
-## 2. Solution Overview
-Introduce a **creator marketplace paradigm** where farmers share daily life via short-form video reels and story posts. Travelers browse an engaging visual feed that connects storytelling directly to booking stays and purchasing farm products.
+**Feature Title:** Discovery Engine: The Farm Feed & AgriReels  
+**Ecosystem Pillar:** Discovery Layer (Top-of-Funnel Conversion)  
+**Priority:** P5 in Core Development Matrix  
+**Document Status:** Approved Baseline (UMANI v3.0)  
+**Owners:** Product Design & Full-Stack Engineering  
 
 ---
 
-## 3. User Personas & User Stories
+## 1. Executive Summary
 
-### Persona 1: Tatay Roman (Organic Mango & Honey Farmer in Guimaras)
-* *"As a farmer, I want to record a 30-second video of our mango harvest on my phone, so that tourists in Iloilo and Manila see that fruit picking is in season and book a weekend stay."*
-* *"As a farmer, I want a public profile where my follower count and farm history are displayed, giving credibility to my certified organic products."*
+### 1.1 Problem Statement
+Agricultural tourism is inherently seasonal and deeply tied to real-time farm life: mangoes ripen in specific months, honey is harvested in windows, and farmers have stories that cannot be communicated through static real-estate listings. In legacy models, farms remain invisible outside peak travel seasons, and tourists lack an authentic window into farm operations before booking.
 
-### Persona 2: Maya (Eco-Conscious Traveler & Foodie from Manila - Mobile User)
-* *"As a traveler on my phone, I want to open Agribnv and immediately see authentic, relaxing farm reels and harvesting stories, so I can discover unique rural escapes."*
-* *"As a traveler watching a reel about a hillside kubo, I want to tap a button directly on the video to check availability and reserve my stay without searching for the listing manually."*
+### 1.2 Proposed Solution
+Implement **The Farm Feed**: a farmer-first short-form content experience (9:16 vertical video reels and rich photo journals) that acts as the primary **Discovery Engine** for UMANI. Farmers can record and post updates directly from their fields, seamlessly linking each piece of content to their Farm Profile, Stays, Experiences, Events, Products, or Farm Kitchen menus.
 
-### Persona 3: Leo (Remote Worker & Group Trip Organizer - Desktop Website User)
-* *"As a traveler planning a team offsite on my laptop browser, I want to browse farm stays on an expansive screen with an interactive map, watch farm video reels in a high-res theater mode, and review room configurations, Wi-Fi speeds, and dates side-by-side with comments."*
-* *"As a desktop user, I want keyboard shortcuts to quickly navigate through reels and look up booking details without clumsy touch-swiping emulation."*
-
-### Persona 4: Elena (Farm Admin & Marketing Manager - Desktop Creator Studio)
-* *"As a farm marketing manager sitting at my office computer, I want to drag and drop professionally shot drone and landscape videos directly from my desktop, select the best video thumbnail frame, tag our cottages, and track view counts and direct booking conversions."*
+### 1.3 Success Criteria
+* **Daily Active Discovery Time:** Average daily time spent browsing the app exceeds 6 minutes per active session.
+* **Content-to-Ecosystem Conversion:** $\ge 18\%$ of all stay reservations, workshop bookings, and product orders originate from a tagged feed card or video reel.
+* **Farmer Adoption:** $> 60\%$ of onboarded farmers post at least 2 updates or reels per month.
+* **Scroll Performance:** Sustained 60 FPS vertical snap-scrolling on mid-tier mobile WebViews with zero Out-Of-Memory (OOM) crashes.
 
 ---
 
-## 4. Detailed Feature Specifications
+## 2. User Experience & Functionality
 
-### 4.1 Farmer Creator Profile
-* **Header Elements:** 
-  - Farm avatar (120x120), Cover banner, Farm Name, Verified Green Checkmark.
-  - Farmer Full Name & Title (e.g. "Master Beekeeper & Host").
-  - Stats Bar: `[ 42 Posts | 1.8k Followers | 340 Following | 12k Likes ]`.
-  - Bio: Max 280 characters + external link (website/social) + Terroir/Municipality tag.
-  - Action row: `[ Follow / Following ]`, `[ Direct Message ]`, `[ Share Farm ]`.
-* **Profile Tabs:**
-  1. `Reels`: Vertical thumbnail grid with view count badges (4 columns on desktop $\ge 1024\text{px}$, 3 columns on mobile).
-  2. `Posts`: Square thumbnail grid of photo journals and updates.
-  3. `Stays`: Cards of overnight accommodations with price per night.
-  4. `Products`: Cards of farm goods with price and harvest season.
-* **Desktop Website Enhancements:**
-  - High-resolution 16:5 panoramic cover banner with smooth parallax scrolling.
-  - Sticky sub-navigation tab bar maintaining visibility during long vertical page scrolls.
-  - Hover previews on Reels thumbnails: hovering for $>300\text{ms}$ initiates silent video looping.
-  - Floating "Book a Stay" widget pinned on the right side of the profile on wide viewports.
+### 2.1 User Personas
+* **Tatay Ramon (Host / Farmer in Guimaras):** Wants to quickly record a 30-second reel of the ripe Carabao mango harvest on his mobile phone to attract weekend day-tourists from nearby cities.
+* **Maya (Urban Traveler & Foodie from Manila - Mobile):** Wants to browse authentic farm life during her commute, follow local honey and coffee producers, and tap directly on a video to book a weekend kubo stay.
+* **Leo (Group Planner - Desktop Web):** Wants to research farm stays on a large monitor in Theater Mode, reviewing high-definition video footage alongside comments and host credentials before booking for a team offsite.
 
-### 4.2 Home Screen Feed (`[ Feed | Explore ]`)
-* **Dual Header:** Fixed segment controller at top of Home screen.
-* **Sub-Tabs:** `For You` (algorithmically ranked by location & engagement) and `Following` (reverse chronological).
-* **Feed Card Elements:**
-  - Host info header with avatar, name, and post timestamp.
-  - Media container: Aspect ratio 4:5 or 1:1 for photos; auto-looping silent video.
-  - Action row: Like button (animated heart pop), Comment button, Share button, Bookmark button.
-  - Tagged Entity Pill: e.g. `📍 Guimaras Mango Farm` or `🏷️ Sweet Carabao Mangoes (₱150/kg)`.
-  - Expandable caption with hashtags.
-* **Desktop Website 3-Column Layout:**
-  - **Left Rail (240px):** Persistent sidebar navigation (`Home`, `Explore`, `AgriReels`, `Saved Stays`, `Messages`, `Creator Studio`).
-  - **Center Feed (640px max):** Optimized readable line-length avoiding wide monitor distortion.
-  - **Right Rail (340px):** Contextual discovery widgets:
-    - *"Featured Farms to Follow"* (with 1-click follow button).
-    - *"Seasonal Harvest Calendar"* (e.g., Carabao Mangoes in Guimaras, Heirloom Rice in Batad, Arabica Coffee in Benguet).
-    - *"Farming Hub Weather"* (real-time weather at top agritourism destinations).
-  - Hover-to-play for embedded feed videos with un-mute and full-screen controls.
+### 2.2 User Stories
+* `As a farmer, I want to upload short video clips and harvest journals directly from my phone so that I can tell my farm's story without needing marketing agencies.`
+* `As a traveler, I want to tap on a product or stay pill embedded within a farm reel so that I can instantly view pricing and check reservation availability.`
+* `As a desktop user, I want to navigate reels with keyboard shortcuts and view synchronized booking details in a theater layout.`
 
-### 4.3 AgriReels (Short-Form Video Engine)
-* **Viewport Adaptations:**
-  - **Mobile:** Full viewport height ($100\text{vh}$ / $100\text{dvh}$) with CSS scroll snap.
-  - **Desktop Website (Theater Mode):** Split 2-column modal/page layout:
-    - *Left Video Canvas (9:16 Frame):* Centered video stage (max-height 85vh) surrounded by ambient frosted-glass glow sampled from the video colors.
-    - *Right Information & Commerce Panel (400px):* Host profile card, follow button, full caption with hashtags, audio track name, scrollable comments list with inline reply field, and **Sticky Instant Booking Card** (`[ Thumbnail | "Sunset Kubo" | ₱2,200/night | Book Now ]`).
-* **Desktop Playback Controls:**
-  - Video timeline scrubber bar with hover timestamp tooltip.
-  - Custom volume slider with hover popup and mute toggle.
-  - Picture-in-Picture (PiP) button allowing the user to multitask across the site while audio/video plays in a floating window.
-  - Fullscreen toggle button (`F`).
-* **Desktop Keyboard Shortcuts:**
-  - `Space` / `K`: Toggle Play / Pause.
-  - `ArrowDown` / `J`: Next Reel.
-  - `ArrowUp`: Previous Reel.
-  - `M`: Toggle Audio Mute / Unmute.
-  - `L`: Like / Unlike Reel.
-  - `C`: Focus comment input.
-  - `B`: Open instant booking modal for tagged stay.
-  - `Esc`: Close theater mode.
-  *(Disabled when typing inside text inputs).*
+### 2.3 Acceptance Criteria
+* [ ] **AC-1 (Feed Navigation Streams):** Home feed provides a persistent switcher between `"For You"` (algorithmic & geographic discovery) and `"Following"` (chronological updates from followed farms).
+* [ ] **AC-2 (Mobile Snap Experience):** Vertical video reels snap cleanly to $100\text{dvh}$ viewports with touch drag physics and instant auto-play on $\ge 50\%$ viewport visibility.
+* [ ] **AC-3 (Memory Eviction & OOM Prevention):** Mobile WebView enforces a strict 3-slot window (`[Previous (unloaded), Active (playing), Next (preloading)]`). Scrolled-out video decoders are immediately paused, emptied, and reloaded to free GPU textures.
+* [ ] **AC-4 (Tagged Offering Drawer):** Every feed card/reel supports a linked offering pill (`Stay`, `Experience`, `Event`, `Product`, or `Kitchen`). Tapping opens the interactive booking/inquiry sheet without terminating video playback.
+* [ ] **AC-5 (Desktop Theater Mode & Hotkeys):** On screens $\ge 1024\text{px}$, `/reels` renders a 2-column theater view (9:16 ambient video canvas + 400px comment/booking panel) supporting `Space`/`K` (pause/play), `J`/`Down` (next), `Up`/`K` (prev), `M` (mute), `L` (like), `C` (comment), and `B` (book).
+* [ ] **AC-6 (Creator Upload Studio & MVP Storage):** Mobile upload via `@capacitor/camera` and desktop drag-and-drop supporting MP4/MOV (max 60 seconds, max 50MB, client-side normalized to 1080p/720p H.264 + AAC FastStart with `moov` atom at front). Videos and photos are stored in public Supabase Object Storage buckets fronted by Supabase Smart CDN (Cloudflare Edge). Includes interactive frame scrubber for custom thumbnail selection.
 
-### 4.4 Desktop Creator Studio & Media Uploader
-* **Drag-and-Drop Media Zone:** Hosts can drag video files (MP4, MOV, WebM up to 30MB/60s) directly into browser.
-* **Video Frame Scrubber:** Interactive canvas-based scrubber allowing hosts to choose the exact cover frame for their video thumbnail.
-* **Tagging Selector:** Searchable dropdown to link an active property stay or direct farm product to the reel.
-* **Host Performance Analytics:** Visual charts showing Reel views, average watch duration, profile visits, and booking conversions.
+### 2.4 Non-Goals
+* **No Unbounded Social Network:** The Farm Feed is strictly an agricultural discovery engine, not a generic public video platform. Only verified hosts (`app_role = 'host'`) can publish reels; consumers can like, comment, bookmark, and share.
+* **No In-App Live Streaming (v3.0):** Real-time live broadcasting is deferred to future milestones; v3.0 focuses on short-form asynchronous video and photo journals.
 
 ---
 
-## 5. Acceptance Criteria
+## 3. Discovery Architecture & Feed Algorithm
 
-* [ ] **AC-1:** Unauthenticated users can view public feeds, reels, and profiles, but tapping Like, Comment, Follow, or Book triggers the Auth modal.
-* [ ] **AC-2:** Video reels snap cleanly on mobile touch swipe without getting stuck between frames.
-* [ ] **AC-3:** When a user scrolls past a video, audio stops immediately and video memory is evicted to prevent mobile WebView crashes.
-* [ ] **AC-4:** Tapping the commerce pill on any reel opens the verified listing booking flow with pre-populated property data.
-* [ ] **AC-5:** Only hosts with `app_role = 'host'` see the "Create Reel / Post" floating action button.
-* [ ] **AC-6 (Desktop Layout Parity):** On screen widths $\ge 1024\text{px}$, Agribnv displays the persistent 3-column layout with left navigation, centered 640px feed, and right discovery sidebar.
-* [ ] **AC-7 (Desktop Theater Mode & Hotkeys):** Navigating to `/reels` on desktop renders the 2-column theater mode; pressing `Space` pauses/plays, `J`/`Down` advances to the next reel, and `M` toggles mute.
-* [ ] **AC-8 (Desktop Drag-and-Drop Upload):** Hosts on desktop web can drag-and-drop a video file into Creator Studio and scrub frames to pick a thumbnail.
-* [ ] **AC-9 (SEO & OpenGraph Previews):** Direct links to `/@farm_handle` and `/reels/:id` generate complete OpenGraph and Twitter Card previews with video and image previews.
-* [ ] **AC-10 (Cross-Browser Support):** Desktop web operates without console errors or layout degradation across Chrome, Safari, Firefox, and Edge.
+### 3.1 Ranking & Recommendation Signals
+The `"For You"` discovery feed orders content based on a weighted multi-factor scoring function:
+$$\text{Score} = (w_1 \cdot \text{Proximity}) + (w_2 \cdot \text{Recency}) + (w_3 \cdot \text{Engagement Rate}) + (w_4 \cdot \text{Seasonal Relevancy})$$
+* **Proximity ($w_1 = 0.35$):** Farms located within the user's province or region (via GPS or selected region).
+* **Recency ($w_2 = 0.25$):** Exponential decay with half-life of 48 hours for harvest updates.
+* **Engagement Rate ($w_3 = 0.25$):** Like-to-view and comment-to-view ratios.
+* **Seasonal Relevancy ($w_4 = 0.15$):** Boost for active harvest windows declared in the farm's seasonal calendar.
 
 ---
 
-## 6. Success Metrics & KPIs
+## 4. Technical Specifications
 
-1. **Engagement Time:** Average daily time spent in app increases from $< 2$ minutes (transactional) to $> 7$ minutes (social discovery).
-2. **Follower Graph:** $> 40\%$ of active users follow at least 3 local farms within 30 days.
-3. **Reel-to-Booking Conversion:** $> 15\%$ of total stay bookings originate from a tagged Reel or Story post.
-4. **Desktop Booking Share:** Desktop web maintains $> 35\%$ of total booking transactions due to high-value group trip planners utilizing the desktop calendar and theater view.
+### 4.1 Data Model & Integration Points
+* **Database Tables:** `public.farm_reels`, `public.farm_posts`, `public.post_likes`, `public.post_comments`, `public.farm_follows`.
+* **Foreign Key Constraints:** Tagging references `properties.id`, `products.id`, `farm_events.id`, or `kitchen_menus.id`.
+* **Realtime Broadcast:** Realtime subscriptions on `post_likes` and `post_comments` for live count updates.
+
+### 4.2 Storage, Streaming & Security Architecture
+* **Supabase Object Storage Streaming (MVP):**
+  - Stored in a public `reels` bucket with aggressive caching headers (`Cache-Control: public, max-age=31536000, immutable`).
+  - Served through Supabase Smart CDN with edge POPs in Manila and Singapore.
+  - Video players utilize native HTTP Range Requests (`Content-Range`) for seekable progressive playback without upfront complete downloads.
+* **Automated Pre-Flight Check:** Supabase Edge Function scans uploaded media for NSFW/harmful content prior to public status transition.
+* **Modular Zero-Infrastructure Rate Limiting:**
+  - Enforced via PostgreSQL `check_rate_limit()` RPC function and Edge Function middleware.
+  - Quotas: Max 5 reels per host per 24-hour rolling window; max 30 comments per user per hour (burst: 5/min); max 60 likes per minute.
+  - Exceeded quotas return `HTTP 429 Too Many Requests` with standard IETF headers (`Retry-After`, `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`) and RFC 7807 JSON error body.
+* **Content Takedown:** 1-tap "Report Content" trigger routing to `legal@agribnv.com` with a 24-hour SLA.
+
+---
+
+## 5. Risks & Phased Roadmap
+
+### 5.1 Phased Rollout
+* **Phase 1 (MVP Baseline):** Photo journals and reverse-chronological reels stream with Supabase Object Storage progressive streaming, Smart CDN caching, and basic tagging.
+* **Phase 2 (Desktop Theater & Hotkeys):** 2-column theater view with ambient frosted-glass sampling and keyboard controls.
+* **Phase 3 (Algorithmic Ranking & Transcoding):** Automated HLS transcoding pipeline (Cloudflare Stream or Mux via Supabase Database Webhooks) when creator volume exceeds 5,000 DAU.
+
+### 5.2 Technical Risks & Mitigation
+* **Risk (Mobile WebView Crashes from Video Decoders):** Mitigated by strict 3-slot virtualization and immediate decoder destruction on scroll-out.
+* **Risk (Slow Rural Uploads):** Mitigated by client-side canvas thumbnail generation, client-side FastStart MP4 compression, and background chunked uploads via TUS protocol.

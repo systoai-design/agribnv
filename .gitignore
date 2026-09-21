@@ -34,3 +34,10 @@ supabase/.branches
 
 # Claude Code local config
 .claude/
+
+# Litho documentation cache
+.litho/
+
+# Playwright reports and test results
+playwright-report/
+test-results/

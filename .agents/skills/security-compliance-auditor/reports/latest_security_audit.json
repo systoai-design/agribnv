@@ -1,0 +1,102 @@
+{
+  "security_score": 10,
+  "total_findings": 9,
+  "findings_by_severity": {
+    "CRITICAL": 1,
+    "HIGH": 4,
+    "MEDIUM": 3,
+    "LOW": 1,
+    "INFO": 0
+  },
+  "passed_checks": [
+    "Secrets: .env files protected in .gitignore",
+    "Supabase RLS: All created tables have Row Level Security enabled",
+    "OWASP MASVS: Cleartext HTTP traffic blocked on Android",
+    "OWASP MASVS: iOS App Transport Security intact",
+    "OWASP MASVS: Capacitor config cleartext disabled",
+    "PCI DSS SAQ A: No raw card data forms found in custom UI components"
+  ],
+  "findings": [
+    {
+      "check_id": "SEC-RLS-002",
+      "title": "Excessive Public Grants to 'anon' Role",
+      "severity": "HIGH",
+      "description": "GRANT ALL ON ALL TABLES to anon allows unauthenticated database control if RLS is omitted on any future table.",
+      "file_path": "supabase/migrations/20260821000001_grant_public_table_permissions.sql",
+      "line_number": 3,
+      "remediation": "Restrict anon permissions to SELECT only, or rely on explicit role-based grants."
+    },
+    {
+      "check_id": "SEC-SQL-002",
+      "title": "PostgreSQL View Missing 'security_invoker = true'",
+      "severity": "MEDIUM",
+      "description": "View in 20260714084846_add_reviews_table.sql (line 35) does not specify 'WITH (security_invoker = true)'. In Postgres, this defaults to security definer behavior, potentially bypassing RLS of underlying tables.",
+      "file_path": "supabase/migrations/20260714084846_add_reviews_table.sql",
+      "line_number": 35,
+      "remediation": "Define view with 'CREATE VIEW ... WITH (security_invoker = true) AS SELECT ...';"
+    },
+    {
+      "check_id": "SEC-MASVS-001",
+      "title": "Android Backup Enabled (MASVS-STORAGE-2)",
+      "severity": "MEDIUM",
+      "description": "android:allowBackup is set to 'true'. This allows adb backup extraction of app private storage, preferences, and session tokens.",
+      "file_path": "android/app/src/main/AndroidManifest.xml",
+      "line_number": null,
+      "remediation": "Set android:allowBackup='false' or define android:dataExtractionRules / android:fullBackupContent to exclude sensitive tokens."
+    },
+    {
+      "check_id": "SEC-MASVS-003",
+      "title": "Missing iOS NSCameraUsageDescription",
+      "severity": "HIGH",
+      "description": "@capacitor/camera is installed, but Info.plist lacks 'NSCameraUsageDescription', triggering App Store review rejection or app crash on permission prompt.",
+      "file_path": "ios/App/App/Info.plist",
+      "line_number": null,
+      "remediation": "Add '<key>NSCameraUsageDescription</key><string>UMANI needs camera access to capture farm profiles, harvests, and AgriReels.</string>' to Info.plist."
+    },
+    {
+      "check_id": "SEC-MASVS-004",
+      "title": "Missing iOS NSLocationWhenInUseUsageDescription",
+      "severity": "HIGH",
+      "description": "@capacitor/geolocation is installed, but Info.plist lacks 'NSLocationWhenInUseUsageDescription'.",
+      "file_path": "ios/App/App/Info.plist",
+      "line_number": null,
+      "remediation": "Add '<key>NSLocationWhenInUseUsageDescription</key><string>UMANI uses your location to discover nearby farms and agricultural experiences.</string>' to Info.plist."
+    },
+    {
+      "check_id": "SEC-WEB-001",
+      "title": "Missing Content Security Policy (CSP)",
+      "severity": "MEDIUM",
+      "description": "index.html does not declare a Content-Security-Policy meta tag, leaving the web client vulnerable to script injection and cross-site scripting (XSS).",
+      "file_path": "index.html",
+      "line_number": null,
+      "remediation": "Add a Content-Security-Policy meta tag restricting default-src, script-src, style-src, and connect-src (Supabase, CDN)."
+    },
+    {
+      "check_id": "SEC-WEB-002",
+      "title": "Missing Referrer-Policy Meta Tag",
+      "severity": "LOW",
+      "description": "index.html does not declare a Referrer-Policy, potentially leaking internal URL paths and parameters to third-party CDNs.",
+      "file_path": "index.html",
+      "line_number": null,
+      "remediation": "Add '<meta name=\"referrer\" content=\"strict-origin-when-cross-origin\">' to index.html."
+    },
+    {
+      "check_id": "SEC-WEB-003",
+      "title": "Unsanitized dangerouslySetInnerHTML (OWASP A03: Injection)",
+      "severity": "HIGH",
+      "description": "dangerouslySetInnerHTML used without visible DOMPurify sanitization in src/components/ui/chart.tsx.",
+      "file_path": "src/components/ui/chart.tsx",
+      "line_number": 70,
+      "remediation": "Always sanitize untrusted HTML with DOMPurify.sanitize() before rendering."
+    },
+    {
+      "check_id": "SEC-SUPPLY-001",
+      "title": "Vulnerable Dependencies Found (3 Critical, 23 High)",
+      "severity": "CRITICAL",
+      "description": "npm audit identified 3 critical, 23 high, 8 moderate, and 2 low vulnerabilities in node_modules.",
+      "file_path": "package.json",
+      "line_number": null,
+      "remediation": "Run 'npm audit fix' or update affected dependencies (e.g., maplibre-gl, tar, nanoid) to secure versions."
+    }
+  ]
+}

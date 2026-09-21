@@ -1,0 +1,116 @@
+# Litho (deepwiki-rs) Configuration for Agribnv (UMANI)
+# Documentation generator settings tailored for Vite + React + TypeScript + Supabase
+
+project_name = "Agribnv (UMANI)"
+project_path = "."
+output_path = "./litho.docs"
+target_language = "en"
+
+# ============================================================================
+# Analysis Configuration
+# ============================================================================
+
+# Directories to exclude from source analysis
+excluded_dirs = [
+    "node_modules",
+    "dist",
+    "build",
+    ".git",
+    ".agents",
+    ".terrain",
+    "android",
+    "ios",
+    "public",
+    "icons",
+    "design",
+    ".litho",
+    "litho.docs"
+]
+
+# Specific files to exclude
+excluded_files = [
+    "package-lock.json",
+    "bun.lock",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    ".env",
+    ".env.*",
+    "skills-lock.json",
+    "capacitor.config.ts",
+    "update-padding.cjs"
+]
+
+# Binary / asset extensions to skip
+excluded_extensions = [
+    "png", "jpg", "jpeg", "webp", "gif", "ico",
+    "mp3", "mp4", "zip", "tar", "pdf"
+]
+
+# Supported language extensions to analyze
+included_extensions = [
+    "ts", "tsx", "js", "jsx", "sql", "json", "md", "toml"
+]
+
+# ============================================================================
+# LLM Configuration (Google Gemini)
+# ============================================================================
+
+[llm]
+provider = "openai"
+api_base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
+
+# SECURITY: Read from environment variable GEMINI_API_KEY (or LITHO_LLM_API_KEY)
+# You can set this in your shell: export GEMINI_API_KEY="your-google-ai-studio-key"
+api_key = ""
+
+# High-efficiency model for routine code parsing and initial extraction
+model_efficient = "gemini-flash-lite-latest"
+
+# High-reasoning model for architectural synthesis and C4 diagrams
+model_powerful = "gemini-3.5-flash-lite"
+
+# Low temperature for factual, deterministic documentation
+temperature = 0.1
+max_tokens = 32768
+retry_attempts = 5
+retry_delay_ms = 4000
+timeout_seconds = 300
+
+# ============================================================================
+# External Knowledge & Database Integration
+# ============================================================================
+
+[knowledge.local_docs]
+enabled = true
+cache_dir = ".litho/cache/knowledge/local_docs"
+
+# Product Requirements & Specifications
+[[knowledge.local_docs.categories]]
+name = "architecture"
+description = "Product specifications, requirements, and system design"
+paths = [
+    "docs/**/*.md",
+    "docs/prd/**/*.md",
+    "docs/spec/**/*.md",
+    "SRS.md"
+]
+target_agents = [
+    "SystemContextResearcher",
+    "ArchitectureResearcher",
+    "ArchitectureEditor"
+]
+
+# Supabase Database Schema & Migrations
+[[knowledge.local_docs.categories]]
+name = "database"
+description = "Supabase PostgreSQL schema, migrations, and seed data"
+paths = [
+    "supabase/migrations/**/*.sql",
+    "supabase/full_schema_sync.sql",
+    "supabase/setup.sql"
+]
+target_agents = [
+    "ArchitectureResearcher",
+    "DomainModulesDetector",
+    "KeyModulesInsight"
+]

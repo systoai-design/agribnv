@@ -3,7 +3,7 @@
 **Specification ID:** SPEC-001  
 **Category:** Frontend Architecture, Database Schema, Media Streaming  
 **Status:** Approved  
-**Related Documents:** [`SRS.md`](file:///Users/Kyle/Desktop/Claude/Agribnv/agribnv-demo/SRS.md), [`docs/prd/PRD-001-social-feed-and-reels.md`](file:///Users/Kyle/Desktop/Claude/Agribnv/agribnv-demo/docs/prd/PRD-001-social-feed-and-reels.md)  
+**Related Documents:** [`SRS.md`](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/SRS.md), [`docs/prd/PRD-001-social-feed-and-reels.md`](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-001-social-feed-and-reels.md)  
 
 ---
 
