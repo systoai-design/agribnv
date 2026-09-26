@@ -100,6 +100,7 @@ UMANI defines five distinct user types with strictly segregated permissions enfo
   * Accept, decline, or adjust booking reservations, event RSVPs, and kitchen meal pre-orders.
   * Send direct 1-on-1 messages to inquiring travelers and booked guests.
   * Access the **Desktop Creator Studio** and view Host Performance Analytics (views, watch time, booking conversions, revenue).
+  * Access the **Host Reviews Hub** to monitor incoming guest feedback across their farm properties and publish official public responses.
   * Seamlessly toggle to `guest` view mode within the application to explore, follow, and book other farms without creating a second account.
 * **What They CANNOT Do:**
   * Publish reels, posts, or listings on another farmer's profile or tag other farms' listings without authorization.
@@ -122,7 +123,7 @@ UMANI defines five distinct user types with strictly segregated permissions enfo
   * **Order / Inquire about farm products** and submit 24-hour claims with photo proof for spoiled perishable harvests.
   * **Pre-order Farm Kitchen meals** prior to arrival.
   * Communicate with hosts via real-time 1-on-1 messaging with direct listing/order card attachments.
-  * Manage personal account settings, view booking history, write verified stay reviews, export profile data, and perform self-serve account deletion.
+  * Manage personal account settings, view booking history, write verified dual-entity reviews (evaluating the physical farm facilities and the farmer's personal hospitality separately), export profile data, and perform self-serve account deletion.
   * Apply to elevate account to `host` via `/host/onboarding` if they manage agricultural land.
 * **What They CANNOT Do:**
   * Publish short-form video reels or public photo posts to the public Farm Feed (reserved for verified hosts).
@@ -392,6 +393,34 @@ The public landing page (`/landing` or `/`) shall faithfully implement the 8-sec
   - Native Capacitor bridge intercepts `gcash://` custom URL schemes to open the native GCash application without WebView navigation crashes, returning via deep-link: `umani://checkout/callback?session_id=...`.
   - Employs a hybrid reconciliation model: webhooks act as the single source of truth, complemented by a client-side verification endpoint when the user returns to the app.
 
+### 3.11 Module 11: Whole-Farm & Farmer Dual Reviews Engine (Priority 2)
+* **REQ-REV-1 (Dual-Entity Review Submission Architecture):**
+  - The review submission modal mandates separate ratings (1–5 stars) and dedicated evaluation criteria for two distinct entities:
+    1. **The Farm (The Place):** Facility comfort, grounds, trail safety, cleanliness, and accuracy of listing descriptions. Includes optional photo uploads (up to 3 images).
+    2. **The Farmer (The Person):** Warmth, hospitality, communication speed, agricultural storytelling, and guidance.
+  - Sub-scores are stored as structured JSONB (`sub_scores`) alongside aggregate 1–5 star ratings.
+* **REQ-REV-2 (Separated Public Reviews Presentation):**
+  - Farm Profiles (`/farms/:id`) and Property Detail views (`/properties/:id`) display a persistent segmented control toggling between:
+    1. `[ The Farm & Grounds (★ Score) ]`
+    2. `[ Farmer Hospitality (★ Score) ]`
+  - Each review card highlights verified stay badges (`✓ Verified Stay • 2 nights • Bamboo Cottage`), stay dates, reviewer avatar, and distinct sub-ratings.
+* **REQ-REV-3 (Farmer Review Management Hub in Host Dashboard):**
+  - A dedicated "Reviews" tab inside `/host` (`HostDashboard`) displaying:
+    - Side-by-side scorecard: Farm Facility Average vs. Farmer Hospitality Average.
+    - Review stream with filters (`All`, `Needs Response`, `Farm Reviews`, `Farmer Reviews`, and Star ratings).
+    - Unread review notification badge in host navigation.
+* **REQ-REV-4 (Farmer Public Response Generator):**
+  - Farmers can publish exactly one official public response per review.
+  - Features field-optimized response presets (1-tap templates for gratitude, seasonal farm context, and constructive action updates) plus custom text editing (max 800 characters).
+  - The published response is rendered nested directly beneath the guest review with an official green verified `"Response from Host"` badge.
+* **REQ-REV-5 (Verified Transaction Gating & Window Constraints):**
+  - Reviews are strictly gated to completed bookings (`bookings.status = 'completed'` AND `bookings.guest_id = auth.uid()`).
+  - Exactly one review permitted per completed booking ID (enforced via database unique constraint `UNIQUE(booking_id)`).
+  - Review window opens at checkout (11:00 AM PHT on check-out date) and remains eligible for 30 calendar days.
+* **REQ-REV-6 (Content Moderation & Anti-Defamation Guardrails):**
+  - All reviews and host responses are scanned for profanity, hate speech, and personally identifiable information (phone numbers, emails) prior to storage.
+  - Community members and hosts can flag inappropriate or defamatory reviews (`[ ⚑ Report ]`), routing tickets directly to the `moderator` queue.
+
 ---
 
 ## 4. Security, Moderation & Access Control
@@ -415,6 +444,8 @@ The public landing page (`/landing` or `/`) shall faithfully implement the 8-sec
 | `payments` | None | SELECT (Own Payments) | SELECT (Related Bookings)| None | ALL |
 | `escrow_ledger` | None | None | SELECT (Own Earnings) | None | ALL |
 | `payouts` | None | None | SELECT (Own Payouts) | None | ALL |
+| `reviews` | SELECT | SELECT, INSERT (Own Completed Booking) | SELECT (Related Farm/Host)| SELECT, DELETE (Abuse)| ALL |
+| `review_responses`| SELECT | SELECT | ALL (Owned Review Reply)| SELECT, DELETE (Abuse)| ALL |
 | `moderation_queue`| None | None | None | ALL | ALL |
 
 ### 4.2 Content Moderation & Abuse Prevention

@@ -14,6 +14,7 @@ This directory contains modular, production-grade Product Requirements Documents
 | **[PRD-004](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-004-events-and-schedule.md)** | **Events & Seasonal Schedule Engine** | Pillar 4: Seasonal Calendar & Workshops | **P3** | Approved Baseline |
 | **[PRD-005](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-005-products-and-farm-kitchen.md)** | **Products & Farm Kitchen** | Pillars 5 & 6: Commerce & Farm Dining | **P4** | Approved Baseline |
 | **[PRD-006](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-006-landing-page-and-growth.md)** | **Public Landing Page & Audience Growth** | Growth, Conversion & Audience Tools | **P6** | Approved Baseline |
+| **[PRD-007](file:///home/zeto/Desktop/UMANI%20%28AgriBNV%29/docs/prd/PRD-007-reviews-and-reputation-system.md)** | **Whole-Farm & Farmer Dual Reviews Engine** | Cross-Pillar: Trust, Safety & Reputation | **P2** | Approved Baseline |
 
 ---
 
