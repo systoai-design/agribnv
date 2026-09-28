@@ -76,80 +76,80 @@ export default function FarmerFinish() {
           </div>
         </div>
 
-        {/* 3 Launch Checklist Dark Pills / Cards */}
+        {/* 3 Launch Checklist Cards with UMANI Brand Colors */}
         <div className="mt-4 space-y-2.5">
-          {/* Item 1: Add First Listing */}
+          {/* Item 1: Add First Listing — Canopy Green (#1E3A2B) */}
           <button
             onClick={() => {
               haptics.impact();
               navigate('/host/properties/new');
             }}
-            className="w-full p-3 rounded-2xl bg-[#1C2C20] text-white hover:bg-[#253A2B] transition-all flex items-center justify-between text-left shadow-sm group"
+            className="w-full p-3 rounded-2xl bg-[#1E3A2B] text-white hover:bg-[#254A37] border border-white/10 transition-all flex items-center justify-between text-left shadow-md group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#E09F5A]">
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-[#E09F5A] shadow-inner">
                 <Home className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white group-hover:text-[#E09F5A] transition-colors">
+                <h4 className="text-xs font-semibold text-white group-hover:text-[#F2C078] transition-colors">
                   Add First Listing (Stay or Tour)
                 </h4>
-                <p className="text-[11px] text-white/70">
+                <p className="text-[11px] text-white/80">
                   Kubo, treehouse, campsite, or guided cupping tour
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
           </button>
 
-          {/* Item 2: Set Payout Account */}
+          {/* Item 2: Set Payout Account — Terracotta / Amber (#9C4A2F) */}
           <button
             onClick={handlePayout}
-            className="w-full p-3 rounded-2xl bg-[#1C2C20] text-white hover:bg-[#253A2B] transition-all flex items-center justify-between text-left shadow-sm group"
+            className="w-full p-3 rounded-2xl bg-[#9C4A2F] text-white hover:bg-[#B05335] border border-white/10 transition-all flex items-center justify-between text-left shadow-md group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-400">
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-[#FDF3E0] shadow-inner">
                 <CreditCard className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                  <h4 className="text-xs font-semibold text-white group-hover:text-[#FDF3E0] transition-colors">
                     Set Payout Account (GCash/Bank)
                   </h4>
                   {payoutSetup && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#B0D182]" />
                   )}
                 </div>
-                <p className="text-[11px] text-white/70">
+                <p className="text-[11px] text-white/85">
                   {payoutSetup ? "Connected: GCash 0917••••123" : "Required for automatic guest payout release"}
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
           </button>
 
-          {/* Item 3: Preview Public Farm Profile */}
+          {/* Item 3: Preview Public Farm Profile — Sage Green (#355E3B) */}
           <button
             onClick={() => {
               haptics.impact();
               navigate('/farm-profile-preview');
             }}
-            className="w-full p-3 rounded-2xl bg-[#1C2C20] text-white hover:bg-[#253A2B] transition-all flex items-center justify-between text-left shadow-sm group"
+            className="w-full p-3 rounded-2xl bg-[#355E3B] text-white hover:bg-[#3F7047] border border-white/10 transition-all flex items-center justify-between text-left shadow-md group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-300">
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-[#B0D182] shadow-inner">
                 <Eye className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white group-hover:text-amber-300 transition-colors">
+                <h4 className="text-xs font-semibold text-white group-hover:text-[#B0D182] transition-colors">
                   Preview Public Farm Profile
                 </h4>
-                <p className="text-[11px] text-white/70">
+                <p className="text-[11px] text-white/80">
                   See how travelers will view your stories, offers & stays
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
           </button>
         </div>
 
