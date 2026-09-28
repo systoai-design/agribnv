@@ -19,7 +19,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import haptics from '@/utils/haptics';
 
-type TabCategory = 'offers' | 'stories' | 'stays' | 'experiences';
+type TabCategory = 'offers' | 'posts' | 'stays' | 'experiences';
 
 interface GridItem {
   id: string;
@@ -81,10 +81,10 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     description: 'Pre-order harvest lunch basket with wood-smoked native chicken and heirloom red rice.'
   },
 
-  // Stories
+  // Posts
   {
     id: 'st-1',
-    category: 'stories',
+    category: 'posts',
     title: 'Pruning Shade Trees',
     priceOrTag: 'Reel',
     imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80',
@@ -92,15 +92,15 @@ const MOCK_GRID_ITEMS: GridItem[] = [
   },
   {
     id: 'st-2',
-    category: 'stories',
+    category: 'posts',
     title: 'First Ripe Robusta Cherries',
-    priceOrTag: 'Story',
+    priceOrTag: 'Post',
     imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80',
     description: 'The first crimson cherries turning ruby red along the southern ridge blocks.'
   },
   {
     id: 'st-3',
-    category: 'stories',
+    category: 'posts',
     title: 'Spring Water Irrigation Day',
     priceOrTag: 'Reel',
     imageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80',
@@ -108,23 +108,23 @@ const MOCK_GRID_ITEMS: GridItem[] = [
   },
   {
     id: 'st-4',
-    category: 'stories',
+    category: 'posts',
     title: 'Roasting Over Native Charcoal',
-    priceOrTag: 'Story',
+    priceOrTag: 'Post',
     imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=600&q=80',
     description: 'Wood-fire clay pot roasting with grandfather Mateo in the heritage outdoor kitchen.'
   },
   {
     id: 'st-5',
-    category: 'stories',
+    category: 'posts',
     title: 'Rainy Afternoon Coffee Pavilion',
-    priceOrTag: 'Story',
+    priceOrTag: 'Post',
     imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=600&q=80',
     description: 'Guests gathering for warm Robusta drip while monsoon showers roll down the valley.'
   },
   {
     id: 'st-6',
-    category: 'stories',
+    category: 'posts',
     title: 'Wild Honeybee Nest on Ridge',
     priceOrTag: 'Reel',
     imageUrl: 'https://images.unsplash.com/photo-1473081556163-2a17de81fc97?auto=format&fit=crop&w=600&q=80',
@@ -237,7 +237,7 @@ export default function FarmPublicProfile() {
   const { toast } = useToast();
 
   const [isFollowing, setIsFollowing] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabCategory>('stories');
+  const [activeTab, setActiveTab] = useState<TabCategory>('posts');
   const [selectedItem, setSelectedItem] = useState<GridItem | null>(null);
 
   const handleFollow = () => {
@@ -351,7 +351,7 @@ export default function FarmPublicProfile() {
         <div className="flex items-center justify-center gap-6 mt-2.5 py-1 text-center">
           <div>
             <span className="block text-xs font-bold text-foreground">18</span>
-            <span className="block text-[10px] text-muted-foreground">Stories</span>
+            <span className="block text-[10px] text-muted-foreground">Posts</span>
           </div>
           <div className="w-px h-5 bg-border/60" />
           <div>
@@ -434,16 +434,16 @@ export default function FarmPublicProfile() {
         <button
           onClick={() => {
             haptics.selection();
-            setActiveTab('stories');
+            setActiveTab('posts');
           }}
           className={`py-2.5 flex items-center justify-center border-b-2 transition-colors ${
-            activeTab === 'stories' 
+            activeTab === 'posts' 
               ? 'border-primary text-primary font-semibold' 
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
-          aria-label="Stories and Reels Tab"
+          aria-label="Posts Tab"
         >
-          <Film className="w-4 h-4" />
+          <LayoutGrid className="w-4 h-4" />
         </button>
 
         <button
@@ -523,7 +523,7 @@ export default function FarmPublicProfile() {
               )}
 
               {/* Price / Tag Badge in Bottom-Left Corner */}
-              {item.priceOrTag !== 'Reel' && item.priceOrTag !== 'Story' && (
+              {item.priceOrTag !== 'Reel' && item.priceOrTag !== 'Story' && item.priceOrTag !== 'Post' && (
                 <div className="absolute bottom-1 left-1 pointer-events-none">
                   <span className="text-[9px] font-bold px-1 py-0.5 bg-black/65 text-white rounded-none backdrop-blur-xs">
                     {item.priceOrTag}
