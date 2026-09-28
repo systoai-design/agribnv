@@ -1,43 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { z } from 'zod';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AnimatePresence } from 'framer-motion';
+import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { haptics } from '@/core/platform';
-import { MobileAuthHero } from '@/components/auth/MobileAuthHero';
+import { MobileAuthHero, AuthHeroMode } from '@/components/auth/MobileAuthHero';
 import { AuthWelcomePanel } from '@/components/auth/AuthWelcomePanel';
 import { AuthLoginPanel } from '@/components/auth/AuthLoginPanel';
 import { AuthSignupPanel } from '@/components/auth/AuthSignupPanel';
-import { AuthAccountTypePanel } from '@/components/auth/AuthAccountTypePanel';
-import { AuthGraphic } from '@/components/auth/AuthGraphic';
-import { TreeOverlay } from '@/components/auth/TreeOverlay';
+import { AuthAccountTypePanel, UserRole } from '@/components/auth/AuthAccountTypePanel';
+import { TravelerOnboardingPanel } from '@/components/onboarding/TravelerOnboardingPanel';
+import { FarmerStep1Panel } from '@/components/onboarding/FarmerStep1Panel';
+import { FarmerStep2Panel } from '@/components/onboarding/FarmerStep2Panel';
+import { FarmerStep3Panel } from '@/components/onboarding/FarmerStep3Panel';
+import {
+  TravelerOnboardingData,
+  FarmerStep1Data,
+  FarmerStep2Data,
+  FarmerStep3Data,
+  FarmerFullOnboardingData,
+} from '@/components/onboarding/types';
 
+// Auth validation schema
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  fullName: z.string().optional(),
-  username: z.string().optional(),
+  firstName: z.string().min(2, 'First name is required').optional(),
+  lastName: z.string().min(2, 'Last name is required').optional(),
+  fullName: z.string().min(2, 'Full name is required').optional(),
+  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
 });
 
-export type AuthForm = z.infer<typeof authSchema>;
-export type UserRole = 'guest' | 'host';
-export type AuthMode = 'welcome' | 'login' | 'signup' | 'account-type';
+type AuthForm = z.infer<typeof authSchema>;
+
+export type AuthMode = AuthHeroMode;
 
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
-  const initialMode: AuthMode = searchParams.get('mode') === 'welcome' 
-    ? 'welcome' 
-    : searchParams.get('mode') === 'login' 
-    ? 'login' 
-    : searchParams.get('mode') === 'signup'
-    ? 'signup'
-    : 'welcome';
+  const modeParam = searchParams.get('mode');
+  const initialMode: AuthMode =
+    modeParam === 'welcome' ||
+    modeParam === 'login' ||
+    modeParam === 'signup' ||
+    modeParam === 'account-type' ||
+    modeParam === 'traveler-onboarding' ||
+    modeParam === 'farmer-step1' ||
+    modeParam === 'farmer-step2' ||
+    modeParam === 'farmer-step3'
+      ? (modeParam as AuthMode)
+      : 'welcome';
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +60,10 @@ export default function AuthPage() {
   const [selectedRole, setSelectedRole] = useState<UserRole>(
     searchParams.get('role') === 'host' ? 'host' : 'guest'
   );
+
+  // Onboarding accumulated state
+  const [travelerData, setTravelerData] = useState<Partial<TravelerOnboardingData>>({});
+  const [farmerData, setFarmerData] = useState<Partial<FarmerFullOnboardingData>>({});
 
   const { user, signIn, signUp: authSignUp } = useAuth();
   const navigate = useNavigate();
@@ -58,8 +77,13 @@ export default function AuthPage() {
 
   useEffect(() => {
     const checkUserAndRedirect = async () => {
-      // Only auto-redirect if we're not actively picking account type
-      if (user && mode !== 'account-type') {
+      // Don't auto-redirect if user is in an active onboarding / selection flow
+      const isOnboardingMode =
+        mode === 'account-type' ||
+        mode === 'traveler-onboarding' ||
+        mode.startsWith('farmer-');
+
+      if (user && !isOnboardingMode) {
         const { data } = await supabase
           .from('user_roles')
           .select('role')
@@ -84,7 +108,13 @@ export default function AuthPage() {
   };
 
   const handleBackFromHero = () => {
-    if (mode === 'account-type') {
+    if (mode === 'farmer-step3') {
+      switchMode('farmer-step2');
+    } else if (mode === 'farmer-step2') {
+      switchMode('farmer-step1');
+    } else if (mode === 'farmer-step1' || mode === 'traveler-onboarding') {
+      switchMode('account-type');
+    } else if (mode === 'account-type') {
       switchMode('signup');
     } else {
       switchMode('welcome');
@@ -101,10 +131,8 @@ export default function AuthPage() {
         },
       });
       if (error) {
-        toast({
-          title: 'Social login notice',
-          description: error.message || 'Google authentication provider is being configured.',
-        });
+        haptics.notification('error');
+        toast({ title: 'Authentication error', description: error.message, variant: 'destructive' });
       }
     } catch {
       toast({
@@ -119,8 +147,9 @@ export default function AuthPage() {
     setIsLoading(true);
     try {
       if (mode === 'signup') {
-        const computedName = [data.firstName, data.lastName].filter(Boolean).join(' ') || data.fullName || 'UMANI Explorer';
-        const { data: signUpData, error } = await authSignUp(
+        const computedName =
+          [data.firstName, data.lastName].filter(Boolean).join(' ') || data.fullName || 'UMANI Explorer';
+        const { error } = await authSignUp(
           data.email,
           data.password,
           computedName,
@@ -144,7 +173,7 @@ export default function AuthPage() {
 
         haptics.notification('success');
         // Transition to dedicated "Type of account" wireframe screen
-        setMode('account-type');
+        switchMode('account-type');
       } else {
         const { error } = await signIn(data.email, data.password);
         if (error) {
@@ -168,28 +197,113 @@ export default function AuthPage() {
     }
   };
 
-  const handleConfirmAccountType = async () => {
+  // 1. Account Type Selection -> Routes to Traveler setup or Farmer Step 1
+  const handleConfirmAccountType = () => {
     haptics.impact('medium');
+    if (selectedRole === 'host') {
+      switchMode('farmer-step1');
+    } else {
+      switchMode('traveler-onboarding');
+    }
+  };
+
+  // 2. Traveler Onboarding Completion
+  const handleTravelerComplete = async (data: TravelerOnboardingData) => {
     setIsLoading(true);
+    haptics.impact('medium');
     try {
       const currentUser = user || (await supabase.auth.getUser()).data.user;
-      if (selectedRole === 'host' && currentUser?.id) {
-        await supabase.from('user_roles').upsert({
-          user_id: currentUser.id,
-          role: 'host',
-        }, { onConflict: 'user_id,role' });
+      if (currentUser?.id) {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: data.displayName,
+            bio: data.bio,
+            avatar_url: data.avatarUrl || null,
+          })
+          .eq('id', currentUser.id);
+      }
+      haptics.notification('success');
+      toast({
+        title: 'Welcome to UMANI!',
+        description: 'Your traveler profile has been saved. Happy exploring!',
+      });
+      navigate('/explore');
+    } catch {
+      navigate('/explore');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 3. Farmer Wizard Step 1 Next
+  const handleFarmerStep1Next = (step1Data: FarmerStep1Data) => {
+    setFarmerData((prev) => ({ ...prev, ...step1Data }));
+    switchMode('farmer-step2');
+  };
+
+  // 4. Farmer Wizard Step 2 Next
+  const handleFarmerStep2Next = (step2Data: FarmerStep2Data) => {
+    setFarmerData((prev) => ({ ...prev, ...step2Data }));
+    switchMode('farmer-step3');
+  };
+
+  // 5. Farmer Wizard Step 3 Complete
+  const handleFarmerStep3Complete = async (step3Data: FarmerStep3Data) => {
+    setIsLoading(true);
+    haptics.impact('medium');
+    const finalData = { ...farmerData, ...step3Data };
+
+    try {
+      const currentUser = user || (await supabase.auth.getUser()).data.user;
+      if (currentUser?.id) {
+        // Assign Host Role
+        await supabase
+          .from('user_roles')
+          .upsert({ user_id: currentUser.id, role: 'host' }, { onConflict: 'user_id,role' });
+
+        // Build composite location and arrays
+        const combinedLocation =
+          [finalData.municipality, finalData.province, finalData.region].filter(Boolean).join(', ') ||
+          'Philippines';
+
+        const cropsArray = finalData.crops
+          ? finalData.crops.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
+        const livestockArray = finalData.livestock
+          ? finalData.livestock.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
+        const facilitiesArray = finalData.facilities
+          ? finalData.facilities.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
+
+        await supabase.from('farm_profiles').upsert(
+          {
+            host_id: currentUser.id,
+            farm_name: finalData.farmName || 'My Farm',
+            tagline: finalData.tagline || null,
+            story: finalData.farmerBio || finalData.farmDescription || null,
+            terroir_notes: finalData.storyAndTerroir || null,
+            location: combinedLocation,
+            address: finalData.address || null,
+            cover_image_url: finalData.coverImageUrl || null,
+            avatar_url: finalData.avatarUrl || null,
+            crops: cropsArray,
+            livestock: livestockArray,
+            facilities: facilitiesArray,
+          },
+          { onConflict: 'host_id' }
+        );
       }
 
       haptics.notification('success');
       toast({
         title: 'Welcome to UMANI!',
-        description: selectedRole === 'host'
-          ? 'Your farm host account has been created. Start listing your farm!'
-          : 'Your explorer account has been created. Start discovering farms!',
+        description: 'Your farm profile has been created. Start listing your offerings!',
       });
-      navigate(selectedRole === 'host' ? '/host' : '/explore');
+      navigate('/host');
     } catch {
-      navigate('/explore');
+      navigate('/host');
     } finally {
       setIsLoading(false);
     }
@@ -199,8 +313,12 @@ export default function AuthPage() {
     <div className="min-h-screen w-full bg-[#142A1D] lg:bg-background flex flex-col lg:flex-row overflow-x-hidden">
       {/* MOBILE CONTAINER (Full width on mobile, centered card frame on desktop) */}
       <div className="w-full lg:w-[480px] xl:w-[540px] flex flex-col min-h-screen bg-[#142A1D] shrink-0 mx-auto">
-        {/* Top Hero Section (Atmospheric Sunrise & Terrace Motif) */}
-        <MobileAuthHero mode={mode} onBack={handleBackFromHero} />
+        {/* Top Hero Section (Pure Picture Motif) */}
+        <MobileAuthHero
+          mode={mode}
+          onBack={handleBackFromHero}
+          onSkip={() => navigate(mode.startsWith('farmer-') ? '/host' : '/explore')}
+        />
 
         {/* Bottom Curved Sheet Container matching Low-Fi Wireframe */}
         <div className="flex-1 bg-[#FAF8F5] text-foreground rounded-t-[36px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] flex flex-col -mt-4 relative z-30 pt-3 px-6 sm:px-8 pb-8 safe-area-pb">
@@ -261,6 +379,48 @@ export default function AuthPage() {
                   isLoading={isLoading}
                 />
               )}
+
+              {mode === 'traveler-onboarding' && (
+                <TravelerOnboardingPanel
+                  key="traveler-onboarding"
+                  initialData={travelerData}
+                  onComplete={handleTravelerComplete}
+                  onSkip={() => navigate('/explore')}
+                  onBack={() => switchMode('account-type')}
+                  isLoading={isLoading}
+                />
+              )}
+
+              {mode === 'farmer-step1' && (
+                <FarmerStep1Panel
+                  key="farmer-step1"
+                  initialData={farmerData}
+                  onNext={handleFarmerStep1Next}
+                  onBack={() => switchMode('account-type')}
+                  onSkip={() => navigate('/host')}
+                />
+              )}
+
+              {mode === 'farmer-step2' && (
+                <FarmerStep2Panel
+                  key="farmer-step2"
+                  initialData={farmerData}
+                  onNext={handleFarmerStep2Next}
+                  onBack={() => switchMode('farmer-step1')}
+                  onSkip={() => navigate('/host')}
+                />
+              )}
+
+              {mode === 'farmer-step3' && (
+                <FarmerStep3Panel
+                  key="farmer-step3"
+                  initialData={farmerData}
+                  onComplete={handleFarmerStep3Complete}
+                  onBack={() => switchMode('farmer-step2')}
+                  onSkip={() => navigate('/host')}
+                  isLoading={isLoading}
+                />
+              )}
             </AnimatePresence>
           </div>
         </div>
@@ -270,22 +430,38 @@ export default function AuthPage() {
       <div className="hidden lg:flex lg:flex-1 relative flex-col justify-end overflow-hidden p-12 xl:p-16 bg-primary">
         <AuthGraphic />
         <TreeOverlay />
-
-        {/* Caption — bottom */}
-        <div className="relative z-10">
-          <h2 className="font-serif text-4xl xl:text-5xl font-bold text-white leading-[1.1]">
-            Stay on a farm.
-            <br />
-            <span className="text-[#B0D182]">Or share yours.</span>
+        <div className="relative z-10 max-w-lg text-primary-foreground space-y-4">
+          <span className="text-xs uppercase tracking-widest text-[#B0D182] font-semibold">
+            UMANI Ecosystem
+          </span>
+          <h2 className="text-4xl xl:text-5xl font-serif font-bold leading-tight">
+            Bring the whole farm online.
           </h2>
-          <div className="mt-6 flex items-center gap-3">
-            <span className="h-px w-8" style={{ backgroundColor: 'hsl(var(--sage) / 0.6)' }} />
-            <span className="text-[11px] tracking-[0.2em] uppercase text-white/55 font-medium">
-              Guimaras · 10.60°N 122.60°E
-            </span>
-          </div>
+          <p className="text-primary-foreground/80 text-sm leading-relaxed">
+            Discover verified farm stays, book hands-on harvesting workshops, and support authentic local harvests across the Philippines.
+          </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Right panel decorative elements for large desktop screens
+function AuthGraphic() {
+  return (
+    <div className="absolute inset-0 pointer-events-none opacity-25">
+      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#B0D182]/30 blur-3xl" />
+      <div className="absolute bottom-10 left-10 w-80 h-80 rounded-full bg-[#F2C078]/20 blur-3xl" />
+    </div>
+  );
+}
+
+function TreeOverlay() {
+  return (
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] pointer-events-none opacity-15">
+      <svg viewBox="0 0 200 200" className="w-full h-full text-white" fill="currentColor">
+        <path d="M100 20 L150 100 L120 100 L160 160 L40 160 L80 100 L50 100 Z" />
+      </svg>
     </div>
   );
 }

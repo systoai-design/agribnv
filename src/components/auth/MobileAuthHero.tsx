@@ -4,12 +4,23 @@ import { ArrowLeft } from 'lucide-react';
 import { haptics } from '@/core/platform';
 import { cn } from '@/lib/utils';
 
+export type AuthHeroMode =
+  | 'welcome'
+  | 'login'
+  | 'signup'
+  | 'account-type'
+  | 'traveler-onboarding'
+  | 'farmer-step1'
+  | 'farmer-step2'
+  | 'farmer-step3';
+
 interface MobileAuthHeroProps {
-  mode: 'welcome' | 'login' | 'signup' | 'account-type';
+  mode: AuthHeroMode;
   onBack: () => void;
+  onSkip?: () => void;
 }
 
-export function MobileAuthHero({ mode, onBack }: MobileAuthHeroProps) {
+export function MobileAuthHero({ mode, onBack, onSkip }: MobileAuthHeroProps) {
   const isDetail = mode !== 'welcome';
 
   const handleBack = () => {
@@ -20,9 +31,16 @@ export function MobileAuthHero({ mode, onBack }: MobileAuthHeroProps) {
   const isWelcome = mode === 'welcome';
   const isAccountType = mode === 'account-type';
   const isSignup = mode === 'signup';
+  const isOnboarding =
+    mode === 'traveler-onboarding' ||
+    mode === 'farmer-step1' ||
+    mode === 'farmer-step2' ||
+    mode === 'farmer-step3';
 
   const heroHeightClass = isWelcome
     ? 'h-[44vh] min-h-[320px]'
+    : isOnboarding
+    ? 'h-[18vh] min-h-[130px]'
     : isAccountType
     ? 'h-[24vh] min-h-[180px]'
     : isSignup
@@ -133,20 +151,53 @@ export function MobileAuthHero({ mode, onBack }: MobileAuthHeroProps) {
         </div>
       </div>
 
-      {/* Top Navigation Bar with Safe Area: Only the Back button is shown on detail pages, zero text/pills */}
+      {/* Top Navigation Bar with Safe Area matching Wireframe Header */}
       {isDetail ? (
-        <div className="relative z-20 pt-4 px-4 sm:px-6 flex items-center justify-start safe-area-pt">
+        <div className="relative z-20 pt-4 px-4 sm:px-6 flex items-center justify-between safe-area-pt">
           <motion.button
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
             type="button"
             onClick={handleBack}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-medium backdrop-blur-md border border-white/15 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/25 hover:bg-black/35 active:scale-95 text-white text-xs font-medium backdrop-blur-md border border-white/15 transition-all shadow-sm cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4 text-white" />
+            <ArrowLeft className="w-3.5 h-3.5 text-white" />
             <span>Back</span>
           </motion.button>
+
+          {/* 3-Dot Step Indicator for Farmer Steps matching Wireframe Top-Right */}
+          {mode.startsWith('farmer-') && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-white shadow-sm">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-white/80 mr-0.5">
+                {mode === 'farmer-step1' ? '1 of 3' : mode === 'farmer-step2' ? '2 of 3' : '3 of 3'}
+              </span>
+              <div className="flex items-center gap-1">
+                <span className={cn("w-2 h-2 rounded-full transition-all", mode === 'farmer-step1' ? "bg-[#B0D182] scale-110 shadow-sm" : "bg-white/30")} />
+                <span className={cn("w-2 h-2 rounded-full transition-all", mode === 'farmer-step2' ? "bg-[#B0D182] scale-110 shadow-sm" : "bg-white/30")} />
+                <span className={cn("w-2 h-2 rounded-full transition-all", mode === 'farmer-step3' ? "bg-[#B0D182] scale-110 shadow-sm" : "bg-white/30")} />
+              </div>
+            </div>
+          )}
+
+          {/* Skip CTA for Traveler */}
+          {mode === 'traveler-onboarding' && onSkip && (
+            <button
+              type="button"
+              onClick={() => {
+                haptics.impact('light');
+                onSkip();
+              }}
+              className="text-xs font-semibold text-white/90 hover:text-white px-3 py-1.5 rounded-full bg-black/25 hover:bg-black/35 backdrop-blur-md border border-white/15 transition-all shadow-sm cursor-pointer"
+            >
+              Skip
+            </button>
+          )}
+
+          {/* Clean spacer if neither applies */}
+          {!mode.startsWith('farmer-') && mode !== 'traveler-onboarding' && (
+            <div className="w-8" />
+          )}
         </div>
       ) : (
         <div className="h-6" />
