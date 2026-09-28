@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Home, Compass, Check } from 'lucide-react';
+import { ArrowRight, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { haptics } from '@/core/platform';
-import { cn } from '@/lib/utils';
 import { FarmerStep2Data } from './types';
 
 interface FarmerStep2PanelProps {
@@ -15,32 +14,104 @@ interface FarmerStep2PanelProps {
   onSkip: () => void;
 }
 
+const PREDEFINED_FARM_TYPES = [
+  'Crop & Vegetable Farm',
+  'Fruit Orchard & Plantation',
+  'Poultry & Egg Farm',
+  'Dairy & Cattle Farm',
+  'Livestock & Swine Farm',
+  'Coffee & Cacao Agroforestry',
+  'Aquaculture & Fish Farm',
+  'Beekeeping & Apiary',
+  'Organic & Permaculture Farm',
+  'Flower & Ornamental Nursery',
+  'Mixed / Integrated Farm',
+];
+
+const PREDEFINED_FACILITIES = [
+  'Restrooms & Toilets',
+  'Parking Area',
+  'Farm Store & Market',
+  'Dining / Picnic Area',
+  'Potable Drinking Water',
+  'WiFi Access',
+  'Campsite / Grounds',
+  'Children\'s Play Area',
+  'Function Hall / Gazebo',
+  'Wheelchair Accessible',
+  'Pet Friendly',
+  'Solar Powered / Off-Grid',
+];
+
 export function FarmerStep2Panel({
   initialData,
   onNext,
   onBack,
   onSkip,
 }: FarmerStep2PanelProps) {
-  const [farmType, setFarmType] = useState(initialData?.farmType || '');
-  const [landArea, setLandArea] = useState(initialData?.landArea || '');
-  const [crops, setCrops] = useState(initialData?.crops || '');
-  const [livestock, setLivestock] = useState(initialData?.livestock || '');
-  const [facilities, setFacilities] = useState(initialData?.facilities || '');
-  const [offersStays, setOffersStays] = useState(initialData?.offersStays ?? true);
-  const [offersTours, setOffersTours] = useState(initialData?.offersTours ?? true);
-  const [storyAndTerroir, setStoryAndTerroir] = useState(initialData?.storyAndTerroir || '');
+  // Parse initial farm type
+  const isInitialPredefined = initialData?.farmType
+    ? PREDEFINED_FARM_TYPES.includes(initialData.farmType)
+    : true;
+  const initialType = initialData?.farmType
+    ? isInitialPredefined
+      ? initialData.farmType
+      : 'other'
+    : '';
+
+  const [farmType, setFarmType] = useState<string>(initialType);
+  const [customFarmType, setCustomFarmType] = useState<string>(
+    initialData?.farmType && !isInitialPredefined ? initialData.farmType : ''
+  );
+
+  // Parse initial land area (strip non-digits except dot)
+  const initialLand = initialData?.landArea
+    ? initialData.landArea.replace(/[^0-9.]/g, '')
+    : '';
+  const [landArea, setLandArea] = useState<string>(initialLand);
+
+  const [crops, setCrops] = useState<string>(initialData?.crops || '');
+  const [livestock, setLivestock] = useState<string>(initialData?.livestock || '');
+
+  // Facilities as array and controlled select value
+  const [facilities, setFacilities] = useState<string[]>(
+    Array.isArray(initialData?.facilities) ? initialData.facilities : []
+  );
+  const [selectedFacilityVal, setSelectedFacilityVal] = useState<string>('');
+
+  const [storyAndTerroir, setStoryAndTerroir] = useState<string>(
+    initialData?.storyAndTerroir || ''
+  );
+
+  const handleFacilitySelect = (value: string) => {
+    if (!value) return;
+    haptics.impact('light');
+    if (!facilities.includes(value)) {
+      setFacilities((prev) => [...prev, value]);
+    }
+    setSelectedFacilityVal('');
+  };
+
+  const handleRemoveFacility = (facilityToRemove: string) => {
+    haptics.impact('light');
+    setFacilities((prev) => prev.filter((f) => f !== facilityToRemove));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     haptics.impact('medium');
+
+    const resolvedFarmType =
+      farmType === 'other'
+        ? customFarmType.trim() || 'Other'
+        : farmType.trim();
+
     onNext({
-      farmType: farmType.trim(),
-      landArea: landArea.trim(),
+      farmType: resolvedFarmType,
+      landArea: landArea ? `${landArea} ha` : '',
       crops: crops.trim(),
       livestock: livestock.trim(),
-      facilities: facilities.trim(),
-      offersStays,
-      offersTours,
+      facilities,
       storyAndTerroir: storyAndTerroir.trim(),
     });
   };
@@ -61,41 +132,87 @@ export function FarmerStep2Panel({
             Agricultural Profile & Terroir
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5 max-w-[300px] mx-auto leading-relaxed">
-            Specify what you cultivate, your farm size, and visitor offerings
+            Specify what you cultivate, your farm size, and on-site amenities
           </p>
         </div>
 
         <div className="space-y-3">
-          {/* Row 1: 2 Split Inputs matching Wireframe */}
+          {/* Row 1: Farm Type Dropdown & Land Area Number Input */}
           <div className="grid grid-cols-2 gap-2.5">
+            {/* Farm Type Dropdown */}
             <div className="space-y-1">
-              <label htmlFor="farm-type" className="text-xs font-medium text-foreground px-1">
+              <label htmlFor="farm-type-select" className="text-xs font-medium text-foreground px-1">
                 Farm Type
               </label>
-              <Input
-                id="farm-type"
-                value={farmType}
-                onChange={(e) => setFarmType(e.target.value)}
-                placeholder="e.g. Organic / Agroforestry"
-                className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-4 text-sm bg-background shadow-2xs"
-              />
+              <div className="relative">
+                <select
+                  id="farm-type-select"
+                  value={farmType}
+                  onChange={(e) => {
+                    haptics.impact('light');
+                    setFarmType(e.target.value);
+                  }}
+                  className="h-12 w-full appearance-none rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-9 text-xs sm:text-sm bg-background shadow-2xs text-foreground cursor-pointer"
+                >
+                  <option value="">Select Farm Type</option>
+                  {PREDEFINED_FARM_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                  <option value="other">Other (Specify)</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-60" />
+              </div>
             </div>
 
+            {/* Land Area: Number only with default 'ha' unit */}
             <div className="space-y-1">
               <label htmlFor="farm-land" className="text-xs font-medium text-foreground px-1">
                 Land Area
               </label>
-              <Input
-                id="farm-land"
-                value={landArea}
-                onChange={(e) => setLandArea(e.target.value)}
-                placeholder="e.g. 3.5 Hectares"
-                className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-4 text-sm bg-background shadow-2xs"
-              />
+              <div className="relative">
+                <Input
+                  id="farm-land"
+                  type="number"
+                  inputMode="decimal"
+                  step="any"
+                  min="0"
+                  value={landArea}
+                  onChange={(e) => setLandArea(e.target.value)}
+                  placeholder="e.g. 3.5"
+                  className="h-12 rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-12 text-sm bg-background shadow-2xs"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground pointer-events-none select-none">
+                  ha
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Row 2: 2 Split Inputs matching Wireframe */}
+          {/* Conditional Custom Farm Type Input if 'Other' is chosen */}
+          {farmType === 'other' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-1"
+            >
+              <label htmlFor="custom-farm-type" className="text-xs font-medium text-primary px-1">
+                Specify Other Farm Type
+              </label>
+              <Input
+                id="custom-farm-type"
+                value={customFarmType}
+                onChange={(e) => setCustomFarmType(e.target.value)}
+                placeholder="e.g. Mushroom farm, Herbal sanctuary"
+                className="h-12 rounded-full border-2 border-primary/50 focus:border-primary px-4 text-xs sm:text-sm bg-background shadow-2xs"
+                autoFocus
+              />
+            </motion.div>
+          )}
+
+          {/* Row 2: Primary Crops & Livestock */}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="space-y-1">
               <label htmlFor="farm-crops" className="text-xs font-medium text-foreground px-1">
@@ -124,90 +241,68 @@ export function FarmerStep2Panel({
             </div>
           </div>
 
-          {/* Row 3: 1 Full-Width Input matching Wireframe */}
-          <div className="space-y-1">
-            <label htmlFor="farm-facilities" className="text-xs font-medium text-foreground px-1">
+          {/* Row 3: Facilities & Amenities Dropdown with Predefined Choices */}
+          <div className="space-y-1.5">
+            <label htmlFor="facilities-select" className="text-xs font-medium text-foreground px-1">
               Facilities & Amenities
             </label>
-            <Input
-              id="farm-facilities"
-              value={facilities}
-              onChange={(e) => setFacilities(e.target.value)}
-              placeholder="e.g. Restrooms, Parking, WiFi, Farm Store"
-              className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-5 text-sm bg-background shadow-2xs"
+            <div className="relative">
+              <select
+                id="facilities-select"
+                value={selectedFacilityVal}
+                onChange={(e) => handleFacilitySelect(e.target.value)}
+                className="h-12 w-full appearance-none rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-9 text-xs sm:text-sm bg-background shadow-2xs text-foreground cursor-pointer"
+              >
+                <option value="" disabled>+ Add facilities & amenities...</option>
+                {PREDEFINED_FACILITIES.map((facility) => {
+                  const isSelected = facilities.includes(facility);
+                  return (
+                    <option key={facility} value={facility} disabled={isSelected}>
+                      {facility} {isSelected ? '✓ (Added)' : ''}
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-60" />
+            </div>
+
+            {/* Selected Facilities Tag Pills */}
+            {facilities.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1 max-h-24 overflow-y-auto px-1">
+                {facilities.map((facility) => (
+                  <span
+                    key={facility}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 animate-in fade-in zoom-in-95 duration-150"
+                  >
+                    <span>{facility}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFacility(facility)}
+                      className="hover:text-destructive p-0.5 rounded-full transition-colors cursor-pointer"
+                      aria-label={`Remove ${facility}`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Farm Story & Terroir Notes Textarea */}
+          <div className="space-y-1">
+            <label htmlFor="farm-story" className="text-xs font-medium text-foreground px-1">
+              Farm Story & Terroir Notes
+            </label>
+            <Textarea
+              id="farm-story"
+              value={storyAndTerroir}
+              onChange={(e) => setStoryAndTerroir(e.target.value)}
+              placeholder="Tell travelers what makes your land unique — soil composition, altitude, water source, and your family's farming heritage..."
+              rows={3}
+              className="rounded-2xl border-2 border-border/80 focus:border-primary p-3.5 text-xs sm:text-sm bg-background resize-none shadow-2xs"
             />
           </div>
-        </div>
-
-        {/* Thin Divider Line matching Wireframe */}
-        <div className="relative flex py-1.5 items-center">
-          <div className="flex-grow border-t border-border/70" />
-          <span className="shrink-0 mx-3 text-[10px] uppercase font-semibold text-muted-foreground/70 tracking-wider">
-            Visitor Offerings
-          </span>
-          <div className="flex-grow border-t border-border/70" />
-        </div>
-
-        {/* 2 Split Offering Toggle Buttons matching Wireframe */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              haptics.impact('light');
-              setOffersStays(!offersStays);
-            }}
-            className={cn(
-              "flex items-center justify-between p-3 rounded-2xl border text-xs font-medium transition-all shadow-2xs cursor-pointer",
-              offersStays
-                ? "border-primary bg-primary/10 text-primary font-semibold"
-                : "border-border/80 bg-background text-muted-foreground"
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <Home className="w-4 h-4" />
-              <span>Farm Stays</span>
-            </div>
-            <div className={cn("w-5 h-5 rounded-full flex items-center justify-center border", offersStays ? "bg-primary border-primary text-white" : "border-border")}>
-              {offersStays && <Check className="w-3 h-3" />}
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              haptics.impact('light');
-              setOffersTours(!offersTours);
-            }}
-            className={cn(
-              "flex items-center justify-between p-3 rounded-2xl border text-xs font-medium transition-all shadow-2xs cursor-pointer",
-              offersTours
-                ? "border-primary bg-primary/10 text-primary font-semibold"
-                : "border-border/80 bg-background text-muted-foreground"
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4" />
-              <span>Day Tours</span>
-            </div>
-            <div className={cn("w-5 h-5 rounded-full flex items-center justify-center border", offersTours ? "bg-primary border-primary text-white" : "border-border")}>
-              {offersTours && <Check className="w-3 h-3" />}
-            </div>
-          </button>
-        </div>
-
-        {/* Large Card Textarea matching Wireframe */}
-        <div className="space-y-1">
-          <label htmlFor="farm-story" className="text-xs font-medium text-foreground px-1">
-            Farm Story & Terroir Notes
-          </label>
-          <Textarea
-            id="farm-story"
-            value={storyAndTerroir}
-            onChange={(e) => setStoryAndTerroir(e.target.value)}
-            placeholder="Tell travelers what makes your land unique — soil composition, altitude, water source, and your family's farming heritage..."
-            rows={3}
-            className="rounded-2xl border-2 border-border/80 focus:border-primary p-3.5 text-xs sm:text-sm bg-background resize-none shadow-2xs"
-          />
         </div>
 
         {/* Bottom CTA Button */}

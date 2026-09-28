@@ -273,8 +273,10 @@ export default function AuthPage() {
         const livestockArray = finalData.livestock
           ? finalData.livestock.split(',').map((s) => s.trim()).filter(Boolean)
           : [];
-        const facilitiesArray = finalData.facilities
-          ? finalData.facilities.split(',').map((s) => s.trim()).filter(Boolean)
+        const facilitiesArray = Array.isArray(finalData.facilities)
+          ? finalData.facilities
+          : typeof finalData.facilities === 'string' && finalData.facilities
+          ? (finalData.facilities as string).split(',').map((s) => s.trim()).filter(Boolean)
           : [];
 
         await supabase.from('farm_profiles').upsert(

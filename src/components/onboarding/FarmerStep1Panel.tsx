@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getPhRegions, getPhProvinces, getPhMunicipalities } from '@/shared/data/phLocations';
 import { haptics } from '@/core/platform';
 import { FarmerStep1Data } from './types';
 
@@ -27,11 +28,60 @@ export function FarmerStep1Panel({
   const [region, setRegion] = useState(initialData?.region || '');
   const [error, setError] = useState<string | null>(null);
 
+  const regions = useMemo(() => getPhRegions(), []);
+
+  const selectedRegionObj = useMemo(() => {
+    return regions.find((r) => r.label === region || r.value === region);
+  }, [regions, region]);
+
+  const provinces = useMemo(() => {
+    return getPhProvinces(selectedRegionObj?.code);
+  }, [selectedRegionObj]);
+
+  const selectedProvinceObj = useMemo(() => {
+    return provinces.find((p) => p.value === province || p.label === province);
+  }, [provinces, province]);
+
+  const municipalities = useMemo(() => {
+    return getPhMunicipalities(selectedProvinceObj?.code || selectedProvinceObj?.value, selectedRegionObj?.code);
+  }, [selectedProvinceObj, selectedRegionObj]);
+
+  const handleSelectProvince = (provName: string) => {
+    haptics.impact('light');
+    setProvince(provName);
+    setMunicipality('');
+    // Auto-populate Region from province if not explicitly set
+    if (provName) {
+      const match = provinces.find((p) => p.value === provName || p.label === provName);
+      if (match?.regionCode) {
+        const foundReg = regions.find((r) => r.code === match.regionCode);
+        if (foundReg) {
+          setRegion(foundReg.label);
+        }
+      }
+    }
+  };
+
+  const handleSelectMunicipality = (muniName: string) => {
+    haptics.impact('light');
+    setMunicipality(muniName);
+  };
+
+  const handleSelectRegion = (regName: string) => {
+    haptics.impact('light');
+    setRegion(regName);
+    // Reset province & city if region changed and province doesn't match
+    if (selectedProvinceObj && selectedProvinceObj.regionCode !== selectedRegionObj?.code) {
+      setProvince('');
+      setMunicipality('');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!farmName.trim()) {
+      setError('Farm Name is required.');
       haptics.notification('error');
-      setError('Please provide your farm name.');
       return;
     }
     setError(null);
@@ -126,47 +176,79 @@ export function FarmerStep1Panel({
           <div className="flex-grow border-t border-border/70" />
         </div>
 
-        {/* Row 4: 2 Side-by-Side Inputs matching Wireframe */}
+        {/* Row 4: 2 Side-by-Side Dropdowns (Municipality & Province) matching Wireframe */}
         <div className="grid grid-cols-2 gap-2.5">
+          {/* Municipality / City Dropdown */}
           <div className="space-y-1">
-            <label htmlFor="farm-muni" className="text-xs font-medium text-foreground px-1">
-              Municipality / City
+            <label htmlFor="muni-select" className="text-xs font-medium text-foreground px-1">
+              City / Municipality
             </label>
-            <Input
-              id="farm-muni"
-              value={municipality}
-              onChange={(e) => setMunicipality(e.target.value)}
-              placeholder="e.g. Tuba"
-              className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-4 text-sm bg-background shadow-2xs"
-            />
+            <div className="relative">
+              <select
+                id="muni-select"
+                value={municipality}
+                onChange={(e) => handleSelectMunicipality(e.target.value)}
+                disabled={municipalities.length === 0}
+                className="h-12 w-full appearance-none rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-9 text-xs sm:text-sm bg-background shadow-2xs text-foreground cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="" disabled={Boolean(province)}>
+                  {province ? 'Select City/Town' : 'Pick Province 1st'}
+                </option>
+                {municipalities.map((m) => (
+                  <option key={m.code || m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-60" />
+            </div>
           </div>
 
+          {/* Province Dropdown */}
           <div className="space-y-1">
-            <label htmlFor="farm-prov" className="text-xs font-medium text-foreground px-1">
+            <label htmlFor="prov-select" className="text-xs font-medium text-foreground px-1">
               Province
             </label>
-            <Input
-              id="farm-prov"
-              value={province}
-              onChange={(e) => setProvince(e.target.value)}
-              placeholder="e.g. Benguet"
-              className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-4 text-sm bg-background shadow-2xs"
-            />
+            <div className="relative">
+              <select
+                id="prov-select"
+                value={province}
+                onChange={(e) => handleSelectProvince(e.target.value)}
+                className="h-12 w-full appearance-none rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-9 text-xs sm:text-sm bg-background shadow-2xs text-foreground cursor-pointer"
+              >
+                <option value="">Select Province</option>
+                {provinces.map((p) => (
+                  <option key={p.code || p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-60" />
+            </div>
           </div>
         </div>
 
-        {/* Row 5: 1 Full-Width Input matching Wireframe */}
+        {/* Row 5: 1 Full-Width Region Dropdown matching Wireframe */}
         <div className="space-y-1">
-          <label htmlFor="farm-reg" className="text-xs font-medium text-foreground px-1">
+          <label htmlFor="region-select" className="text-xs font-medium text-foreground px-1">
             Region
           </label>
-          <Input
-            id="farm-reg"
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            placeholder="e.g. Cordillera Administrative Region (CAR)"
-            className="h-12 rounded-full border-2 border-border/80 focus:border-primary px-5 text-sm bg-background shadow-2xs"
-          />
+          <div className="relative">
+            <select
+              id="region-select"
+              value={region}
+              onChange={(e) => handleSelectRegion(e.target.value)}
+              className="h-12 w-full appearance-none rounded-full border-2 border-border/80 focus:border-primary pl-4 pr-9 text-xs sm:text-sm bg-background shadow-2xs text-foreground cursor-pointer"
+            >
+              <option value="">Select Region</option>
+              {regions.map((r) => (
+                <option key={r.code || r.value} value={r.label}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-60" />
+          </div>
         </div>
 
         {/* Bottom CTA Button */}

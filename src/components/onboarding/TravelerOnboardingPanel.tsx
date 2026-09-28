@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import {
   Camera,
   Home,
-  Sprout,
   Utensils,
-  GraduationCap,
   Compass,
   ShoppingBag,
   ArrowRight,
@@ -29,10 +27,8 @@ interface TravelerOnboardingPanelProps {
 
 const INTEREST_OPTIONS = [
   { id: 'stays', label: 'Farm Stays', icon: Home },
-  { id: 'harvest', label: 'Harvest Tours', icon: Sprout },
+  { id: 'experiences', label: 'Experience Farm', icon: Compass },
   { id: 'dining', label: 'Farm Dining', icon: Utensils },
-  { id: 'workshops', label: 'Workshops', icon: GraduationCap },
-  { id: 'tours', label: 'Day Tours', icon: Compass },
   { id: 'products', label: 'Farm Products', icon: ShoppingBag },
 ];
 
@@ -47,7 +43,7 @@ export function TravelerOnboardingPanel({
   const [bio, setBio] = useState(initialData?.bio || '');
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialData?.avatarUrl);
   const [selectedInterests, setSelectedInterests] = useState<string[]>(
-    initialData?.interests || ['stays', 'harvest']
+    initialData?.interests || ['stays', 'experiences']
   );
 
   const toggleInterest = (id: string) => {

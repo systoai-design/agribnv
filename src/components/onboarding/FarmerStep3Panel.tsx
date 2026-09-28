@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Check, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Camera, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { camera, haptics } from '@/core/platform';
-import { cn } from '@/lib/utils';
 import { FarmerStep3Data } from './types';
 
 interface FarmerStep3PanelProps {
@@ -126,60 +125,63 @@ export function FarmerStep3Panel({
           <div className="flex-grow border-t border-border/70" />
         </div>
 
-        {/* Visual Media Upload Area matching Wireframe (Circle + Mountain/Sun Rectangle) */}
-        <div className="flex items-center gap-3">
-          {/* Small Circle: Farmer Profile Photo */}
-          <div className="flex flex-col items-center">
+        {/* Visual Media Upload Area (Significantly Enlarged Profile Circle & Banner Card) */}
+        <div className="flex items-center gap-4 py-1">
+          {/* Large Circle: Farmer Profile Photo */}
+          <div className="flex flex-col items-center shrink-0">
             <button
               type="button"
               onClick={handlePickAvatar}
-              className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border-2 border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center overflow-hidden shadow-inner group cursor-pointer"
+              className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center overflow-hidden shadow-inner group cursor-pointer"
               aria-label="Upload Farmer Photo"
             >
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Farmer Avatar" className="w-full h-full object-cover" />
               ) : (
-                <div className="flex flex-col items-center text-primary/70">
-                  <Camera className="w-5 h-5 mb-0.5" />
-                  <span className="text-[9px] font-semibold uppercase">Profile</span>
+                <div className="flex flex-col items-center text-primary/80 group-hover:text-primary transition-colors">
+                  <Camera className="w-7 h-7 sm:w-8 sm:h-8 mb-1" />
+                  <span className="text-[11px] font-semibold">Add Photo</span>
                 </div>
               )}
-              <div className="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full shadow">
-                <Camera className="w-2.5 h-2.5" />
+              <div className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-md">
+                <Camera className="w-3.5 h-3.5" />
               </div>
             </button>
-            <span className="text-[10px] text-muted-foreground mt-1">Profile Photo</span>
+            <span className="text-xs font-medium text-foreground/80 mt-1.5">Profile Photo</span>
           </div>
 
-          {/* Large Landscape Card: Farm Cover Photo with Mountain/Sun Placeholder matching Wireframe */}
-          <div className="flex-1 flex flex-col">
+          {/* Large Landscape Card: Farm Cover Photo */}
+          <div className="flex-1 flex flex-col h-full">
             <button
               type="button"
               onClick={handlePickCover}
-              className="relative h-20 sm:h-22 w-full rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center overflow-hidden shadow-inner group cursor-pointer"
+              className="relative h-28 sm:h-32 w-full rounded-2xl border-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center overflow-hidden shadow-inner group cursor-pointer"
               aria-label="Upload Farm Cover Photo"
             >
               {coverImageUrl ? (
                 <img src={coverImageUrl} alt="Farm Cover Preview" className="w-full h-full object-cover" />
               ) : (
-                <div className="flex flex-col items-center justify-center text-primary/70 group-hover:text-primary">
-                  {/* Stylized Sun/Mountain motif placeholder from wireframe */}
-                  <div className="relative w-12 h-7 flex items-center justify-center mb-0.5">
-                    <span className="absolute top-0 right-2 w-3.5 h-3.5 rounded-full bg-[#E09F5A]/80 shadow-xs" />
-                    <svg viewBox="0 0 40 24" className="w-10 h-6 text-[#2E5A3E]" fill="currentColor">
+                <div className="flex flex-col items-center justify-center text-primary/80 group-hover:text-primary transition-colors px-2 text-center">
+                  {/* Stylized Sun/Mountain motif placeholder */}
+                  <div className="relative w-14 h-8 flex items-center justify-center mb-1">
+                    <span className="absolute top-0 right-3 w-4 h-4 rounded-full bg-[#E09F5A]/80 shadow-xs" />
+                    <svg viewBox="0 0 40 24" className="w-12 h-7 text-[#2E5A3E]" fill="currentColor">
                       <polygon points="20,2 38,22 2,22" />
                     </svg>
                   </div>
-                  <span className="text-[10px] font-semibold tracking-wide text-foreground/80">
+                  <span className="text-xs sm:text-sm font-semibold tracking-tight text-foreground">
                     Upload Cover Banner
+                  </span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">
+                    Landscape photo of your farmland
                   </span>
                 </div>
               )}
-              <div className="absolute top-1.5 right-1.5 bg-primary text-white p-1 rounded-full shadow-sm">
-                <ImageIcon className="w-2.5 h-2.5" />
+              <div className="absolute top-2 right-2 bg-primary text-white p-1.5 rounded-full shadow-sm">
+                <ImageIcon className="w-3.5 h-3.5" />
               </div>
             </button>
-            <span className="text-[10px] text-muted-foreground mt-1 px-1">Farm Cover Banner</span>
+            <span className="text-xs font-medium text-foreground/80 mt-1.5 px-1">Farm Cover Banner</span>
           </div>
         </div>
 

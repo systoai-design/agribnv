@@ -19,9 +19,7 @@ export interface FarmerStep2Data {
   landArea: string;
   crops: string;
   livestock: string;
-  facilities: string;
-  offersStays: boolean;
-  offersTours: boolean;
+  facilities: string[];
   storyAndTerroir: string;
 }
 
