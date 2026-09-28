@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,12 +12,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
 import { useToast } from '@/hooks/use-toast';
 import { Property, Booking, CATEGORY_LABELS, CATEGORY_ICONS, BOOKING_STATUS_LABELS } from '@/types/database';
-import { Plus, Home, Calendar, Users, MapPin, Eye, Edit, ToggleLeft, ToggleRight, Loader2, TrendingUp, DollarSign, Building2, Mail } from 'lucide-react';
+import { Plus, Home, Calendar, Users, MapPin, Eye, Edit, ToggleLeft, ToggleRight, Loader2, TrendingUp, DollarSign, Building2, Mail, Star } from 'lucide-react';
 import { AnalyticsDashboard } from '@/components/host/AnalyticsDashboard';
+import { FarmerReputationHub } from '@/components/host/FarmerReputationHub';
 
 export default function HostDashboard() {
   const { user, isHost, becomeHost } = useAuth();
   const { unreadMessageCount } = useNotifications();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'properties';
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -236,10 +239,14 @@ export default function HostDashboard() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="properties" className="space-y-6">
+        <Tabs defaultValue={initialTab} className="space-y-6" onValueChange={(val) => setSearchParams({ tab: val })}>
           <TabsList className="bg-muted">
             <TabsTrigger value="properties">Properties ({properties.length})</TabsTrigger>
             <TabsTrigger value="bookings">Bookings ({bookings.length})</TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-1.5">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              Hospitality Reviews
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -283,6 +290,11 @@ export default function HostDashboard() {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="reviews">
+            <FarmerReputationHub />
+          </TabsContent>
+
           <TabsContent value="analytics">
             <AnalyticsDashboard properties={properties} bookings={bookings} />
           </TabsContent>

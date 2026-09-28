@@ -1,55 +1,71 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Eye, EyeOff, User, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
-import agribnvIconGreen from '@/assets/agribnv-icon-green.png?v=2';
+import { haptics } from '@/core/platform';
+import { MobileAuthHero } from '@/components/auth/MobileAuthHero';
+import { AuthWelcomePanel } from '@/components/auth/AuthWelcomePanel';
+import { AuthLoginPanel } from '@/components/auth/AuthLoginPanel';
+import { AuthSignupPanel } from '@/components/auth/AuthSignupPanel';
+import { AuthAccountTypePanel } from '@/components/auth/AuthAccountTypePanel';
 import { AuthGraphic } from '@/components/auth/AuthGraphic';
 import { TreeOverlay } from '@/components/auth/TreeOverlay';
 
 const authSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
+  email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  fullName: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
-  phone: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  fullName: z.string().optional(),
+  username: z.string().optional(),
 });
 
-type AuthForm = z.infer<typeof authSchema>;
-type UserRole = 'guest' | 'host';
+export type AuthForm = z.infer<typeof authSchema>;
+export type UserRole = 'guest' | 'host';
+export type AuthMode = 'welcome' | 'login' | 'signup' | 'account-type';
 
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
-  const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') === 'signup');
+  const initialMode: AuthMode = searchParams.get('mode') === 'welcome' 
+    ? 'welcome' 
+    : searchParams.get('mode') === 'login' 
+    ? 'login' 
+    : searchParams.get('mode') === 'signup'
+    ? 'signup'
+    : 'welcome';
+
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(searchParams.get('role') === 'host' ? 'host' : 'guest');
+  const [selectedRole, setSelectedRole] = useState<UserRole>(
+    searchParams.get('role') === 'host' ? 'host' : 'guest'
+  );
+
   const { user, signIn, signUp: authSignUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<AuthForm>({
+  const form = useForm<AuthForm>({
     resolver: zodResolver(authSchema),
   });
 
+  const { reset } = form;
+
   useEffect(() => {
     const checkUserAndRedirect = async () => {
-      if (user) {
-        // Check if user is a host and redirect accordingly
+      // Only auto-redirect if we're not actively picking account type
+      if (user && mode !== 'account-type') {
         const { data } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .eq('role', 'host')
-          .single();
+          .maybeSingle();
 
         if (data) {
           navigate('/host');
@@ -59,103 +75,80 @@ export default function AuthPage() {
       }
     };
     checkUserAndRedirect();
-  }, [user, navigate]);
+  }, [user, mode, navigate]);
 
-  const handleDemoLogin = async (role: 'guest' | 'host') => {
-    setIsLoading(true);
-    const demoEmail = role === 'host' ? 'demo.host@agribnv.com' : 'demo.guest@agribnv.com';
-    const demoPassword = 'DemoPassword123!';
-    const demoName = role === 'host' ? 'Demo Farm Host' : 'Demo Traveler';
+  const switchMode = (newMode: AuthMode) => {
+    haptics.impact('light');
+    reset();
+    setMode(newMode);
+  };
 
+  const handleBackFromHero = () => {
+    if (mode === 'account-type') {
+      switchMode('signup');
+    } else {
+      switchMode('welcome');
+    }
+  };
+
+  const handleSocialAuth = async () => {
+    haptics.impact('light');
     try {
-      // 1. Try to sign in first
-      const { error: signInErr } = await signIn(demoEmail, demoPassword);
-      if (!signInErr) {
-        toast({
-          title: role === 'host' ? 'Signed in as Demo Host' : 'Signed in as Demo Guest',
-          description: 'Welcome to Agribnv demo.',
-        });
-        navigate(role === 'host' ? '/host' : '/explore');
-        return;
-      }
-
-      // 2. If user doesn't exist yet, sign up
-      const { data: signUpData, error: signUpErr } = await authSignUp(demoEmail, demoPassword, demoName);
-      if (signUpErr) {
-        toast({
-          title: 'Demo sign-in notice',
-          description: signUpErr.message,
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // If host, assign host role
-      if (role === 'host' && signUpData?.user?.id) {
-        await supabase.from('user_roles').insert({
-          user_id: signUpData.user.id,
-          role: 'host',
-        });
-      }
-
-      toast({
-        title: role === 'host' ? 'Welcome, Demo Host!' : 'Welcome, Demo Guest!',
-        description: 'Account created and ready.',
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/explore`,
+        },
       });
-      navigate(role === 'host' ? '/host' : '/explore');
-    } catch (err: any) {
+      if (error) {
+        toast({
+          title: 'Social login notice',
+          description: error.message || 'Google authentication provider is being configured.',
+        });
+      }
+    } catch {
       toast({
-        title: 'Demo login failed',
-        description: err?.message || 'Please try again',
-        variant: 'destructive',
+        title: 'Social login unavailable',
+        description: 'Please sign in with email credentials.',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const onSubmit = async (data: AuthForm) => {
+    haptics.impact('medium');
     setIsLoading(true);
     try {
-      if (isSignUp) {
-        // Sign up the user
-        const { data: authData, error } = await authSignUp(
-          data.email, 
-          data.password, 
-          data.fullName, 
-          data.username, 
-          data.phone
+      if (mode === 'signup') {
+        const computedName = [data.firstName, data.lastName].filter(Boolean).join(' ') || data.fullName || 'UMANI Explorer';
+        const { data: signUpData, error } = await authSignUp(
+          data.email,
+          data.password,
+          computedName,
+          data.username || data.email.split('@')[0]
         );
+
         if (error) {
+          haptics.notification('error');
           if (error.message.includes('already registered')) {
             toast({
               title: 'Account exists',
-              description: 'This email is already registered. Try signing in instead.',
+              description: 'An account with this email already exists. Please log in.',
               variant: 'destructive',
             });
+            switchMode('login');
           } else {
             toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
           }
-        } else {
-          // If host role selected, add it (guest role is added by default via trigger)
-          if (selectedRole === 'host' && authData?.user?.id) {
-            await supabase.from('user_roles').insert({
-              user_id: authData.user.id,
-              role: 'host',
-            });
-          }
-
-          toast({
-            title: selectedRole === 'host' ? 'Welcome, Host!' : 'Welcome to Agribnv!',
-            description: selectedRole === 'host'
-              ? 'Your host account has been created. Start listing your farm!'
-              : 'Your account has been created.',
-          });
-          navigate(selectedRole === 'host' ? '/host' : '/explore');
+          return;
         }
+
+        haptics.notification('success');
+        // Transition to dedicated "Type of account" wireframe screen
+        setMode('account-type');
       } else {
         const { error } = await signIn(data.email, data.password);
         if (error) {
+          haptics.notification('error');
           if (error.message.includes('Invalid login')) {
             toast({
               title: 'Invalid credentials',
@@ -166,6 +159,7 @@ export default function AuthPage() {
             toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
           }
         } else {
+          haptics.notification('success');
           navigate('/explore');
         }
       }
@@ -174,194 +168,105 @@ export default function AuthPage() {
     }
   };
 
+  const handleConfirmAccountType = async () => {
+    haptics.impact('medium');
+    setIsLoading(true);
+    try {
+      const currentUser = user || (await supabase.auth.getUser()).data.user;
+      if (selectedRole === 'host' && currentUser?.id) {
+        await supabase.from('user_roles').upsert({
+          user_id: currentUser.id,
+          role: 'host',
+        }, { onConflict: 'user_id,role' });
+      }
+
+      haptics.notification('success');
+      toast({
+        title: 'Welcome to UMANI!',
+        description: selectedRole === 'host'
+          ? 'Your farm host account has been created. Start listing your farm!'
+          : 'Your explorer account has been created. Start discovering farms!',
+      });
+      navigate(selectedRole === 'host' ? '/host' : '/explore');
+    } catch {
+      navigate('/explore');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
-      {/* LEFT — form pane */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-4 sm:px-10 lg:px-12 xl:px-20 overflow-y-auto">
-        <div className="w-full max-w-md mx-auto my-auto py-2">
-          <div className="text-center">
-            <img src={agribnvIconGreen} alt="Agribnv" className="h-10 sm:h-12 w-auto mx-auto mb-2" />
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-0.5">
-              {isSignUp ? 'Get started' : 'Welcome back'}
-            </h1>
-            <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
-              {isSignUp ? 'Create your account to start booking farm stays.' : 'Sign in to your Agribnv account.'}
-            </p>
-          </div>
+    <div className="min-h-screen w-full bg-[#142A1D] lg:bg-background flex flex-col lg:flex-row overflow-x-hidden">
+      {/* MOBILE CONTAINER (Full width on mobile, centered card frame on desktop) */}
+      <div className="w-full lg:w-[480px] xl:w-[540px] flex flex-col min-h-screen bg-[#142A1D] shrink-0 mx-auto">
+        {/* Top Hero Section (Atmospheric Sunrise & Terrace Motif) */}
+        <MobileAuthHero mode={mode} onBack={handleBackFromHero} />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5 sm:space-y-3">
-            {/* Role Selection for Sign Up */}
+        {/* Bottom Curved Sheet Container matching Low-Fi Wireframe */}
+        <div className="flex-1 bg-[#FAF8F5] text-foreground rounded-t-[36px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] flex flex-col -mt-4 relative z-30 pt-3 px-6 sm:px-8 pb-8 safe-area-pb">
+          {/* Subtle Pull-Bar / Card Indicator */}
+          <div className="w-12 h-1.5 rounded-full bg-border/70 mx-auto mb-4 shrink-0" />
+
+          <div className="flex-1 flex flex-col min-h-0">
             <AnimatePresence mode="wait">
-              {isSignUp && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-2"
-                >
-                  <p className="text-xs font-medium text-muted-foreground">I want to:</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRole('guest')}
-                      className={cn(
-                        'flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all text-center',
-                        selectedRole === 'guest' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
-                      )}
-                    >
-                      <div className={cn('w-7 h-7 rounded-full flex items-center justify-center', selectedRole === 'guest' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
-                        <User className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="font-semibold text-xs">Book Stays</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight">Find & book farm stays</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRole('host')}
-                      className={cn(
-                        'flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all text-center',
-                        selectedRole === 'host' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
-                      )}
-                    >
-                      <div className={cn('w-7 h-7 rounded-full flex items-center justify-center', selectedRole === 'host' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
-                        <Home className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="font-semibold text-xs">Host Guests</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight">List your farm property</span>
-                    </button>
-                  </div>
+              {mode === 'welcome' && (
+                <AuthWelcomePanel
+                  key="welcome-panel"
+                  onSignIn={() => switchMode('login')}
+                  onSignUp={() => switchMode('signup')}
+                  onSocialAuth={handleSocialAuth}
+                  isLoading={isLoading}
+                />
+              )}
 
-                  <Input
-                    id="fullName"
-                    placeholder="Full name"
-                    className="h-11 rounded-xl border-2 text-base"
-                    {...register('fullName')}
-                  />
-                  {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
+              {mode === 'login' && (
+                <AuthLoginPanel
+                  key="login-panel"
+                  form={form}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  onSwitchToSignup={() => switchMode('signup')}
+                  onSocialAuth={handleSocialAuth}
+                  isLoading={isLoading}
+                  showPassword={showPassword}
+                  onTogglePassword={() => {
+                    haptics.impact('light');
+                    setShowPassword(!showPassword);
+                  }}
+                />
+              )}
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <Input
-                        id="username"
-                        placeholder="Username"
-                        className="h-11 rounded-xl border-2 text-base"
-                        {...register('username')}
-                      />
-                      {errors.username && <p className="text-xs text-destructive">{errors.username.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                      <Input
-                        id="phone"
-                        placeholder="Phone number"
-                        className="h-11 rounded-xl border-2 text-base"
-                        {...register('phone')}
-                      />
-                      {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
-                    </div>
-                  </div>
-                </motion.div>
+              {mode === 'signup' && (
+                <AuthSignupPanel
+                  key="signup-panel"
+                  form={form}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  onSwitchToLogin={() => switchMode('login')}
+                  onSocialAuth={handleSocialAuth}
+                  onSwitchToAccountType={() => switchMode('account-type')}
+                  isLoading={isLoading}
+                  showPassword={showPassword}
+                  onTogglePassword={() => {
+                    haptics.impact('light');
+                    setShowPassword(!showPassword);
+                  }}
+                />
+              )}
+
+              {mode === 'account-type' && (
+                <AuthAccountTypePanel
+                  key="account-type-panel"
+                  selectedRole={selectedRole}
+                  onSelectRole={setSelectedRole}
+                  onContinue={handleConfirmAccountType}
+                  isLoading={isLoading}
+                />
               )}
             </AnimatePresence>
-
-            <div className="space-y-1">
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email"
-                className="h-11 rounded-xl border-2 text-base"
-                {...register('email')}
-              />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-1">
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  className="h-11 rounded-xl border-2 text-base pr-11"
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
-
-            <p className="text-[11px] text-muted-foreground leading-snug pt-0.5">
-              By continuing, you agree to our{' '}
-              <Link to="/terms" className="underline font-semibold hover:text-foreground">Terms of Use</Link>
-              {' '}and{' '}
-              <Link to="/privacy" className="underline font-semibold hover:text-foreground">Privacy Policy</Link>.
-            </p>
-
-            <Button
-              type="submit"
-              className="w-full h-10 sm:h-11 rounded-xl text-xs sm:text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isSignUp ? (
-                selectedRole === 'host' ? 'Create Host Account' : 'Create Account'
-              ) : (
-                'Log in'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-2.5 sm:mt-3 text-center">
-            <button
-              type="button"
-              onClick={() => { setIsSignUp(!isSignUp); reset(); setSelectedRole('guest'); }}
-              className="text-xs sm:text-sm font-semibold underline text-foreground/80 hover:text-foreground transition-colors"
-            >
-              {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
-            </button>
-          </div>
-
-          {/* 1-Click Demo Access for quick testing */}
-          <div className="mt-3 pt-2.5 border-t border-border/60">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Demo Quick Access</span>
-              <span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.2 rounded">1-Click</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isLoading}
-                onClick={() => handleDemoLogin('guest')}
-                className="h-8 rounded-lg text-xs font-medium border-border hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-1.5"
-              >
-                <User className="h-3 w-3 text-primary" />
-                <span>Demo Guest</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isLoading}
-                onClick={() => handleDemoLogin('host')}
-                className="h-8 rounded-lg text-xs font-medium border-border hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-1.5"
-              >
-                <Home className="h-3 w-3 text-primary" />
-                <span>Demo Host</span>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* RIGHT — animated "Terraced Light" brand graphic (desktop only) */}
+      {/* RIGHT PANE — Expanded "Terraced Light" Brand Artwork (Desktop View) */}
       <div className="hidden lg:flex lg:flex-1 relative flex-col justify-end overflow-hidden p-12 xl:p-16 bg-primary">
         <AuthGraphic />
         <TreeOverlay />

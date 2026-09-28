@@ -28,9 +28,7 @@ import Privacy from "./pages/Privacy";
 import ChangePassword from "./pages/ChangePassword";
 import NotFound from "./pages/NotFound";
 
-import { Keyboard } from '@capacitor/keyboard';
-import { Capacitor } from '@capacitor/core';
-import { SafeArea } from 'capacitor-plugin-safe-area';
+import { keyboard, initSafeArea } from '@/core/platform';
 import { useEffect } from 'react';
 
 function PushSetup() {
@@ -45,30 +43,17 @@ function NativeSplashSetup() {
 
 function KeyboardSetup() {
   useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(console.error);
-    }
+    keyboard.setAccessoryBarVisible(false);
   }, []);
   return null;
 }
 
 function SafeAreaSetup() {
   useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      SafeArea.getSafeAreaInsets().then(({ insets }) => {
-        document.documentElement.style.setProperty('--sat', `${insets.top}px`);
-        document.documentElement.style.setProperty('--sab', `${insets.bottom}px`);
-        document.documentElement.style.setProperty('--sar', `${insets.right}px`);
-        document.documentElement.style.setProperty('--sal', `${insets.left}px`);
-      }).catch(console.error);
-
-      SafeArea.addListener('safeAreaChanged', data => {
-        document.documentElement.style.setProperty('--sat', `${data.insets.top}px`);
-        document.documentElement.style.setProperty('--sab', `${data.insets.bottom}px`);
-        document.documentElement.style.setProperty('--sar', `${data.insets.right}px`);
-        document.documentElement.style.setProperty('--sal', `${data.insets.left}px`);
-      });
-    }
+    const cleanupPromise = initSafeArea();
+    return () => {
+      cleanupPromise.then(cleanup => cleanup());
+    };
   }, []);
   return null;
 }

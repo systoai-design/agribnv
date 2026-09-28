@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { SplashScreen } from '@capacitor/splash-screen';
+import { splash } from '@/core/platform';
 
 // Hides the native OS splash screen once React has mounted and committed its first paint —
 // at that point AppLoadingScreen (same forest-green background, same icon) is already on
@@ -10,7 +9,6 @@ import { SplashScreen } from '@capacitor/splash-screen';
 // on slower devices where init takes longer than that.
 export function useHideNativeSplash(): void {
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-    SplashScreen.hide();
+    splash.hide();
   }, []);
 }

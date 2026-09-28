@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Capacitor } from '@capacitor/core';
+import { isNativePlatform } from '@/core/platform';
 import { Navbar } from './Navbar';
 import { MobileNav } from './MobileNav';
 import { Footer } from './Footer';
@@ -62,7 +62,7 @@ export function Layout({
       </div>
       <main id="main-scroll-container" className={`flex-1 overflow-y-auto overflow-x-hidden ${showMobileNav ? 'pb-20 md:pb-0' : ''}`}>
         {children}
-        {showFooter && !Capacitor.isNativePlatform() && <div className="shrink-0 mt-auto"><Footer /></div>}
+        {showFooter && !isNativePlatform() && <div className="shrink-0 mt-auto"><Footer /></div>}
       </main>
       {showMobileNav && <div className="shrink-0"><MobileNav /></div>}
     </div>

@@ -13,7 +13,7 @@
     "test:watch": "vitest",
     "cap:build": "vite build && npx cap sync",
     "cap:ios": "vite build && npx cap sync && npx cap open ios",
-    "cap:android": "vite build && npx cap sync && npx cap open android",
+    "cap:android": "export CAPACITOR_ANDROID_STUDIO_PATH=\"${CAPACITOR_ANDROID_STUDIO_PATH:-$HOME/android-studio/bin/studio.sh}\"; vite build && npx cap sync && npx cap open android",
     "security:audit": "python3 .agents/skills/security-compliance-auditor/scripts/audit_system_security.py",
     "security:deps": "npm audit",
     "arch:audit": "python3 .agents/skills/system-architect/scripts/audit_architecture.py",

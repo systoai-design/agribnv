@@ -1,24 +1,22 @@
 import { useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
+import { isNativePlatform, push } from '@/core/platform';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Lazy-load push notification APIs only on native platforms
+// Lazy-load push notification APIs only on native platforms via platform adapter
 async function setupPushNotifications(userId: string) {
-  if (!Capacitor.isNativePlatform()) return;
+  if (!isNativePlatform()) return;
 
-  const { PushNotifications } = await import('@capacitor/push-notifications');
+  const granted = await push.requestPermissions();
+  if (!granted) return;
 
-  const permission = await PushNotifications.requestPermissions();
-  if (permission.receive !== 'granted') return;
+  await push.register();
 
-  await PushNotifications.register();
-
-  await PushNotifications.addListener('registration', async ({ value: token }) => {
+  await push.onRegistration(async (token) => {
     await supabase.from('profiles').update({ push_token: token }).eq('id', userId);
   });
 
-  await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+  await push.onNotificationReceived((notification) => {
     // Native foreground notification — Sonner toast is handled in NotificationsContext
     // via realtime subscription, so no duplicate toast needed here.
     console.info('[Push] Foreground notification received:', notification.title);

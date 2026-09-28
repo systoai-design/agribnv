@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { isNativePlatform } from '@/core/platform';
 import { Navigate } from 'react-router-dom';
 import LandingPage from '@/pages/LandingPage';
 import { NativeRoot } from './NativeRoot';
@@ -16,9 +16,9 @@ export function Root() {
   }
 
   // If authenticated and on web, go to the app dashboard
-  if (user && !Capacitor.isNativePlatform()) {
+  if (user && !isNativePlatform()) {
     return <Navigate to={viewMode === 'host' ? '/host' : '/explore'} replace />;
   }
 
-  return Capacitor.isNativePlatform() ? <NativeRoot /> : <LandingPage />;
+  return isNativePlatform() ? <NativeRoot /> : <LandingPage />;
 }
