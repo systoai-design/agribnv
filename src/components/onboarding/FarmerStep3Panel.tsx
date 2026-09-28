@@ -143,9 +143,6 @@ export function FarmerStep3Panel({
                   <span className="text-[11px] font-semibold">Add Photo</span>
                 </div>
               )}
-              <div className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-md">
-                <Camera className="w-3.5 h-3.5" />
-              </div>
             </button>
             <span className="text-xs font-medium text-foreground/80 mt-1.5">Profile Photo</span>
           </div>
@@ -162,13 +159,7 @@ export function FarmerStep3Panel({
                 <img src={coverImageUrl} alt="Farm Cover Preview" className="w-full h-full object-cover" />
               ) : (
                 <div className="flex flex-col items-center justify-center text-primary/80 group-hover:text-primary transition-colors px-2 text-center">
-                  {/* Stylized Sun/Mountain motif placeholder */}
-                  <div className="relative w-14 h-8 flex items-center justify-center mb-1">
-                    <span className="absolute top-0 right-3 w-4 h-4 rounded-full bg-[#E09F5A]/80 shadow-xs" />
-                    <svg viewBox="0 0 40 24" className="w-12 h-7 text-[#2E5A3E]" fill="currentColor">
-                      <polygon points="20,2 38,22 2,22" />
-                    </svg>
-                  </div>
+                  <ImageIcon className="w-7 h-7 sm:w-8 sm:h-8 mb-1 text-primary/70" />
                   <span className="text-xs sm:text-sm font-semibold tracking-tight text-foreground">
                     Upload Cover Banner
                   </span>
@@ -177,9 +168,6 @@ export function FarmerStep3Panel({
                   </span>
                 </div>
               )}
-              <div className="absolute top-2 right-2 bg-primary text-white p-1.5 rounded-full shadow-sm">
-                <ImageIcon className="w-3.5 h-3.5" />
-              </div>
             </button>
             <span className="text-xs font-medium text-foreground/80 mt-1.5 px-1">Farm Cover Banner</span>
           </div>

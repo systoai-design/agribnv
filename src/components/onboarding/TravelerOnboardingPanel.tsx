@@ -27,7 +27,7 @@ interface TravelerOnboardingPanelProps {
 
 const INTEREST_OPTIONS = [
   { id: 'stays', label: 'Farm Stays', icon: Home },
-  { id: 'experiences', label: 'Experience Farm', icon: Compass },
+  { id: 'experiences', label: 'Farm Experiences', icon: Compass },
   { id: 'dining', label: 'Farm Dining', icon: Utensils },
   { id: 'products', label: 'Farm Products', icon: ShoppingBag },
 ];
@@ -113,9 +113,6 @@ export function TravelerOnboardingPanel({
                 <span className="text-[9px] font-semibold uppercase tracking-wider">Photo</span>
               </div>
             )}
-            <div className="absolute bottom-0.5 right-0.5 bg-primary text-white p-1 rounded-full shadow-md">
-              <Camera className="w-3 h-3" />
-            </div>
           </button>
           <span className="text-[10px] text-muted-foreground mt-1">Tap to choose profile picture</span>
         </div>
