@@ -26,6 +26,9 @@ import About from "./pages/About";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import ChangePassword from "./pages/ChangePassword";
+import Feed from "./pages/Feed";
+import FarmPublicProfile from "./pages/FarmPublicProfile";
+import FarmerFinish from "./pages/FarmerFinish";
 import NotFound from "./pages/NotFound";
 
 import { keyboard, initSafeArea } from '@/core/platform';
@@ -91,6 +94,9 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/change-password" element={<ChangePassword />} />
+              <Route path="/feed" element={<Feed />} />
+              <Route path="/farm-profile-preview" element={<FarmPublicProfile />} />
+              <Route path="/farmer-finish" element={<FarmerFinish />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </NotificationsProvider>

@@ -226,11 +226,11 @@ export default function AuthPage() {
       haptics.notification('success');
       toast({
         title: 'Welcome to UMANI!',
-        description: 'Your traveler profile has been saved. Happy exploring!',
+        description: 'Your traveler profile has been saved. Welcome to the farm feed!',
       });
-      navigate('/explore');
+      navigate('/feed');
     } catch {
-      navigate('/explore');
+      navigate('/feed');
     } finally {
       setIsLoading(false);
     }
@@ -301,11 +301,11 @@ export default function AuthPage() {
       haptics.notification('success');
       toast({
         title: 'Welcome to UMANI!',
-        description: 'Your farm profile has been created. Start listing your offerings!',
+        description: 'Your farm profile has been created. Complete your launch checklist!',
       });
-      navigate('/host');
+      navigate('/farmer-finish');
     } catch {
-      navigate('/host');
+      navigate('/farmer-finish');
     } finally {
       setIsLoading(false);
     }

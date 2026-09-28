@@ -4,7 +4,7 @@ import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UseFormReturn } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/core/platform';
@@ -31,6 +31,7 @@ export function AuthSignupPanel({
   showPassword,
   onTogglePassword,
 }: AuthSignupPanelProps) {
+  const navigate = useNavigate();
   const { register, formState: { errors } } = form;
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState(false);
@@ -234,7 +235,7 @@ export function AuthSignupPanel({
         </p>
 
         {onSwitchToAccountType && (
-          <div>
+          <div className="space-y-2">
             <button
               type="button"
               onClick={onSwitchToAccountType}
@@ -242,6 +243,33 @@ export function AuthSignupPanel({
             >
               Preview "Type of Account" wireframe →
             </button>
+
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-border/40 text-[10px] text-muted-foreground">
+              <span className="font-semibold text-foreground/70">Wireframes:</span>
+              <button
+                type="button"
+                onClick={() => navigate('/feed')}
+                className="font-medium text-primary hover:underline"
+              >
+                Feed
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => navigate('/farm-profile-preview')}
+                className="font-medium text-primary hover:underline"
+              >
+                Farm Profile
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => navigate('/farmer-finish')}
+                className="font-medium text-primary hover:underline"
+              >
+                Finish Farmer
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Camera,
@@ -39,6 +40,7 @@ export function TravelerOnboardingPanel({
   onBack,
   isLoading,
 }: TravelerOnboardingPanelProps) {
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState(initialData?.displayName || '');
   const [bio, setBio] = useState(initialData?.bio || '');
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialData?.avatarUrl);
@@ -195,7 +197,7 @@ export function TravelerOnboardingPanel({
             )}
           </Button>
 
-          <div className="text-center mt-2.5">
+          <div className="text-center mt-2.5 space-y-2">
             <button
               type="button"
               onClick={onSkip}
@@ -203,6 +205,24 @@ export function TravelerOnboardingPanel({
             >
               Skip for now, take me to explore
             </button>
+
+            <div className="flex items-center justify-center gap-3 pt-2 border-t border-border/40 text-[11px]">
+              <button
+                type="button"
+                onClick={() => navigate('/feed')}
+                className="font-medium text-primary hover:underline"
+              >
+                Preview Feed Wireframe →
+              </button>
+              <span className="text-muted-foreground">•</span>
+              <button
+                type="button"
+                onClick={() => navigate('/farm-profile-preview')}
+                className="font-medium text-primary hover:underline"
+              >
+                Preview Farm Profile →
+              </button>
+            </div>
           </div>
         </div>
       </form>

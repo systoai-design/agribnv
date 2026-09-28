@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Camera, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ export function FarmerStep3Panel({
   onSkip,
   isLoading,
 }: FarmerStep3PanelProps) {
+  const navigate = useNavigate();
   const [farmerBio, setFarmerBio] = useState(initialData?.farmerBio || '');
   const [farmDescription, setFarmDescription] = useState(initialData?.farmDescription || '');
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialData?.avatarUrl);
@@ -190,7 +192,7 @@ export function FarmerStep3Panel({
             )}
           </Button>
 
-          <div className="text-center mt-2.5">
+          <div className="text-center mt-2.5 space-y-2">
             <button
               type="button"
               onClick={onSkip}
@@ -198,6 +200,16 @@ export function FarmerStep3Panel({
             >
               Skip and go to Host Dashboard
             </button>
+
+            <div className="flex items-center justify-center gap-3 pt-2 border-t border-border/40 text-[11px]">
+              <button
+                type="button"
+                onClick={() => navigate('/farmer-finish')}
+                className="font-medium text-primary hover:underline"
+              >
+                Preview "Finish Up Farmer" Wireframe →
+              </button>
+            </div>
           </div>
         </div>
       </form>
