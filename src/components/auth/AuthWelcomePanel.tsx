@@ -107,7 +107,7 @@ export function AuthWelcomePanel({
       <div className="pt-2 pb-1 text-center space-y-3">
         <div>
           <Link
-            to="/explore"
+            to="/feed"
             className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
           >
             Explore as Guest

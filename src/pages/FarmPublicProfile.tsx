@@ -7,18 +7,14 @@ import {
   MessageSquare, 
   Plus, 
   Check, 
-  Sparkles, 
   Tag, 
   Film, 
   Home, 
   Compass, 
   MapPin, 
   Award, 
-  Calendar, 
-  Clock,
-  Layers,
-  ChevronRight,
-  X
+  X,
+  LayoutGrid
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import haptics from '@/utils/haptics';
@@ -59,6 +55,30 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     priceOrTag: '₱2,400',
     imageUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=600&q=80',
     description: 'Direct-trade unroasted green coffee cherries for home roasters and specialty micro-cafes.'
+  },
+  {
+    id: 'off-4',
+    category: 'offers',
+    title: 'Pure Forest Wildflower Honey',
+    priceOrTag: '₱450',
+    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+    description: 'Raw, unpasteurized honey harvested from native pukyutan bees nesting near coffee blossoms.'
+  },
+  {
+    id: 'off-5',
+    category: 'offers',
+    title: 'Single-Origin Robusta Cold Brew',
+    priceOrTag: '₱180',
+    imageUrl: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
+    description: '18-hour cold steeped heirloom Robusta with natural hints of cacao nibs and toasted hazelnut.'
+  },
+  {
+    id: 'off-6',
+    category: 'offers',
+    title: 'Farm Kitchen Table Reserve Box',
+    priceOrTag: '₱850',
+    imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+    description: 'Pre-order harvest lunch basket with wood-smoked native chicken and heirloom red rice.'
   },
 
   // Stories
@@ -136,6 +156,30 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d69102353?auto=format&fit=crop&w=600&q=80',
     description: 'A 90-minute walk through 50-year-old Liberica mother trees guided by 3rd-generation farm family members.'
   },
+  {
+    id: 'sty-4',
+    category: 'stays',
+    title: 'Canopy Glamping Safari Bell Tent',
+    priceOrTag: '₱2,200/nt',
+    imageUrl: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=600&q=80',
+    description: 'Luxury canvas tent nestled among flowering shade trees with stargazing firepit.'
+  },
+  {
+    id: 'sty-5',
+    category: 'stays',
+    title: 'Sunrise Ridge View Deck Hut',
+    priceOrTag: '₱1,650/nt',
+    imageUrl: 'https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=600&q=80',
+    description: 'Panoramic views of Mt. Sungay and misty Cavite valleys with outdoor pour-over bar.'
+  },
+  {
+    id: 'sty-6',
+    category: 'stays',
+    title: 'Sunset Coffee Orchard Walk',
+    priceOrTag: '₱400/pax',
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    description: 'Golden hour walk concluding with fresh drip coffee and local rice cakes at the ridge lookout.'
+  },
 
   // Experiences
   {
@@ -161,6 +205,30 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     priceOrTag: '₱500/pax',
     imageUrl: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
     description: 'Plant a tagged heirloom Robusta seedling with your family name that will grow on the estate.'
+  },
+  {
+    id: 'exp-4',
+    category: 'experiences',
+    title: 'Honey Harvesting & Hive Inspection',
+    priceOrTag: '₱750/pax',
+    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+    description: 'Suit up with our beekeeper to inspect stingless native bee hives and sample fresh comb.'
+  },
+  {
+    id: 'exp-5',
+    category: 'experiences',
+    title: 'Farm Kitchen Cupping & Table Lunch',
+    priceOrTag: '₱950/pax',
+    imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+    description: 'Sensory coffee cupping flight followed by a 3-course organic harvest meal in the open-air pavilion.'
+  },
+  {
+    id: 'exp-6',
+    category: 'experiences',
+    title: 'Traditional Bamboo Craft & Trellis Workshop',
+    priceOrTag: '₱450/pax',
+    imageUrl: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=600&q=80',
+    description: 'Learn sustainable bamboo joining and weave simple plant supports with estate artisans.'
   }
 ];
 
@@ -208,39 +276,39 @@ export default function FarmPublicProfile() {
   const currentTabItems = MOCK_GRID_ITEMS.filter(item => item.category === activeTab);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-foreground flex flex-col pb-20 select-none">
+    <div className="min-h-screen bg-[#FDFBF7] text-foreground flex flex-col pb-16 select-none">
       {/* Top App Bar */}
-      <header className="sticky top-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-border/40 px-4 py-2.5 flex items-center justify-between safe-area-pt">
+      <header className="sticky top-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-border/40 px-3 py-2 flex items-center justify-between safe-area-pt">
         <button
           onClick={() => {
             haptics.selection();
             navigate(-1);
           }}
-          className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-foreground transition-colors"
+          className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-secondary/80 hover:bg-secondary text-foreground transition-colors"
           aria-label="Back"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back</span>
         </button>
 
-        <span className="font-semibold text-xs tracking-tight text-foreground/80">
-          @amadeocoffee
-        </span>
+        <div className="flex items-center gap-1 font-semibold text-xs tracking-tight text-foreground/90">
+          <span>@amadeocoffee</span>
+        </div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={handleShare}
-            className="w-9 h-9 rounded-full bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-colors"
+            className="w-8 h-8 rounded-full bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-colors"
             aria-label="Share Farm Profile"
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => toast({ title: "Options", description: "Report profile or view compliance certificates." })}
-            className="w-9 h-9 rounded-full bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-colors"
+            className="w-8 h-8 rounded-full bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-colors"
             aria-label="More Options"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-3.5 h-3.5" />
           </button>
         </div>
       </header>
@@ -248,18 +316,18 @@ export default function FarmPublicProfile() {
       {/* Hero Cover Banner & Avatar */}
       <div className="relative">
         {/* Cover Banner */}
-        <div className="w-full h-44 sm:h-52 bg-muted overflow-hidden">
+        <div className="w-full h-36 sm:h-44 bg-muted overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80"
             alt="Amadeo Farmland Cover"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
 
         {/* Circular Farm Avatar (Centered Overlapping Banner) */}
-        <div className="relative -mt-14 flex justify-center">
-          <div className="w-24 h-24 rounded-full p-1 bg-[#FDFBF7] shadow-md ring-2 ring-primary/20">
+        <div className="relative -mt-10 flex justify-center">
+          <div className="w-20 h-20 rounded-full p-0.5 bg-[#FDFBF7] shadow-sm ring-2 ring-[#FDFBF7]">
             <img
               src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=240&q=80"
               alt="Farmer Mateo Avatar"
@@ -269,35 +337,58 @@ export default function FarmPublicProfile() {
         </div>
       </div>
 
-      {/* Farm Name, Handle & Location */}
-      <div className="text-center px-4 pt-2">
-        <h1 className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+      {/* Farm Name, Location & Stats */}
+      <div className="text-center px-4 pt-1.5">
+        <h1 className="font-serif text-lg sm:text-xl font-bold tracking-tight text-foreground">
           Amadeo Heritage Coffee Estate
         </h1>
-        <p className="text-xs text-muted-foreground mt-0.5 flex items-center justify-center gap-1">
-          <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+        <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center justify-center gap-1">
+          <MapPin className="w-3 h-3 text-primary shrink-0" />
           <span>Amadeo, Cavite • 3rd-Gen Robusta & Liberica</span>
         </p>
 
-        {/* 2 Action Buttons Side-by-Side */}
-        <div className="grid grid-cols-2 gap-2.5 max-w-sm mx-auto mt-4">
+        {/* Instagram Profile Stats Row */}
+        <div className="flex items-center justify-center gap-6 mt-2.5 py-1 text-center">
+          <div>
+            <span className="block text-xs font-bold text-foreground">18</span>
+            <span className="block text-[10px] text-muted-foreground">Stories</span>
+          </div>
+          <div className="w-px h-5 bg-border/60" />
+          <div>
+            <span className="block text-xs font-bold text-foreground">1.4k</span>
+            <span className="block text-[10px] text-muted-foreground">Followers</span>
+          </div>
+          <div className="w-px h-5 bg-border/60" />
+          <div>
+            <span className="block text-xs font-bold text-foreground">12 ha</span>
+            <span className="block text-[10px] text-muted-foreground">Farmland</span>
+          </div>
+          <div className="w-px h-5 bg-border/60" />
+          <div>
+            <span className="block text-xs font-bold text-foreground">4.9 ★</span>
+            <span className="block text-[10px] text-muted-foreground">94 Reviews</span>
+          </div>
+        </div>
+
+        {/* Compact Instagram-Style Action Buttons (Sleek h-8) */}
+        <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto mt-2.5">
           {/* Follow Button */}
           <button
             onClick={handleFollow}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs ${
+            className={`h-8 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-2xs ${
               isFollowing
-                ? 'bg-secondary text-foreground hover:bg-secondary/80 border border-border'
-                : 'bg-primary text-white hover:bg-primary/95'
+                ? 'bg-[#F3EFE6] text-[#1E3A2B] hover:bg-[#E8E2D5] border border-[#DDD5C5]'
+                : 'bg-[#1E3A2B] text-white hover:bg-[#1E3A2B]/90'
             }`}
           >
             {isFollowing ? (
               <>
-                <Check className="w-4 h-4 text-emerald-600" />
-                Following Farm
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                Following
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
                 Follow Farm
               </>
             )}
@@ -306,27 +397,27 @@ export default function FarmPublicProfile() {
           {/* Message Farmer Button */}
           <button
             onClick={handleMessage}
-            className="py-2 px-4 rounded-xl text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground border border-border flex items-center justify-center gap-1.5 transition-all shadow-xs"
+            className="h-8 px-3 rounded-lg text-xs font-semibold bg-[#F3EFE6] hover:bg-[#E8E2D5] text-[#1E3A2B] border border-[#DDD5C5] flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
           >
-            <MessageSquare className="w-4 h-4 text-primary" />
-            Message Farmer
+            <MessageSquare className="w-3.5 h-3.5 text-[#1E3A2B]" />
+            Message
           </button>
         </div>
 
-        {/* Rounded Terroir & Farm Highlight Card */}
-        <div className="max-w-md mx-auto mt-4 p-3.5 rounded-2xl bg-[#F6F1E8]/70 border border-[#E5DECF] text-left shadow-2xs">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+        {/* Compact Terroir & Farm Highlight Card */}
+        <div className="max-w-md mx-auto mt-3 px-3 py-2 rounded-lg bg-[#F6F1E8]/70 border border-[#E5DECF]/80 text-left shadow-2xs">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary">
               Organic Terroir
             </span>
             <span className="text-[10px] text-muted-foreground">
               Est. 1974 • 12 Hectares
             </span>
           </div>
-          <p className="text-xs text-foreground/85 leading-relaxed">
+          <p className="text-[11px] text-foreground/80 leading-snug">
             Rich volcanic loam at 450m altitude with natural spring-fed gravity irrigation. Dedicated to preserving Philippine heirloom Robusta through regenerative agroforestry.
           </p>
-          <div className="mt-2.5 pt-2 border-t border-[#E5DECF]/80 flex flex-wrap gap-2 text-[10px] text-muted-foreground font-medium">
+          <div className="mt-1.5 pt-1.5 border-t border-[#E5DECF]/70 flex flex-wrap gap-2 text-[10px] text-muted-foreground font-medium">
             <span className="flex items-center gap-1">
               <Award className="w-3 h-3 text-[#E09F5A]" /> GAP Certified
             </span>
@@ -337,93 +428,92 @@ export default function FarmPublicProfile() {
           </div>
         </div>
 
-        {/* 4 Circular Category Tabs (Specified by User):
-            1. Offers  2. Stories  3. Stays & Tours  4. Experiences */}
-        <div className="max-w-md mx-auto mt-6">
+        {/* Resized Story Highlights (Compact 44px Instagram Story Bubbles) */}
+        <div className="max-w-md mx-auto mt-3.5 mb-1">
           <div className="flex items-center justify-around px-2">
-            {/* Tab 1: Offers */}
+            {/* Highlight 1: Offers */}
             <button
               onClick={() => {
                 haptics.selection();
                 setActiveTab('offers');
               }}
-              className="flex flex-col items-center gap-1.5 group"
+              className="flex flex-col items-center group cursor-pointer"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                 activeTab === 'offers'
-                  ? 'bg-primary text-white shadow-md ring-3 ring-primary/20'
-                  : 'bg-secondary text-muted-foreground group-hover:text-foreground'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
+                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
               }`}>
-                <Tag className="w-6 h-6" />
+                <Tag className="w-4 h-4" />
               </div>
-              <span className={`text-[11px] font-semibold transition-colors ${
-                activeTab === 'offers' ? 'text-primary' : 'text-muted-foreground'
+              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
+                activeTab === 'offers' ? 'text-primary font-semibold' : 'text-muted-foreground'
               }`}>
                 Offers
               </span>
             </button>
 
-            {/* Tab 2: Stories */}
+            {/* Highlight 2: Stories */}
             <button
               onClick={() => {
                 haptics.selection();
                 setActiveTab('stories');
               }}
-              className="flex flex-col items-center gap-1.5 group"
+              className="flex flex-col items-center group cursor-pointer"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                 activeTab === 'stories'
-                  ? 'bg-primary text-white shadow-md ring-3 ring-primary/20'
-                  : 'bg-secondary text-muted-foreground group-hover:text-foreground'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
+                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
               }`}>
-                <Film className="w-6 h-6" />
+                <Film className="w-4 h-4" />
               </div>
-              <span className={`text-[11px] font-semibold transition-colors ${
-                activeTab === 'stories' ? 'text-primary' : 'text-muted-foreground'
+              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
+                activeTab === 'stories' ? 'text-primary font-semibold' : 'text-muted-foreground'
               }`}>
                 Stories
               </span>
             </button>
 
-            {/* Tab 3: Stays & Tours */}
+            {/* Highlight 3: Stays & Tours */}
             <button
               onClick={() => {
                 haptics.selection();
                 setActiveTab('stays');
               }}
-              className="flex flex-col items-center gap-1.5 group"
+              className="flex flex-col items-center group cursor-pointer"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                 activeTab === 'stays'
-                  ? 'bg-primary text-white shadow-md ring-3 ring-primary/20'
-                  : 'bg-secondary text-muted-foreground group-hover:text-foreground'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
+                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
               }`}>
-                <Home className="w-6 h-6" />
+                <Home className="w-4 h-4" />
               </div>
-              <span className={`text-[11px] font-semibold transition-colors ${
-                activeTab === 'stays' ? 'text-primary' : 'text-muted-foreground'
+              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
+                activeTab === 'stays' ? 'text-primary font-semibold' : 'text-muted-foreground'
               }`}>
                 Stays & Tours
               </span>
             </button>
 
-            {/* Tab 4: Experiences */}
+            {/* Highlight 4: Experiences */}
             <button
               onClick={() => {
                 haptics.selection();
                 setActiveTab('experiences');
               }}
-              className="flex flex-col items-center gap-1.5 group"
+              className="flex flex-col items-center group cursor-pointer"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                 activeTab === 'experiences'
-                  ? 'bg-primary text-white shadow-md ring-3 ring-primary/20'
-                  : 'bg-secondary text-muted-foreground group-hover:text-foreground'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
+                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
               }`}>
-                <Compass className="w-6 h-6" />
+                <Compass className="w-4 h-4" />
               </div>
-              <span className={`text-[11px] font-semibold transition-colors ${
-                activeTab === 'experiences' ? 'text-primary' : 'text-muted-foreground'
+              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
+                activeTab === 'experiences' ? 'text-primary font-semibold' : 'text-muted-foreground'
               }`}>
                 Experiences
               </span>
@@ -432,9 +522,76 @@ export default function FarmPublicProfile() {
         </div>
       </div>
 
-      {/* 3-Column Media Grid (Matching wireframe layout) */}
-      <section className="max-w-md mx-auto w-full px-2 sm:px-3 mt-5">
-        <div className="grid grid-cols-3 gap-1.5">
+      {/* Instagram Profile Grid Tabs Bar (Sharp lines, active indicator) */}
+      <div className="max-w-md mx-auto w-full mt-2 border-t border-border/50 grid grid-cols-4 text-center">
+        <button
+          onClick={() => {
+            haptics.selection();
+            setActiveTab('stories');
+          }}
+          className={`py-2 flex items-center justify-center border-b-2 transition-colors ${
+            activeTab === 'stories' 
+              ? 'border-primary text-primary font-semibold' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="Stories and Reels Tab"
+        >
+          <Film className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={() => {
+            haptics.selection();
+            setActiveTab('offers');
+          }}
+          className={`py-2 flex items-center justify-center border-b-2 transition-colors ${
+            activeTab === 'offers' 
+              ? 'border-primary text-primary font-semibold' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="Offers Tab"
+        >
+          <Tag className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={() => {
+            haptics.selection();
+            setActiveTab('stays');
+          }}
+          className={`py-2 flex items-center justify-center border-b-2 transition-colors ${
+            activeTab === 'stays' 
+              ? 'border-primary text-primary font-semibold' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="Stays and Tours Tab"
+        >
+          <Home className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={() => {
+            haptics.selection();
+            setActiveTab('experiences');
+          }}
+          className={`py-2 flex items-center justify-center border-b-2 transition-colors ${
+            activeTab === 'experiences' 
+              ? 'border-primary text-primary font-semibold' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="Experiences Tab"
+        >
+          <Compass className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Instagram-Style Media Grid:
+          - Strictly NO rounded corners (rounded-none)
+          - 3 columns with 1.5px hairline gap
+          - Square photos (aspect-square)
+          - Subtle corner indicators (Reels icon, price tag) */}
+      <section className="max-w-md mx-auto w-full">
+        <div className="grid grid-cols-3 gap-[1.5px] bg-[#E5DECF]/50">
           {currentTabItems.map((item) => (
             <div
               key={item.id}
@@ -442,20 +599,34 @@ export default function FarmPublicProfile() {
                 haptics.selection();
                 setSelectedItem(item);
               }}
-              className="relative aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer group shadow-2xs"
+              className="relative aspect-square bg-muted rounded-none overflow-hidden cursor-pointer group"
             >
               <img
                 src={item.imageUrl}
                 alt={item.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover rounded-none transition-transform duration-200 group-hover:scale-105"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-95 transition-opacity" />
-              <div className="absolute bottom-1.5 left-1.5 right-1.5 text-white">
-                <span className="text-[9px] font-bold px-1 py-0.5 bg-black/50 rounded-xs backdrop-blur-xs">
-                  {item.priceOrTag}
-                </span>
-                <p className="text-[10px] font-medium leading-tight truncate mt-1">
+
+              {/* Instagram Reel Icon in Top-Right Corner */}
+              {item.priceOrTag === 'Reel' && (
+                <div className="absolute top-1.5 right-1.5 pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] text-white">
+                  <Film className="w-3.5 h-3.5" />
+                </div>
+              )}
+
+              {/* Price / Tag Badge in Bottom-Left Corner */}
+              {item.priceOrTag !== 'Reel' && item.priceOrTag !== 'Story' && (
+                <div className="absolute bottom-1 left-1 pointer-events-none">
+                  <span className="text-[9px] font-bold px-1 py-0.5 bg-black/65 text-white rounded-none backdrop-blur-xs">
+                    {item.priceOrTag}
+                  </span>
+                </div>
+              )}
+
+              {/* Subtle Instagram Hover/Tap Overlay */}
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity flex items-end p-1.5 pointer-events-none">
+                <p className="text-[10px] text-white font-medium truncate leading-tight drop-shadow-sm">
                   {item.title}
                 </p>
               </div>
@@ -467,7 +638,7 @@ export default function FarmPublicProfile() {
       {/* Item Detail Sheet / Modal when clicking grid item */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-[#FDFBF7] w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+          <div className="bg-[#FDFBF7] w-full max-w-md rounded-t-2xl sm:rounded-xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
             <div className="relative aspect-video w-full bg-muted">
               <img
                 src={selectedItem.imageUrl}
@@ -476,20 +647,20 @@ export default function FarmPublicProfile() {
               />
               <button
                 onClick={() => setSelectedItem(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="absolute bottom-3 left-3">
-                <span className="text-xs font-bold px-2 py-1 rounded-sm bg-primary text-white">
+              <div className="absolute bottom-2.5 left-2.5">
+                <span className="text-xs font-bold px-2 py-0.5 bg-[#1E3A2B] text-white rounded-sm">
                   {selectedItem.priceOrTag}
                 </span>
               </div>
             </div>
 
-            <div className="p-4 space-y-3">
-              <h3 className="font-serif text-lg font-bold text-foreground">
+            <div className="p-3.5 space-y-2.5">
+              <h3 className="font-serif text-base font-bold text-foreground">
                 {selectedItem.title}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -506,13 +677,13 @@ export default function FarmPublicProfile() {
                     });
                     setSelectedItem(null);
                   }}
-                  className="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/95 transition-all shadow-xs"
+                  className="flex-1 h-9 rounded-lg bg-[#1E3A2B] text-white text-xs font-semibold hover:bg-[#1E3A2B]/90 transition-colors shadow-xs"
                 >
                   Book / Inquire Now
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="py-2.5 px-4 rounded-xl bg-secondary text-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors"
+                  className="h-9 px-3.5 rounded-lg bg-[#F3EFE6] text-[#1E3A2B] text-xs font-semibold hover:bg-[#E8E2D5] border border-[#DDD5C5] transition-colors"
                 >
                   Close
                 </button>
