@@ -61,7 +61,7 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     category: 'offers',
     title: 'Pure Forest Wildflower Honey',
     priceOrTag: '₱450',
-    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=600&q=80',
     description: 'Raw, unpasteurized honey harvested from native pukyutan bees nesting near coffee blossoms.'
   },
   {
@@ -203,7 +203,7 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     category: 'experiences',
     title: 'Coffee Tree Grafting & Planting',
     priceOrTag: '₱500/pax',
-    imageUrl: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
     description: 'Plant a tagged heirloom Robusta seedling with your family name that will grow on the estate.'
   },
   {
@@ -211,7 +211,7 @@ const MOCK_GRID_ITEMS: GridItem[] = [
     category: 'experiences',
     title: 'Honey Harvesting & Hive Inspection',
     priceOrTag: '₱750/pax',
-    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1473081556163-2a17de81fc97?auto=format&fit=crop&w=600&q=80',
     description: 'Suit up with our beekeeper to inspect stingless native bee hives and sample fresh comb.'
   },
   {
@@ -427,109 +427,16 @@ export default function FarmPublicProfile() {
             <span>Working Apiary</span>
           </div>
         </div>
-
-        {/* Resized Story Highlights (Compact 44px Instagram Story Bubbles) */}
-        <div className="max-w-md mx-auto mt-3.5 mb-1">
-          <div className="flex items-center justify-around px-2">
-            {/* Highlight 1: Offers */}
-            <button
-              onClick={() => {
-                haptics.selection();
-                setActiveTab('offers');
-              }}
-              className="flex flex-col items-center group cursor-pointer"
-            >
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                activeTab === 'offers'
-                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
-                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
-              }`}>
-                <Tag className="w-4 h-4" />
-              </div>
-              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
-                activeTab === 'offers' ? 'text-primary font-semibold' : 'text-muted-foreground'
-              }`}>
-                Offers
-              </span>
-            </button>
-
-            {/* Highlight 2: Stories */}
-            <button
-              onClick={() => {
-                haptics.selection();
-                setActiveTab('stories');
-              }}
-              className="flex flex-col items-center group cursor-pointer"
-            >
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                activeTab === 'stories'
-                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
-                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
-              }`}>
-                <Film className="w-4 h-4" />
-              </div>
-              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
-                activeTab === 'stories' ? 'text-primary font-semibold' : 'text-muted-foreground'
-              }`}>
-                Stories
-              </span>
-            </button>
-
-            {/* Highlight 3: Stays & Tours */}
-            <button
-              onClick={() => {
-                haptics.selection();
-                setActiveTab('stays');
-              }}
-              className="flex flex-col items-center group cursor-pointer"
-            >
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                activeTab === 'stays'
-                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
-                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
-              }`}>
-                <Home className="w-4 h-4" />
-              </div>
-              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
-                activeTab === 'stays' ? 'text-primary font-semibold' : 'text-muted-foreground'
-              }`}>
-                Stays & Tours
-              </span>
-            </button>
-
-            {/* Highlight 4: Experiences */}
-            <button
-              onClick={() => {
-                haptics.selection();
-                setActiveTab('experiences');
-              }}
-              className="flex flex-col items-center group cursor-pointer"
-            >
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                activeTab === 'experiences'
-                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-[#FDFBF7] bg-[#1E3A2B] text-white shadow-xs'
-                  : 'border border-[#E5DECF] bg-[#F4EFE6] text-muted-foreground group-hover:text-foreground'
-              }`}>
-                <Compass className="w-4 h-4" />
-              </div>
-              <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${
-                activeTab === 'experiences' ? 'text-primary font-semibold' : 'text-muted-foreground'
-              }`}>
-                Experiences
-              </span>
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Instagram Profile Grid Tabs Bar (Sharp lines, active indicator) */}
-      <div className="max-w-md mx-auto w-full mt-2 border-t border-border/50 grid grid-cols-4 text-center">
+      <div className="max-w-md mx-auto w-full mt-3 border-t border-border/50 grid grid-cols-4 text-center">
         <button
           onClick={() => {
             haptics.selection();
             setActiveTab('stories');
           }}
-          className={`py-2 flex items-center justify-center border-b-2 transition-colors ${
+          className={`py-2.5 flex items-center justify-center border-b-2 transition-colors ${
             activeTab === 'stories' 
               ? 'border-primary text-primary font-semibold' 
               : 'border-transparent text-muted-foreground hover:text-foreground'
